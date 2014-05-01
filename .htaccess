@@ -1,0 +1,6 @@
+
+RewriteEngine on
+
+RewriteCond %{HTTP_HOST} ^sara-project.org$
+RewriteRule ^(.*)$ "http\:\/\/www\.sara-project\.org\/$1" [R=301,L]
+
