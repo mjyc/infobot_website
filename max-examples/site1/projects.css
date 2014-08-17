@@ -1,0 +1,227 @@
+/* Imports
+*******************************************************************************/
+/* Import bootstrap */
+@import url(bootstrap.min.css);
+/* Size constants
+*******************************************************************************/
+/* Colors
+*******************************************************************************/
+/* Mixins
+*******************************************************************************/
+/* Note: SASS bug: can't use variables within CSS functions (like calc).*/
+/* Must manually set all to 50% + ($px_imgWidth + <desired padding>) */
+/* Classes
+*******************************************************************************/
+/*I think 380 is the smallest setting, but my phone is 360, so basing off of that*/
+header > .container.top {
+  max-width: 360px; }
+
+header > .container.separator {
+  width: 100%;
+  padding-top: 10px; }
+
+.spacebar {
+  /* Default */
+  border-bottom: 1px solid #cdcdcd; }
+
+.spacebar.programming {
+  border-bottom: 1px solid #ff7f00; }
+
+.spacebar.music {
+  border-bottom: 1px solid #377eb8; }
+
+.spacebar.clothes {
+  border-bottom: 1px solid #33a02c; }
+
+.spacebar.robotics {
+  border-bottom: 1px solid #984ea3; }
+
+.location {
+  font-size: 9pt;
+  padding-left: 5px; }
+
+.cats a, .cats a:visited {
+  color: #cdcdcd; }
+
+.programming a, .programming a:visited {
+  color: #ff7f00; }
+
+.music a, .music a:visited {
+  color: #377eb8; }
+
+.clothes a, .clothes a:visited {
+  color: #33a02c; }
+
+.robotics a, .robotics a:visited {
+  color: #984ea3; }
+
+body {
+  color: #cdcdcd;
+  background-color: #fcfcfc; }
+
+/* Universal styles */
+header, footer, body, h1, h2, h3, h4, h5, h6 {
+  font-family: monospace; }
+
+/* Spacing and nav links font */
+header, footer {
+  color: #cdcdcd; }
+
+.linkbar > div {
+  padding-bottom: 5px;
+  letter-spacing: 2px; }
+
+.prjLink {
+  text-align: left; }
+
+.researchLink {
+  text-align: right; }
+
+.row .research {
+  text-align: right; }
+
+.areas > div {
+  letter-spacing: 1px;
+  text-align: left; }
+
+header {
+  margin-top: 0px;
+  margin-bottom: 10px; }
+
+/* My "Max Forbes" font */
+header h1, header h1 a:hover, header h1 a {
+  color: #242625;
+  text-align: center;
+  font-family: monospace;
+  margin-bottom: 10px;
+  font-size: 29pt;
+  /*text-shadow: #111 0px 0px 10px;*/ }
+
+header h2 {
+  font-size: 18pt;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  color: #242625; }
+
+footer {
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 9pt;
+  border-top: 1px solid #cdcdcd; }
+  footer a, footer a:hover, footer a:visited {
+    color: #787878; }
+
+.content {
+  /* Centers all of the cards. */
+  text-align: center; }
+
+.content h1 {
+  margin-top: 0px;
+  font-size: 10pt;
+  font-weight: 100;
+  letter-spacing: 2px; }
+
+.content h2 {
+  font-size: 14pt;
+  margin-top: 0px;
+  font-weight: 100;
+  clear: both;
+  color: #787878; }
+
+.vertImage {
+  filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#grayscale");
+  /* Firefox 10+, Firefox on Android */
+  filter: gray;
+  /* IE6-9 */
+  -webkit-filter: grayscale(100%);
+  /* Chrome 19+, Safari 6+, Safari 6+ iOS */
+  width: 250px;
+  height: auto;
+  padding-bottom: 5px; }
+
+.simpledate {
+  font-size: 8pt;
+  text-align: left;
+  float: left; }
+
+.licon {
+  margin-right: 8px; }
+
+.ricon {
+  margin-left: 8px; }
+
+.simpleicon {
+  float: right;
+  text-align: right; }
+
+.content p {
+  /*font-family: "Helvetica Neue";*/
+  font-size: 9pt;
+  text-align: left;
+  color: #787878;
+  /* Better justify. Not in Chrome (!). */ }
+
+pre code {
+  font-size: 9pt; }
+
+.itemcontent {
+  margin: 0 auto;
+  font-size: 9pt;
+  color: #787878;
+  text-align: justify;
+  max-width: 500px; }
+  .itemcontent h1 {
+    text-align: center; }
+  .itemcontent h2, .itemcontent h3, .itemcontent h4, .itemcontent h5, .itemcontent h6 {
+    text-align: left; }
+  .itemcontent img {
+    filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='grayscale'><feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0'/></filter></svg>#grayscale");
+    /* Firefox 10+, Firefox on Android */
+    filter: gray;
+    /* IE6-9 */
+    -webkit-filter: grayscale(100%);
+    /* Chrome 19+, Safari 6+, Safari 6+ iOS */
+    /* With a small screen, show image inline. */ }
+    @media (max-width: 970px) {
+      .itemcontent img {
+        max-width: 500px;
+        text-align: center; } }
+  .itemcontent img:not(.inline) {
+    	/* For images not marked as inline, and with a big screen,
+       show image to right. */ }
+    @media (min-width: 970px) {
+      .itemcontent img:not(.inline) {
+        max-width: 200px;
+        position: absolute;
+        /* Firefox */
+        left: -moz-calc(50% + 500px / 2 + 35px);
+        /* WebKit */
+        left: -webkit-calc(50% + 500px / 2 + 35px);
+        /* Opera */
+        left: -o-calc(50% + 500px / 2 + 35px);
+        /* Standard */
+        left: calc(50% + 500px / 2 + 35px); } }
+  .itemcontent table td {
+    padding-left: 7px; }
+
+.simpleitem {
+  border-left: 1px solid #cdcdcd;
+  width: 270px;
+  margin: 50px;
+  padding: 10px;
+  display: inline-block; }
+
+/* Fix spacing for multi-level bullets. We want inner bullets closer
+   to their parents, and farther away from the next level below.*/
+p ~ ol, p ~ ul {
+  margin-top: -10px;
+  /* Not right next to, but close */
+  margin-bottom: 10px;
+  /* Get some room on the bottom! */ }
+
+/* Hoever, with the last fix, bullets that come right after headers are
+   wonky; space them out a bit.*/
+h1 ~ ol, h1 ~ ul, h2 ~ ol, h2 ~ ul, h3 ~ ol, h3 ~ ul, h4 ~ ol, h4 ~ ul, h5 ~ ol, h5 ~ ul, h6 ~ ol, h6 ~ ul {
+  margin-top: 0px;
+  /* Restore the natural space (remove negative). */ }

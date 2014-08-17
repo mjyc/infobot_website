@@ -1,0 +1,417 @@
+@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic);
+
+/* For five columns (or rather 2.4 of a 12 column grid :-): ----------*/
+
+.col-xs-5ths,
+.col-sm-5ths,
+.col-md-5ths,
+.col-lg-5ths {
+    position: relative;
+    min-height: 1px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+.col-xs-5ths {
+    width: 20%;
+    float: left;
+}
+@media (min-width: 768px) {
+.col-sm-5ths {
+        width: 20%;
+        float: left;
+    }
+}
+@media (min-width: 992px) {
+    .col-md-5ths {
+        width: 20%;
+        float: left;
+    }
+}
+@media (min-width: 1200px) {
+    .col-lg-5ths {
+        width: 20%;
+        float: left;
+    }
+}
+
+/* Settings: ---------------------------------------------------------*/
+
+/* Colorbrewer colors: */
+@orange: #fc8d59;
+@y_off_r: #fee08b;
+@yellow: #ffffbf;
+@y_off_g: #e6f598;
+@green: #91cf60;
+@dark: #3f3f3f;
+
+
+@light_1: #d6dadc;
+@light_2: #888;
+@light_25: #555;
+@light_3: #333;
+
+@c_uncompleted: @orange;
+@c_completed: @green;
+@c_text: @yellow;
+@c_bg: @dark;
+
+/* Size settings */
+@donut_height: 120px;
+
+
+/* Normal page CSS: --------------------------------------------------*/
+
+body {
+	background-color: @dark;
+	font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	color: @c_text;
+	font-size: 16pt;
+}
+
+.jumbotron {
+	background-color: @dark;
+}
+
+.sorry {
+	text-align: center;
+	font-weight: 200;
+}
+
+.bottomstuff {
+	hr {
+		border-color: @light_25;
+		margin-bottom: 5px;
+	}
+	text-align: right;
+	font-size: 12pt;
+	a {
+		color: @light_25;
+	}
+}
+
+.loginarea {
+	text-align: center;
+}
+
+.circleDiv {
+	text-align: center;
+}
+
+.progressDiv {
+	text-align: center;
+}
+
+progress {
+	width: 100%;
+}
+
+progress[value] {
+	height: 10px;
+	/* Reset the default appearance */
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+progress[value]::-webkit-progress-bar {
+	/*border-radius: 2px;*/
+	/*box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;*/
+	background-color: @light_3;
+}
+
+progress[value]::-webkit-progress-value {
+	background-color: @c_text;
+}
+
+// Hide darn number input madness
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0;  //<-- Apparently some margin are still there even though it's hidden
+}
+
+.plvlnext {
+	text-align: right;
+	color: #888;
+}
+
+.spaceRow {
+	height: 30px;
+}
+
+
+.block, .ublock, .ablock {
+	/*width: 60px;*/
+	height: 10px;
+	/*float: left;*/
+	/*margin-right: 20px;*/
+}
+
+.ublock {
+	background: @light_3;
+}
+
+.ablock {
+	background: @c_text;
+}
+
+.toptext {
+	margin-bottom: 5px;
+}
+
+.alvlnext {
+	text-align: right;
+	color: @light_3;
+}
+
+.bottomtext {
+	margin-top: 5px;
+}
+
+.donut {
+	text-align: center;
+	height: @donut_height;
+}
+
+.right {
+	text-align: right;
+}
+
+.dark {
+	color: @light_2;
+}
+
+.donutchart {
+	margin-top: 0px;
+	margin-left: auto;
+	margin-right: auto;
+	max-height: @donut_height;
+}
+
+
+/* Circle CSS stuff: -------------------------------------------------*/
+
+/* Default: */
+@media (max-width: 360px) {
+	.styleThings(50px);
+}
+/* 60px per column, minus padding... */
+@media (min-width: 361px) and (max-width: 560px) {
+	.styleThings(50px);
+}
+/* 60px per column, minus padding... */
+@media (min-width: 561px) and (max-width: 767px) {
+	.styleThings(80px);
+}
+
+/* 125px per column, minus padding... */
+@media (min-width: 768px) and (max-width: 991px) {
+	.styleThings(110px);
+}
+/* 161px per column, minus padding... */
+@media (min-width: 992px) and (max-width: 1199px) {
+	.styleThings(140px);
+}
+ // 195px per column, minus padding...
+@media (min-width: 1200px) {
+	.styleThings(170px);
+}
+
+.rp-color-mixin(@color) {
+	p, input, .percentage {
+		color: @color
+	}
+
+	.mask {
+		.fill {
+			background-color: @color;
+		}
+	}
+
+	::-webkit-input-placeholder {
+		/* WebKit browsers */
+		color:    @color;
+	}
+	:-moz-placeholder {
+		/* Mozilla Firefox 4 to 18 */
+	    color:    @color;
+	    opacity:  1;
+	}
+	::-moz-placeholder {
+		/* Mozilla Firefox 19+ */
+	    color:    @color;
+	    opacity:  1;
+	}
+	:-ms-input-placeholder {
+		/* Internet Explorer 10+ */
+	    color:    @color;
+	}
+
+	input:focus {
+	    outline-color: @color;
+	}
+
+	::-webkit-input-placeholder input:focus {
+	    outline-color: @color;
+	}
+
+	input:hover {
+	    outline-color: @color;
+	}
+}
+
+.complete {
+	.rp-color-mixin(@c_completed);
+}
+
+.uncomplete{
+	.rp-color-mixin(@c_uncompleted);
+}
+
+.radial-progress {
+	@body-bg: @c_bg;
+	@circle-background: @light_3;
+
+	/*@inset-color: #fbfbfb;*/
+
+	@inset-color: @c_bg;
+	@transition-length: 1s;
+
+	/*@shadow: 6px 6px 10px rgba(0,0,0,0.2);*/
+	@shadow: 6px 6px 10px rgba(0,0,0,0.0);
+
+	margin-top: 20px;
+	margin-bottom: 10px;
+	margin-left: auto;
+	margin-right: auto;
+
+	background-color: @circle-background;
+	border-radius: 50%;
+	.circle {
+		.mask, .fill, .shadow {
+			position: absolute;
+			border-radius: 50%;
+		}
+		.shadow {
+			box-shadow: @shadow inset;
+		}
+		.mask, .fill {
+			-webkit-backface-visibility: hidden;
+			transition: -webkit-transform @transition-length;
+			transition: -ms-transform @transition-length;
+			transition: transform @transition-length;
+			border-radius: 50%;
+		}
+		// .mask {
+		// 	.fill {
+		// 		background-color: @circle-color;
+		// 	}
+		// }
+	}
+	.inset {
+		position:    absolute;
+		background-color: @inset-color;
+		border-radius: 50%;
+		box-shadow: @shadow;
+		.percentage {
+			position:    absolute;
+			line-height: 1;
+			text-align:  center;
+			font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+			// color:       @percentage-color;
+			background-color: @body-bg;
+			font-weight: 300;
+			border: none;
+		}
+	}
+
+	@i: 0;
+	@increment: 180deg / 100;
+	.loop (@i) when (@i <= 100) {
+		&[data-progress="@{i}"] {
+			.circle {
+				.mask.full, .fill {
+					-webkit-transform: rotate(@increment * @i);
+					-ms-transform: rotate(@increment * @i);
+					transform: rotate(@increment * @i);
+				}
+				.fill.fix {
+					-webkit-transform: rotate(@increment * @i * 2);
+					-ms-transform: rotate(@increment * @i * 2);
+					transform: rotate(@increment * @i * 2);
+				}
+			}
+			.inset .percentage:before {
+				content: "@{i}"
+			}
+		}
+		.loop(@i + 1);
+	}
+	.loop(@i);
+}
+
+.styleThings(@cw) {
+	@clBase: 5;
+	@bodyBase: 10;
+
+	body {
+		font-size: (@cw / 14 + @bodyBase);
+	}
+
+	.circleLabel {
+		font-size: (@cw / 14 + @clBase);
+	}
+
+	.bcol {
+		@bpad: (17 - 340 / @cw);
+		padding-left: @bpad;
+		padding-right: @bpad;
+	}
+
+	.bcol.first {
+		padding-left: 15px;
+	}
+
+	.bcol.last {
+		padding-right: 15px;
+	}
+
+	.radial-progress {
+		@circle-size: @cw;
+		/*@circle-size: 120px;*/
+
+		@inset-size: (@circle-size * (3/4));
+
+		@percentage-font-size: (@circle-size / 4);
+		@percentage-text-width: (@circle-size / 2);
+		/*@percentage-font-size: 22px;*/
+		/*@percentage-text-width: 57px;*/
+
+		width:  @circle-size;
+		height: @circle-size;
+		.circle {
+			.mask, .fill, .shadow {
+				width:    @circle-size;
+				height:   @circle-size;
+			}
+			.mask {
+				clip: rect(0px, @circle-size, @circle-size, @circle-size/2);
+				.fill {
+					clip: rect(0px, @circle-size/2, @circle-size, 0px);
+				}
+			}
+		}
+		.inset {
+			width:       @inset-size;
+			height:      @inset-size;
+			margin-left: (@circle-size - @inset-size)/2;
+			margin-top:  (@circle-size - @inset-size)/2;
+			.percentage {
+				width:       @percentage-text-width;
+				top:         (@inset-size - @percentage-font-size) / 2;
+				left:        (@inset-size - @percentage-text-width) / 2;
+				font-size:   @percentage-font-size;
+			}
+		}
+	}
+}
