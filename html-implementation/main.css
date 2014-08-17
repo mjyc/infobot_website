@@ -1,0 +1,55 @@
+body {
+  /*padding-top: 50px;*/
+  padding-bottom: 20px;
+  /*background-color: #f2f2f2;*/
+  /*margin: 0px auto;*/
+}
+
+h1, h2, h3, h4 {
+  text-align: center;
+}
+
+@media(max-width:767px) {
+  .submit_question_btn {
+    width: 100%;
+  }
+}
+@media(min-width:768px){
+  /*.submit_question_btn {
+    float: right;
+  }*/
+}
+@media(min-width:992px){
+  /*.submit_question_btn {
+    width: 25%;
+  }*/
+}
+@media(min-width:1200px){
+  /*.submit_question_btn {
+    width: 1%;
+  }*/
+}
+
+.right-inner-addon {
+    position: relative;
+}
+.right-inner-addon input {
+    padding-right: 30px;
+}
+.right-inner-addon i {
+    position: absolute;
+    right: 0px;
+    padding: 10px 10px;
+    pointer-events: none;
+}
+
+.md-width {
+  max-width: 500px; margin-left: auto; margin-right: auto;
+}
+.pad-top-10 {
+  padding-top: 10px;
+}
+.pad-tb-10 {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}

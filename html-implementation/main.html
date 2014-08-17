@@ -11,69 +11,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="css/bootstrap.min.css">
-        <style>
-            body {
-                /*padding-top: 50px;*/
-                padding-bottom: 20px;
-                /*background-color: #f2f2f2;*/
-                /*margin: 0px auto;*/
-            }
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
 
-            h1, h2, h3, h4 {
-              text-align: center;
-            }
-
-            @media(max-width:767px) {
-              .submit_question_btn {
-                width: 100%;
-              }
-            }
-            @media(min-width:768px){
-              /*.submit_question_btn {
-                float: right;
-              }*/
-            }
-            @media(min-width:992px){
-              /*.submit_question_btn {
-                width: 25%;
-              }*/
-            }
-            @media(min-width:1200px){
-              /*.submit_question_btn {
-                width: 1%;
-              }*/
-            }
-
-            .right-inner-addon {
-                position: relative;
-            }
-            .right-inner-addon input {
-                padding-right: 30px;
-            }
-            .right-inner-addon i {
-                position: absolute;
-                right: 0px;
-                padding: 10px 10px;
-                pointer-events: none;
-            }
-
-            .md-width {
-              max-width: 500px; margin-left: auto; margin-right: auto;
-            }
-            .pad-top-10 {
-              padding-top: 10px
-            }
-            .pad-tb-10 {
-              padding-top: 10px
-              padding-bottom: 10px
-            }
-
-
-        </style>
-        <!-- <link rel="stylesheet" href="css/bootstrap-theme.min.css"> -->
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-        <link rel="stylesheet" href="css/main.css">
-
+        <!-- CUSTOM -->
+        <link rel="stylesheet" href="main.css">
         <link href="bootstrap-timepicker.min.css" rel="stylesheet">
 
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
@@ -102,7 +43,7 @@
       </div>
     </div> -->
 
-    <div class="container global-container">
+    <div class="container md-width">
 
 
       <h1> Ask DUB-E </h1>
@@ -111,7 +52,7 @@
       <div class="row">
         <form role="form">
           <div class="col-xs-12">
-            <div class="form-group  right-inner-addon">
+            <div class="form-group right-inner-addon">
               <i class="glyphicon glyphicon-question-sign form-control-feedback"></i>
               <input type="text" class="form-control" id="id_userquery-querytext" placeholder="Type question here">
             </div>
@@ -136,14 +77,14 @@
       </div>
 
 
-      <ul class="nav nav-tabs tab-main" role="tablist">
+      <ul class="nav nav-tabs pad-top-10" role="tablist">
         <li class="active"><a href="#">{{user}}</a></li>
         <li><a href="#">Question Feed</a></li>
         <li><a href="#">DUB-E</a></li>
       </ul>
 
 
-      <div class="row contents-main">
+      <div class="row pad-top-10">
 
         <div class="col-xs-12">
 
@@ -154,7 +95,7 @@
               <div class="row">
                 <p class="list-group-item-text col-xs-6">Today 10:05am</p>
                 <p class="list-group-item-text col-xs-6" align="right">in queue</p>
-                <p class="list-group-item-text col-xs-12" style="padding-top: 10px; padding-bottom: 10px">@user: Is Aleesha in her office?</p>
+                <p class="list-group-item-text col-xs-12 pad-tb-10">@user: Is Aleesha in her office?</p>
                 <p class="list-group-item-text col-xs-6">Deadline: 10:20am</p>
                 <div class="col-xs-6" align="right">
                   <button type="button" class="btn btn-primary">Cancel</button>
@@ -164,11 +105,11 @@
 
             <div class="list-group-item">
               <img src="./Image_view_example_resized.png" class="img-thumbnail" alt="Result" style="width: 100%; height: auto;">
-              <div style="padding-bottom: 10px"></div>
+              <div class="pad-top-10"></div>
               <div class="row">
                 <p class="list-group-item-text col-xs-6">Yesterday 1:30pm</p>
                 <p class="list-group-item-text col-xs-6" align="right">success</p>
-                <p class="list-group-item-text col-xs-12" style="padding-top: 10px; padding-bottom: 10px">@user: Is there food in the kitchen?</p>
+                <p class="list-group-item-text col-xs-12 pad-tb-10">@user: Is there food in the kitchen?</p>
               </div>
             </div>
 
@@ -176,7 +117,7 @@
               <div class="row">
                 <p class="list-group-item-text col-xs-6">Yesterday 10:05am</p>
                 <p class="list-group-item-text col-xs-6" align="right">failed</p>
-                <p class="list-group-item-text col-xs-12" style="padding-top: 10px; padding-bottom: 10px">@user: Is CSE403 in use?</p>
+                <p class="list-group-item-text col-xs-12 pad-tb-10">@user: Is CSE403 in use?</p>
               </div>
             </div>
           </div>
@@ -189,8 +130,7 @@
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.0.min.js"><\/script>')</script> -->
         <script src="js/vendor/jquery-1.11.0.min.js"></script>
 
-        <!-- <script src="js/vendor/bootstrap.min.js"></script> -->
-        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="js/vendor/bootstrap.min.js"></script>
 
         <script src="bootstrap-timepicker.js"></script>
 
