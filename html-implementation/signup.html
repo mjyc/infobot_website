@@ -51,47 +51,43 @@
       </div>
     </div>
 
-    <div class="container">
-      <!-- Example row of columns -->
+     <div class="container">
       <div class="row">
+        <div class="col-sm-2 col-md-3"></div>
 
-        <div class="col-md-3"></div>
         <!-- CONTENTS -->
-        <form class="container col-md-6 form" action="{% url 'signin' %}" method="post">
-
+        <div class="col-sm-8 col-md-6 form">
           <h1>Sign Up</h1>
           <p>Use DUB-E to check out what is going on in CSE today!</p>
 
-          <!-- THIS CAN BE A LOOP -->
+          <form role="form">
+            <!-- Name -->
+            <div class="form-group">
+                <label for="id_fullname">Name</label>
+                <input type="text" class="form-control" id="id_userprofile-fullname" maxlength="30" placeholder="First and Last Name">
+                <p class="help-block">A name is required. </p>
+                <p class="help-block">30 characters or fewer. Letters, digits and @/./+/-/_ only. </p>
+            </div>
 
-          <!-- Name -->
-          <div class="form-group">
-              <label for="id_fullname" class="control-label">Name</label>
-              <input class="form-control" id="id_baseprofile-fullname" maxlength="30" name="baseprofile-fullname" type="text">
-              <p class="help-block">A name is required. </p>
-              <p class="help-block">30 characters or fewer. Letters, digits and @/./+/-/_ only. </p>
-          </div>
+            <!-- EMAIL -->
+            <div class="form-group">
+              <label for="id_email">Email</label>
+              <input type="email" class="form-control" id="id_userprofile-email" placeholder="Email">
+              <p class="help-block">Doesn't look like a valid email.</p>
+              <p class="help-block">What's your email address?</p>
+            </div>
 
-          <!-- EMAIL -->
-          <div class="form-group">
-            <label for="id_email" class="control-label">Email</label>
-            <input class="form-control" id="id_baseprofile-email" name="baseprofile-email" type="email">
-            <p class="help-block">Doesn't look like a valid email.</p>
-            <p class="help-block">What's your email address?</p>
-          </div>
+            <!-- PASSWORD -->
+            <div class="form-group">
+              <label for="id_password">Password</label>
+              <input type="password" class="form-control" id="id_userprofile-password"  placeholder="Password">
+              <p class="help-text"> </p>
+            </div>
 
-          <!-- PASSWORD -->
-          <div class="form-group">
-            <label for="id_password" class="control-label">Password</label>
-            <input class="form-control" id="id_baseprofile-password" name="baseprofile-password" type="password">
-            <p class="help-text"> </p>
-          </div>
-
-          <!-- <button class="btn btn-inverse btn-lg btn-register" href="/signup">Sign up</button> -->
-          <button class="btn btn-inverse btn-lg btn-register" href="/signup">Sign up</button>
-
-        </form>
-        <div class="col-md-3"></div>
+            <!-- Submit -->
+            <button class="btn btn-warning" href="/signup">Sign up</button>
+          </form>
+        </div>
 
 
       </div>

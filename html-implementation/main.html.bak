@@ -16,7 +16,6 @@
                 /*padding-top: 50px;*/
                 padding-bottom: 20px;
                 /*background-color: #f2f2f2;*/
-                /*margin: 0px auto;*/
             }
 
             h1, h2, h4 {
@@ -76,8 +75,7 @@
             }
 
         </style>
-        <!-- <link rel="stylesheet" href="css/bootstrap-theme.min.css"> -->
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="css/main.css">
 
         <link href="bootstrap-timepicker.min.css" rel="stylesheet">
@@ -108,7 +106,7 @@
       </div>
     </div> -->
 
-    <div class="container" style="max-width: 500px; margin-left: auto; margin-right: auto;">
+    <div class="container">
       <!-- Example row of columns -->
       <div class="row">
         <form role="form">
@@ -123,9 +121,9 @@
           </div>
 
           <div class="col-xs-5 col-sm-4" align="right">
-            <button type="button" class="btn btn-default btn-small">SMS</button>
+            <button type="button" class="btn btn-success btn-small active">SMS</button>
             &nbsp;&nbsp;
-            <button type="button" class="btn btn-default btn-small active">Email</button>
+            <button type="button" class="btn btn-default btn-small">Email</button>
           </div>
 
           <div class="col-xs-7 col-sm-4">
@@ -149,14 +147,9 @@
       </div>
 
       <div class="row">
+        <div class="col-xs-12 col-sm-6 your_questions">
 
-        <ul class="nav nav-tabs" role="tablist">
-          <li class="active"><a href="#">{{user}}</a></li>
-          <li><a href="#">Profile</a></li>
-          <li><a href="#">Messages</a></li>
-        </ul>
-
-        <div class="col-xs-12" style="padding-top: 30px">
+          <h4> {{user}}'s questions </h4>
 
           <!-- <div class="list-group">
             <div class="list-group-item">
@@ -178,7 +171,7 @@
                 <p class="col-xs-12" style="padding-top: 10px; padding-bottom: 10px">@user: Is Aleesha in her office?</p>
                 <p class="col-xs-6">Deadline: 10:20am</p>
                 <div class="col-xs-6" align="right">
-                  <button type="button" class="btn btn-primary">Cancel</button>
+                  <button type="button" class="btn btn-danger">Cancel</button>
                 </div>
               </div>
             </div>
@@ -273,7 +266,7 @@
           <div class="post">
             <p>Today 10:05am</p>
             <p>in queue</p>
-            <p>@maya: Is Aleesha in her office?</pboot>
+            <p>@maya: Is Aleesha in her office?</p>
             <p>Deadline: 10:20am</p>
             <p>Cancel</p>
           </div>
@@ -285,8 +278,7 @@
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.0.min.js"><\/script>')</script> -->
         <script src="js/vendor/jquery-1.11.0.min.js"></script>
 
-        <!-- <script src="js/vendor/bootstrap.min.js"></script> -->
-        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="js/vendor/bootstrap.min.js"></script>
 
         <script src="bootstrap-timepicker.js"></script>
 
