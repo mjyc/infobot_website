@@ -10,14 +10,14 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" href="../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="../public/css/bootstrap.min.css">
+        <!-- <link rel="stylesheet" href="../public/css/bootstrap-theme.min.css"> -->
 
         <!-- Place favicon.ico and apple-touch-icon(s) in the root directory -->
 
-        <link rel="stylesheet" href="../css/normalize.css">
-        <link rel="stylesheet" href="../css/main.css">
-        <script src="../js/vendor/modernizr-2.8.3.min.js"></script>
+        <link rel="stylesheet" href="../public/css/normalize.css">
+        <link rel="stylesheet" href="../public/css/main.css">
+        <script src="../public/js/vendor/modernizr-2.8.3.min.js"></script>
     </head>
     <body>
         <!--[if lt IE 8]>
@@ -33,9 +33,15 @@
           <div class="row">
             <form role="form">
               <div class="col-xs-12">
-                <div class="form-group right-inner-addon">
-                  <i class="glyphicon glyphicon-question-sign form-control-feedback"></i>
-                  <input type="text" class="form-control" id="id_userquery-querytext" placeholder="Type question here">
+                <div class="form-group">
+                  <div class="right-inner-addon">
+                    <i class="glyphicon glyphicon-question-sign"></i>
+                    <input type="text" class="form-control" id="id_userquery-querytext" placeholder="Type question here">
+                  </div>
+                  <!-- <div class="input-group">
+                    <span class="glyphicon glyphicon-question-sign form-control-feedback"></span>
+                    <input type="text" class="form-control" id="id_userquery-querytext" placeholder="Type question here">
+                  </div> -->
                 </div>
               </div>
               <div class="col-xs-5 col-sm-4" align="right">
@@ -118,9 +124,9 @@
         </div>
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="../js/vendor/jquery-1.11.1.min.js"><\/script>')</script>
-        <script src="../js/plugins.js"></script>
-        <script src="../js/main.js"></script>
+        <script>window.jQuery || document.write('<script src="../public/js/vendor/jquery-1.11.1.min.js"><\/script>')</script>
+        <script src="../public/js/plugins.js"></script>
+        <script src="../public/js/main.js"></script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>

@@ -1,0 +1,54 @@
+extends layout
+
+block content
+  .container.main-width
+    h1  Ask DUB-E
+    .row
+      form(role="form")
+        .col-xs-12
+          .form-group
+            .right-inner-addon
+              i.glyphicon.glyphicon-question-sign
+              input#id_userquery-querytext.form-control(type="text", placeholder="Type question here")
+        .col-xs-5.col-sm-4(align="right")
+          button.btn.btn-default.btn-small(type="button") SMS
+          | &nbsp;&nbsp;&nbsp;&nbsp;
+          button.btn.btn-default.btn-small.active(type="button") Email
+        .col-xs-7.col-sm-4
+          .form-group
+            #timepickerdiv.input-group.input-group-sm.bootstrap-timepicker
+              input#timepicker1.form-control(type="text")
+              span.input-group-addon
+                i.glyphicon.glyphicon-time
+        .col-xs-12.col-sm-4(align="left")
+          button.btn.btn-primary.btn-submitquestion Submit Question
+    ul.nav.nav-tabs.pad-top(role="tablist")
+      li.active
+        a(href="#") {{user}}
+      li
+        a(href="#") Question Feed
+      li
+        a(href="#") Find DUB-E
+    .row.pad-top
+      .col-xs-12
+        .list-group
+          .list-group-item
+            .row
+              p.list-group-item-text.col-xs-6 Today 10:05am
+              p.list-group-item-text.col-xs-6(align="right") in queue
+              p.list-group-item-text.col-xs-12.pad-tb @{{user}}: Is Aleesha in her office?
+              p.list-group-item-text.col-xs-6 Deadline: 10:20am
+              .col-xs-6(align="right")
+                button.btn.btn-primary(type="button") Cancel
+          .list-group-item
+            img.img-thumbnail(src="img/Image_view_example_resized.png", alt="Result", style="width: 100%; height: auto;")
+            .pad-top
+            .row
+              p.list-group-item-text.col-xs-6 Yesterday 1:30pm
+              p.list-group-item-text.col-xs-6(align="right") success
+              p.list-group-item-text.col-xs-12.pad-tb @{{user}}: Is there food in the kitchen?
+          .list-group-item
+            .row
+              p.list-group-item-text.col-xs-6 Yesterday 10:05am
+              p.list-group-item-text.col-xs-6(align="right") failed
+              p.list-group-item-text.col-xs-12.pad-tb @{{user}}: Is CSE403 in use?

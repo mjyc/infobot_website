@@ -2,6 +2,7 @@
 
 body {
   padding-bottom: 20px;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
 h1 {
   text-align: center;
@@ -41,6 +42,9 @@ h1 {
     font-size: 1.17em;
     margin-before: 1em;
     margin-after: 1em;
+    font-size: 1.5em;
+    margin-before: 0.83em;
+    margin-after: 0.83em;
   }
   .btn-submitquestion {
     width: 100%;
@@ -48,9 +52,12 @@ h1 {
 }
 @media (min-width: 768px) {
   h1 {
-    font-size: 1.5em;
+    /*font-size: 1.5em;
     margin-before: 0.83em;
-    margin-after: 0.83em;
+    margin-after: 0.83em;*/
+    font-size: 2em;
+    margin-before: 0.67em;
+    margin-after: 0.67em;
   }
   .main-width {
     max-width: 700px;
@@ -58,7 +65,7 @@ h1 {
     margin-right: auto;
   }
 }
-@media (min-width: 992px) {
+/*@media (min-width: 992px) {
   h1 {
     font-size: 2em;
     margin-before: 0.67em;
@@ -70,3 +77,4 @@ h1 {
     margin-right: auto;
   }
 }
+*/
