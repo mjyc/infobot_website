@@ -1,0 +1,74 @@
+extends layout
+
+block content
+  //- NAVBAR HEADER
+  .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
+    .container
+      .navbar-header
+        button.navbar-toggle(type="button", data-toggle="collapse", data-target=".navbar-collapse")
+          span.sr-only Toggle navigation
+          span.icon-bar
+          span.icon-bar
+          span.icon-bar
+      .navbar-collapse.collapse
+        ul.nav.navbar-nav
+          li
+            a(href="#") Ask DUB-E
+          li
+            a(href="#") Question Feed
+          li
+            a(href="#") Where's DUB-E?
+
+  //- JUMBOTRON
+  .jumbotron
+    .container
+      h1 Ask DUB-E
+      //- p
+      //-   | Ask DUB-E to see what is going on in CSE today!
+      .row
+        form(role="form")
+          //- .col-xs-12
+          .form-group
+            .right-inner-addon
+              i.glyphicon.glyphicon-question-sign
+              input#id_userquery-querytext.form-control(type="text", placeholder="Type question here")
+          //- .col-xs-12(align="left")
+          .form-inline
+            button.btn.btn-primary.btn-lg Submit Question
+            | &nbsp;&nbsp;&nbsp;&nbsp;
+            button.btn.btn-default.btn-small(type="button") SMS
+            | &nbsp;&nbsp;&nbsp;&nbsp;
+            button.btn.btn-default.btn-small.active(type="button") Email
+            | &nbsp;&nbsp;&nbsp;&nbsp;
+            .form-group
+              #timepickerdiv.input-group.input-group-sm.bootstrap-timepicker
+                input#timepicker1.form-control(type="text")
+                span.input-group-addon
+                  i.glyphicon.glyphicon-time
+
+  //- MAIN CONTENTS
+  .container
+    .row
+      .col-xs-12
+        .list-group
+          .list-group-item
+            .row
+              p.list-group-item-text.col-xs-6 Today 10:05am
+              p.list-group-item-text.col-xs-6(align="right") in queue
+              p.list-group-item-text.col-xs-12 @{{user}}: Is Aleesha in her office?
+              p.list-group-item-text.col-xs-6 Deadline: 10:20am
+              .col-xs-6(align="right")
+                button.btn.btn-primary(type="button") Cancel
+          .list-group-item
+            img.img-thumbnail(src="img/Image_view_example_resized.png", alt="Result", style="width: 100%; height: auto;")
+
+            .row
+              p.list-group-item-text.col-xs-6 Yesterday 1:30pm
+              p.list-group-item-text.col-xs-6(align="right") success
+              p.list-group-item-text.col-xs-12 @{{user}}: Is there food in the kitchen?
+          .list-group-item
+            .row
+              p.list-group-item-text.col-xs-6 Yesterday 10:05am
+              p.list-group-item-text.col-xs-6(align="right") failed
+              p.list-group-item-text.col-xs-12 @{{user}}: Is CSE403 in use?
+
