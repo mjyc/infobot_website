@@ -4,25 +4,23 @@ block content
   //- JUMBOTRON
   .jumbotron(style="padding-top: 70px; padding-bottom: 20px;")
     .container
-      //- h1 Ask DUB-E
-      //- p DUB-E can answer questions about CSE. The more you use it, there will be more questions DUB-E can answer in future!
-      form(role="form")
+      form#submitQuestion(role="form")
         .form-group
           .right-inner-addon
             i.glyphicon.glyphicon-question-sign
-            input#id_userquery-querytext.form-control(type="text", placeholder="Type question here")
+            input#inputTypedCmd.form-control(type="text", placeholder="Type question here")
         .form-inline
-            button.btn.btn-primary.btn-lg Submit Question
+            button#btnSubmitQuestion.btn.btn-primary.btn-lg Submit Question
             | &nbsp;&nbsp;&nbsp;&nbsp;
-            button.btn.btn-default.btn-small(type="button") SMS
+            button#btnToggleSMS.btn.btn-default.btn-small(type="button" data-toggle="button") SMS
             | &nbsp;&nbsp;&nbsp;&nbsp;
-            button.btn.btn-default.btn-small.active(type="button") Email
-            | &nbsp;&nbsp;&nbsp;&nbsp;
-            .form-group
-              #timepickerdiv.input-group.input-group-sm.bootstrap-timepicker
-                input#timepicker1.form-control(type="text")
-                span.input-group-addon
-                  i.glyphicon.glyphicon-time
+            button#btnToggleEmail.btn.btn-default.btn-small(type="button" data-toggle="button") Email
+            //- | &nbsp;&nbsp;&nbsp;&nbsp;
+            //- .form-group
+            //-   .input-group.input-group-sm.bootstrap-timepicker
+            //-     input#inputDeadline.form-control(type="text")
+            //-     span.input-group-addon
+            //-       i.glyphicon.glyphicon-time
 
   //- MAIN CONTENTS
   .container

@@ -10,7 +10,7 @@ var passport = require('passport');
 var session = require('express-session');
 // Locals
 var routes = require('./routes/index');
-var users = require('./routes/users');
+var queryjobs = require('./routes/queryjobs');
 var configDB = require('./config/database.js');
 
 // DB and passport setups
@@ -35,9 +35,7 @@ app.use(passport.initialize());
 app.use(passport.session());  // persistent login sessions
 
 app.use('/', routes);
-app.use('/users', users);
-
-// require('./routes/routes.js')(app, passport); // passport
+app.use('/queryjobs', queryjobs);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {

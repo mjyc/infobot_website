@@ -2,9 +2,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 
-// =====================================================================
-// Helper Function
-// =====================================================================
+// Helper Function =====================================================
 
 // Route middleware to ensure user is logged in
 function isLoggedIn(req, res, next) {
@@ -14,9 +12,7 @@ function isLoggedIn(req, res, next) {
     res.redirect('/');
 }
 
-// =====================================================================
-// Routes
-// =====================================================================
+// Routes ==============================================================
 
 // Login
 router.get('/', function(req, res) {
@@ -50,9 +46,7 @@ router.get('/logout', function(req, res) {
     res.redirect('/');
 });
 
-// =====================================================================
-// Authenticate (First Login)
-// =====================================================================
+// Authenticate (First Login) ==========================================
 
 // Google
 
@@ -68,9 +62,7 @@ router.get('/auth/google/callback',
         failureRedirect: '/'
     }));
 
-// =====================================================================
-// Authorize (Already Logged In / Connecting Other Social Account)
-// =====================================================================
+// Authorize (Already Logged In / Connecting Other Social Account) =====
 
 // Google
 
@@ -86,9 +78,7 @@ router.get('/connect/google/callback',
         failureRedirect: '/'
     }));
 
-// =====================================================================
-// Unlink Accounts
-// =====================================================================
+// Unlink Accounts =====================================================
 
 // Google
 router.get('/unlink/google', isLoggedIn, function(req, res) {
