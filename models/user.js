@@ -3,7 +3,8 @@ var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 
 // define the schema for our user model
-var userSchema = mongoose.Schema({
+var Schema   = mongoose.Schema;
+var userSchema = Schema({
 
     google           : {
         id           : String,
@@ -11,19 +12,12 @@ var userSchema = mongoose.Schema({
         email        : String,
         name         : String
     }
+    // ,
 
+    // queryjob_hitory : [{
+    //     queryjob_id : {type: Schema.ObjectId, required: true}
+    // }]
 });
-
-// NOTE(mjyc): don't need this since I'm not use local account.
-// // generating a hash
-// userSchema.methods.generateHash = function(password) {
-//     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-// };
-
-// // checking if password is valid
-// userSchema.methods.validPassword = function(password) {
-//     return bcrypt.compareSync(password, this.local.password);
-// };
 
 // create the model for users and expose it to our app
 module.exports = mongoose.model('User', userSchema);

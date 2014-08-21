@@ -1,39 +1,17 @@
 extends layout
 
 block content
-  //- NAVBAR HEADER
-  .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
-    .container
-      .navbar-header
-        button.navbar-toggle(type="button", data-toggle="collapse", data-target=".navbar-collapse")
-          span.sr-only Toggle navigation
-          span.icon-bar
-          span.icon-bar
-          span.icon-bar
-      .navbar-collapse.collapse
-        ul.nav.navbar-nav
-          li
-            a(href="#") Ask DUB-E
-          li
-            a(href="#") Question Feed
-          li
-            a(href="#") Where's DUB-E?
-
   //- JUMBOTRON
-  .jumbotron
+  .jumbotron(style="padding-top: 70px; padding-bottom: 20px;")
     .container
-      h1 Ask DUB-E
-      //- p
-      //-   | Ask DUB-E to see what is going on in CSE today!
-      .row
-        form(role="form")
-          //- .col-xs-12
-          .form-group
-            .right-inner-addon
-              i.glyphicon.glyphicon-question-sign
-              input#id_userquery-querytext.form-control(type="text", placeholder="Type question here")
-          //- .col-xs-12(align="left")
-          .form-inline
+      //- h1 Ask DUB-E
+      //- p DUB-E can answer questions about CSE. The more you use it, there will be more questions DUB-E can answer in future!
+      form(role="form")
+        .form-group
+          .right-inner-addon
+            i.glyphicon.glyphicon-question-sign
+            input#id_userquery-querytext.form-control(type="text", placeholder="Type question here")
+        .form-inline
             button.btn.btn-primary.btn-lg Submit Question
             | &nbsp;&nbsp;&nbsp;&nbsp;
             button.btn.btn-default.btn-small(type="button") SMS

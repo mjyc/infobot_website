@@ -1,24 +1,36 @@
 module.exports = function(app, passport) {
 
-    // normal routes ==========================================================
+    // ========================================================================
+    // NORMAL =================================================================
+    // ========================================================================
 
-    // show the home page (will also have our login links)
+    // login
     app.get('/', function(req, res) {
         if (req.isAuthenticated())
             res.redirect('/home')
         else
-            res.render('login.jade');
+            res.render('login.jade', {
+                isAuthenticated: req.isAuthenticated()
+            });
     });
 
-    // PROFILE SECTION =========================
+    // home
     app.get('/home', isLoggedIn, function(req, res) {
-        console.log(req.user);
         res.render('home.jade', {
+            isAuthenticated: req.isAuthenticated(),
             user: req.user
         });
     });
 
-    // LOGOUT ==============================
+    // map
+    app.get('/map', isLoggedIn, function(req, res) {
+        res.render('map.jade', {
+            isAuthenticated: req.isAuthenticated(),
+            user: req.user
+        });
+    });
+
+    // logout
     app.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/');
@@ -28,7 +40,7 @@ module.exports = function(app, passport) {
     // AUTHENTICATE (FIRST LOGIN) =============================================
     // ========================================================================
 
-    // google ---------------------------------
+    // Google
 
     // send to google to do the authentication
     app.get('/auth/google', passport.authenticate('google', {
@@ -46,7 +58,7 @@ module.exports = function(app, passport) {
     // AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) ========
     // ========================================================================
 
-    // google ---------------------------------
+    // Google
 
     // send to google to do the authentication
     app.get('/connect/google', passport.authorize('google', {
@@ -65,9 +77,9 @@ module.exports = function(app, passport) {
     // ========================================================================
     // used to unlink accounts. for social accounts, just remove the token
     // for local account, remove email and password
-    // user account will stay active in case they want to reconnect in the future
+    // user account will stay active in case they want to reconnect in future
 
-    // google ---------------------------------
+    // Google
     app.get('/unlink/google', isLoggedIn, function(req, res) {
         var user = req.user;
         user.google.token = undefined;
