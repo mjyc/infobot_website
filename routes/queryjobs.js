@@ -17,8 +17,17 @@ router.post('/addqueryjob', function(req, res) {
 
   console.log(req.user);
 
-  // var newQueryJob = new QueryJob();
-  // newQueryJob.user_id = req.user
+  var newQueryJob = new QueryJob();
+  newQueryJob.user_id = req.user._id;
+  newQueryJob.timeissued = req.body.timeissued;  // new Date();
+  newQueryJob.typed_cmd = req.body.typed_cmd;
+  console.log(newQueryJob);
+
+  newQueryJob.save(function(err) {
+    res.send(
+      (err === null) ? { msg: '' } : { msg: err }
+    );
+  });
 
 
   // // if the user is not already logged in:

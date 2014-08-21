@@ -13,7 +13,7 @@ var userSchema = mongoose.Schema({
   },
 
   queryjob_hitory : [{
-    queryjob_id : { type: mongoose.Schema.ObjectId, required: true }
+    queryjob_id : {type: mongoose.Schema.ObjectId, required: true}
   }]
 });
 
