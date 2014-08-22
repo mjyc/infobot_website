@@ -37,11 +37,6 @@ $(document).ready(function() {
 function submitQuestion(event) {
     event.preventDefault();
 
-    console.log("Hello");
-    console.log($('#submitQuestion input#inputTypedCmd').val());
-    console.log($('#submitQuestion button#btnToggleSMS').hasClass('active'));
-    console.log($('#submitQuestion button#btnToggleEmail').hasClass('active'));
-
     // get toggle state and other state
     // then send to the server
 
@@ -59,6 +54,8 @@ function submitQuestion(event) {
             // 'user_id': $('#submitQuestion input#inputUserName').val(),
             // 'notification_type': $('#submitQuestion input#inputUserEmail').val(),
             'timeissued': new Date(),
+            'notification_sms': $('#submitQuestion button#btnToggleSMS').hasClass('active'),
+            'notification_sms': $('#submitQuestion button#btnToggleEmail').hasClass('active'),
             'typed_cmd': $('#submitQuestion input#inputTypedCmd').val(),
             // 'ros_cmd': $('#submitQuestion input#inputUserGender').val()
         }

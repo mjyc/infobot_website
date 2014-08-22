@@ -10,11 +10,11 @@ block content
             i.glyphicon.glyphicon-question-sign
             input#inputTypedCmd.form-control(type="text", placeholder="Type question here")
         .form-inline
-            button#btnSubmitQuestion.btn.btn-primary.btn-lg Submit Question
+            button#btnSubmitQuestion.btn.btn-primary Submit Question
             | &nbsp;&nbsp;&nbsp;&nbsp;
-            button#btnToggleSMS.btn.btn-default.btn-small(type="button" data-toggle="button") SMS
+            button#btnToggleSMS.btn.btn-default.btn-sm(type="button", data-toggle="button") SMS
             | &nbsp;&nbsp;&nbsp;&nbsp;
-            button#btnToggleEmail.btn.btn-default.btn-small(type="button" data-toggle="button") Email
+            button#btnToggleEmail.btn.btn-default.btn-sm(type="button", data-toggle="button") Email
             //- | &nbsp;&nbsp;&nbsp;&nbsp;
             //- .form-group
             //-   .input-group.input-group-sm.bootstrap-timepicker
@@ -26,25 +26,79 @@ block content
   .container
     .row
       .col-xs-12
-        .list-group
-          .list-group-item
-            .row
-              p.list-group-item-text.col-xs-6 Today 10:05am
-              p.list-group-item-text.col-xs-6(align="right") in queue
-              p.list-group-item-text.col-xs-12 @{{user}}: Is Aleesha in her office?
-              p.list-group-item-text.col-xs-6 Deadline: 10:20am
-              .col-xs-6(align="right")
-                button.btn.btn-primary(type="button") Cancel
-          .list-group-item
-            img.img-thumbnail(src="img/Image_view_example_resized.png", alt="Result", style="width: 100%; height: auto;")
+        p.col-sm-10
+          span(style="display: inline-block; color: gray;") Today at 10:05am &nbsp;&nbsp;
+          span(style="display: inline-block;")
+            b #{user.google.name}: &nbsp;
+            | Is Aleesha in her office?
+          span(style="display: inline-block;") Deadline: 10:20am
+        p.col-sm-2(align="right")
+          button.btn.btn-default.btn-xs(type="button") in queue
+        .col-xs-12
+          button.btn.btn-default(type="button") Cancel
 
-            .row
-              p.list-group-item-text.col-xs-6 Yesterday 1:30pm
-              p.list-group-item-text.col-xs-6(align="right") success
-              p.list-group-item-text.col-xs-12 @{{user}}: Is there food in the kitchen?
-          .list-group-item
-            .row
-              p.list-group-item-text.col-xs-6 Yesterday 10:05am
-              p.list-group-item-text.col-xs-6(align="right") failed
-              p.list-group-item-text.col-xs-12 @{{user}}: Is CSE403 in use?
+      .col-xs-12(style="padding-top: 20px")
+        p.col-sm-10
+          b #{user.google.name}: &nbsp;
+          span(style="color: gray;") Today at 10:05am
+          span &nbsp;&nbsp; Is Aleesha in her office?
+          br
+          span Deadline: 10:20am
+        p.col-sm-2(align="right")
+          button.btn.btn-default.btn-xs(type="button") in queue
+        p.col-sm-12
+          b DUB-E
+          span(style="color: gray;") &nbsp;&nbsp; Today at 10:05am
+          span &nbsp;&nbsp; Yes (accuracy %10)
+        .col-xs-12
+          button.btn.btn-default(type="button") Cancel
+
+      .col-xs-12(style="padding-top: 20px")
+        p.col-xs-6
+          b #{user.google.name}
+          | &nbsp;&nbsp;
+          span(style="color: gray;") Today at 10:05am
+        p.col-xs-6(align="right")
+          button.btn.btn-default.btn-xs(type="button") in queue
+        p.col-xs-12
+          | Is Aleesha in her office?
+        p.col-xs-6 Deadline: 10:20am
+        .col-xs-6(align="right")
+          button.btn.btn-default(type="button") Cancel
+
+        //- a.pull-right(href="#")
+          //-   .media-object
+          //-     img.media-object(src="img/Image_view_example_resized.png", alt="result", style="height: 64px;")
+              //- img.img-thumbnail(src="img/Image_view_example_resized.png", alt="Result",
+
+        //- .media
+        //-   .media-body
+        //-     p.col-xs-6 Today 10:05am
+        //-     p.col-xs-6(align="right") in queue
+        //-     p.col-xs-12 @#{user.google.name}: Is Aleesha in her office?
+        //-     p.col-xs-6 Deadline: 10:20am
+        //-     .col-xs-6(align="right")
+        //-       button.btn.btn-primary(type="button") Cancel
+
+        //- .list-group
+        //-   .list-group-item
+        //-     .row
+        //-       p.list-group-item-text.col-xs-6
+        //-       p.list-group-item-text.col-xs-6(align="right") in queue
+        //-       p.list-group-item-text.col-xs-12 @{{user}}: Is Aleesha in her office?
+        //-       p.list-group-item-text.col-xs-6 Deadline: 10:20am
+        //-       .col-xs-6(align="right")
+        //-         button.btn.btn-primary(type="button") Cancel
+        //-   .list-group-item
+        //-     img.img-thumbnail(src="img/Image_view_example_resized.png", alt="Result", style="width: 100%; height: auto;")
+
+        //-     .row
+        //-       p.list-group-item-text.col-xs-6 Yesterday 1:30pm
+        //-       p.list-group-item-text.col-xs-6(align="right") success
+        //-       p.list-group-item-text.col-xs-12 @{{user}}: Is there food in the kitchen?
+        //-   .list-group-item
+        //-     .row
+        //-       p.list-group-item-text.col-xs-6 Yesterday 10:05am
+        //-       p.list-group-item-text.col-xs-6(align="right") failed
+        //-       p.list-group-item-text.col-xs-12 @{{user}}: Is CSE403 in use?
 
