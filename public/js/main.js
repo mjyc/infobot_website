@@ -3,6 +3,25 @@
 // DOM Ready ===========================================================
 $(document).ready(function() {
 
+    $('#btnimgresult1').click(function() {
+        $('#imgresult1').toggle();
+    });
+
+    // $('#imgresult1').hover(function() {
+    //     $(this).css("cursor", "pointer");
+    //     $(this).animate({
+    //         width: "300px",
+    //         height: "280px"
+    //     });
+
+    // }, function() {
+    //     $(this).animate({
+    //         width: "128px",
+    //         height: "128px"
+    //     });
+
+    // });
+
     $('#submitQuestion #inputDeadline').timepicker();
 
     // // Populate the user table on initial page load

@@ -2,69 +2,85 @@ extends layout
 
 block content
   //- JUMBOTRON
-  .jumbotron(style="padding-top: 70px; padding-bottom: 20px;")
+  .jumbotron(style="padding-top: 70px; padding-bottom: 20px; padding-right: 0px; padding-left: 0px; ")
     .container
       form#submitQuestion(role="form")
         .form-group
           .right-inner-addon
-            i.glyphicon.glyphicon-question-sign
+            //- i.glyphicon.glyphicon-question-sign
+            i.fa.fa-question-circle.fa-lg
             input#inputTypedCmd.form-control(type="text", placeholder="Type question here")
-        .form-inline
-            button#btnSubmitQuestion.btn.btn-primary Submit Question
-            | &nbsp;&nbsp;&nbsp;&nbsp;
-            button#btnToggleSMS.btn.btn-default.btn-sm(type="button", data-toggle="button") SMS
-            | &nbsp;&nbsp;&nbsp;&nbsp;
-            button#btnToggleEmail.btn.btn-default.btn-sm(type="button", data-toggle="button") Email
-            //- | &nbsp;&nbsp;&nbsp;&nbsp;
-            //- .form-group
-            //-   .input-group.input-group-sm.bootstrap-timepicker
-            //-     input#inputDeadline.form-control(type="text")
-            //-     span.input-group-addon
-            //-       i.glyphicon.glyphicon-time
+        .form-inline(align="center")
+            button#btnSubmitQuestion.btn.btn-primary
+              | Submit Question
+            | &nbsp;&nbsp;
+            button#btnToggleSMS.btn.btn-default.btn-sm(type="button", data-toggle="button")
+              | SMS
+            | &nbsp;&nbsp;
+            button#btnToggleEmail.btn.btn-default.btn-sm(type="button", data-toggle="button")
+              | Email
 
   //- MAIN CONTENTS
   .container
     .row
+      p.col-sm-8
+        span(style="display: inline-block; font-weight: bold;") #{user.google.name} &nbsp;
+          span(style="; font-weight: normal; color: gray;") Today at 10:05am &nbsp;&nbsp;
+        span(style="display: inline-block;") Is Aleesha in her office? &nbsp;&nbsp;
+      p.col-sm-4(align="right")
+        button.btn.btn-default.btn-xs( disabled="disabled") deadline at 10:20am
+        | &nbsp;&nbsp;
+        button.btn.btn-default.btn-xs(type="button") in queue
       .col-xs-12
-        p.col-sm-10
-          span(style="display: inline-block; color: gray;") Today at 10:05am &nbsp;&nbsp;
-          span(style="display: inline-block;")
-            b #{user.google.name}: &nbsp;
-            | Is Aleesha in her office?
-          span(style="display: inline-block;") Deadline: 10:20am
-        p.col-sm-2(align="right")
-          button.btn.btn-default.btn-xs(type="button") in queue
-        .col-xs-12
-          button.btn.btn-default(type="button") Cancel
+        button.btn.btn-default(type="button") Cancel
 
-      .col-xs-12(style="padding-top: 20px")
-        p.col-sm-10
-          b #{user.google.name}: &nbsp;
-          span(style="color: gray;") Today at 10:05am
-          span &nbsp;&nbsp; Is Aleesha in her office?
-          br
-          span Deadline: 10:20am
-        p.col-sm-2(align="right")
-          button.btn.btn-default.btn-xs(type="button") in queue
-        p.col-sm-12
-          b DUB-E
-          span(style="color: gray;") &nbsp;&nbsp; Today at 10:05am
-          span &nbsp;&nbsp; Yes (accuracy %10)
-        .col-xs-12
-          button.btn.btn-default(type="button") Cancel
-
-      .col-xs-12(style="padding-top: 20px")
-        p.col-xs-6
-          b #{user.google.name}
+    .row(style="padding-top: 40px")
+      p.col-sm-12
+        span(style="display: inline-block; font-weight: bold;") #{user.google.name} &nbsp;
+          span(style="; font-weight: normal; color: gray;") Today at 10:05am &nbsp;&nbsp;
+        span(style="display: inline-block;") Is Aleesha in her office? &nbsp;&nbsp;
+      p.col-sm-8
+        b DUB-E
+        span(style="color: gray;") &nbsp;&nbsp; Today at 10:15am &nbsp;&nbsp;
+        span Yes
+      p.col-sm-4(align="right")
+          button.btn.btn-default.btn-xs(type="button") 80% accuracy
           | &nbsp;&nbsp;
-          span(style="color: gray;") Today at 10:05am
-        p.col-xs-6(align="right")
-          button.btn.btn-default.btn-xs(type="button") in queue
-        p.col-xs-12
-          | Is Aleesha in her office?
-        p.col-xs-6 Deadline: 10:20am
-        .col-xs-6(align="right")
-          button.btn.btn-default(type="button") Cancel
+          button.btn.btn-success.btn-xs(type="button") success
+      p.col-sm-12(align="center")
+        img#imgresult1.img-rounded(src="img/Image_view_example_resized.png", alt="result")
+      p.col-sm-12
+        button#btnimgresult1.btn.btn-default(type="button") Toggle result picture
+
+
+    .row(style="padding-top: 40px")
+      p.col-sm-8
+        span(style="display: inline-block; font-weight: bold;") #{user.google.name} &nbsp;
+          span(style="; font-weight: normal; color: gray;") Today at 10:05am &nbsp;&nbsp;
+        span(style="display: inline-block;") Is Aleesha in her office? &nbsp;&nbsp;
+      p.col-sm-8
+          b DUB-E
+          span(style="color: gray;") &nbsp;&nbsp; Today at 10:15am &nbsp;&nbsp;
+          span Yes
+      p.col-sm-4(align="right")
+          button.btn.btn-default.btn-xs(type="button") 80% accuracy
+          | &nbsp;&nbsp;
+          button.btn.btn-danger.btn-xs(type="button") failed
+        //- .col-xs-12
+        //-   button.btn.btn-default(type="button") Cancel
+
+      //- .col-xs-12(style="padding-top: 20px")
+      //-   p.col-xs-6
+      //-     b #{user.google.name}
+      //-     | &nbsp;&nbsp;
+      //-     span(style="color: gray;") Today at 10:05am
+      //-   p.col-xs-6(align="right")
+      //-     button.btn.btn-default.btn-xs(type="button") in queue
+      //-   p.col-xs-12
+      //-     | Is Aleesha in her office?
+      //-   p.col-xs-6 Deadline: 10:20am
+      //-   .col-xs-6(align="right")
+      //-     button.btn.btn-default(type="button") Cancel
 
         //- a.pull-right(href="#")
           //-   .media-object
