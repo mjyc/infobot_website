@@ -22,7 +22,7 @@ html(class="no-js")
     link(rel='stylesheet', href='css/normalize.css')
     link(rel='stylesheet', href='css/main.css')
     script(src='js/vendor/modernizr-2.8.3.min.js')
-  body(onload='init()')
+  body
     <!--[if lt IE 8]>
     p.browsehappy
       | You are using an <strong>outdated</strong> browser.
@@ -46,24 +46,11 @@ html(class="no-js")
                 a(href="/home") Ask DUB-E
               li
                 a(href="#") Question Feed
-              li
-                a(href="/map") Where's DUB-E?
+              //- li
+              //-   a(href="/map") Where's DUB-E?
 
-    //- //- Add your site or application content here
-    //- block content
-
-    h1 Simple Map Example
-    p Run the following commands in the terminal then refresh this page. This will load a map from the
-      tt ros-groovy-rail-maps package.
-    ol
-      li
-        tt roscore
-      li
-        tt rosrun map_server map_server /opt/ros/groovy/share/rail_maps/maps/ilab.pgm 0.05
-      li
-        tt roslaunch rosbridge_server rosbridge_websocket.launch
-    #map
-
+    //- Add your site or application content here
+    block content
 
     script(src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
     script window.jQuery || document.write('<script src="javascripts/vendor/jquery-1.11.1.min.js"><\/script>')
@@ -71,57 +58,6 @@ html(class="no-js")
     script(src='js/vendor/bootstrap-switch.min.js')
     script(src='js/vendor/bootstrap-timepicker.min.js')
     script(src='js/main.js')
-
-    script(src='http://cdn.robotwebtools.org/threejs/current/three.js')
-    script(src='http://cdn.robotwebtools.org/ColladaAnimationCompress/current/ColladaLoader2.js')
-    script(src='http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js')
-    script(src='http://cdn.robotwebtools.org/roslibjs/current/roslib.js')
-    script(src='http://cdn.robotwebtools.org/ros3djs/current/ros3d.js')
-
-
-    script.
-      /**
-       * Setup all visualization elements when the page is loaded.
-       */
-      function init() {
-        // Connect to ROS.
-        var ros = new ROSLIB.Ros({
-          url : 'ws://localhost:9090'
-        });
-
-        // Create the main viewer.
-        var viewer = new ROS3D.Viewer({
-          divID : 'map',
-          width : 800,
-          height : 600,
-          antialias : true
-        });
-
-        // Setup the marker client.
-        var gridClient = new ROS3D.OccupancyGridClient({
-          ros : ros,
-          rootObject : viewer.scene
-        });
-
-        // Add a grid.
-        viewer.addObject(new ROS3D.Grid());
-
-        // Setup a client to listen to TFs.
-        var tfClient = new ROSLIB.TFClient({
-          ros : ros,
-          angularThres : 0.01,
-          transThres : 0.01,
-          rate : 10.0
-        });
-
-        // Setup the URDF client.
-        var urdfClient = new ROS3D.UrdfClient({
-          ros : ros,
-          tfClient : tfClient,
-          path : 'http://127.0.0.1/',
-          rootObject : viewer.scene
-        });
-      }
 
     //- Google Analytics: change UA-XXXXX-X to be your site's ID.
     script.

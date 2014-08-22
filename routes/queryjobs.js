@@ -5,7 +5,7 @@ var User = require('../models/user');
 var QueryJob = require('../models/queryjob');
 
 // // GET userlist.
-// router.get('/userlist', function(req, res) {
+// router.get('/queryjob', function(req, res) {
 //     var db = req.db;
 //     db.collection('userlist').find().toArray(function (err, items) {
 //         res.json(items);
