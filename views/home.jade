@@ -2,7 +2,7 @@ extends layout
 
 block content
   //- JUMBOTRON
-  .jumbotron(style="padding-top: 70px; padding-bottom: 20px; padding-right: 0px; padding-left: 0px; ")
+  .jumbotron(style="padding-top: 70px; padding-bottom: 20px; padding-right: 0px; padding-left: 0px; margin-bottom: 0px;")
     .container
       form#submitQuestion(role="form")
         .form-group
@@ -11,45 +11,47 @@ block content
             i.fa.fa-question-circle.fa-lg
             input#inputTypedCmd.form-control(type="text", placeholder="Type question here")
         .form-inline(align="center")
-            button#btnSubmitQuestion.btn.btn-primary
-              | Submit Question
+            button#btnSubmitQuestion.btn.btn-primary Submit Question
             | &nbsp;&nbsp;
-            button#btnToggleSMS.btn.btn-default.btn-sm(type="button", data-toggle="button")
-              | SMS
+            button#btnToggleSMS.btn.btn-default.btn-sm(type="button", data-toggle="button") SMS
             | &nbsp;&nbsp;
-            button#btnToggleEmail.btn.btn-default.btn-sm(type="button", data-toggle="button")
-              | Email
+            button#btnToggleEmail.btn.btn-default.btn-sm(type="button", data-toggle="button") Email
 
   //- MAIN CONTENTS
   .container
-    .row
-      p.col-sm-8
-        span(style="display: inline-block; font-weight: bold;") #{user.google.name} &nbsp;
-          span(style="; font-weight: normal; color: gray;") Today at 10:05am &nbsp;&nbsp;
-        span(style="display: inline-block;") Is Aleesha in her office? &nbsp;&nbsp;
-      p.col-sm-4(align="right")
-        button.btn.btn-default.btn-xs( disabled="disabled") deadline at 10:20am
+    .row(style="padding-top: 30px")
+      p.col-sm-12(align="center" style="margin-bottom: 0px")
+        button.btn.btn-default.btn-xs(type="button", disabled="disabled", style="opacity: 1;") deadline at 10:20am
         | &nbsp;&nbsp;
-        button.btn.btn-default.btn-xs(type="button") in queue
-      .col-xs-12
+        button.btn.btn-default.btn-xs(type="button", disabled="disabled", style="opacity: 1;") in queue
+      p.col-sm-12(style="text-align: center")
+        span(style="display: inline-block; font-weight: bold; padding-right: 0px") #{user.google.name} &nbsp;
+          span(style="; font-weight: normal; color: gray;") Today at 10:05am
+        br
+        span(style="display: inline-block;") Is Aleesha in her office?
+      //- p.col-sm-4(align="right")
+      //-   button.btn.btn-default.btn-xs(type="button", disabled="disabled", style="opacity: 1;") deadline at 10:20am
+      //-   | &nbsp;&nbsp;
+      //-   button.btn.btn-default.btn-xs(type="button", disabled="disabled", style="opacity: 1;") in queue
+      .col-xs-12(align="center")
         button.btn.btn-default(type="button") Cancel
 
     .row(style="padding-top: 40px")
       p.col-sm-12
-        span(style="display: inline-block; font-weight: bold;") #{user.google.name} &nbsp;
-          span(style="; font-weight: normal; color: gray;") Today at 10:05am &nbsp;&nbsp;
-        span(style="display: inline-block;") Is Aleesha in her office? &nbsp;&nbsp;
+        span(style="display: inline-block; font-weight: bold; padding-right: 10px") #{user.google.name} &nbsp;
+          span(style="; font-weight: normal; color: gray;") Today at 10:05am
+        span(style="display: inline-block;") Is Aleesha in her office?
       p.col-sm-8
-        b DUB-E
-        span(style="color: gray;") &nbsp;&nbsp; Today at 10:15am &nbsp;&nbsp;
-        span Yes
+        span(style="display: inline-block; font-weight: bold; padding-right: 10px") DUB-E &nbsp;
+          span(style="; font-weight: normal; color: gray;") Today at 10:15am
+        span(style="display: inline-block;") Yes
       p.col-sm-4(align="right")
           button.btn.btn-default.btn-xs(type="button") 80% accuracy
           | &nbsp;&nbsp;
           button.btn.btn-success.btn-xs(type="button") success
       p.col-sm-12(align="center")
         img#imgresult1.img-rounded(src="img/Image_view_example_resized.png", alt="result")
-      p.col-sm-12
+      p.col-sm-12(style="text-align: center;")
         button#btnimgresult1.btn.btn-default(type="button") Toggle result picture
 
 
