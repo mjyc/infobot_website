@@ -20,20 +20,15 @@ block content
   //- MAIN CONTENTS
   .container
     .row(style="padding-top: 30px")
-      p.col-sm-12(align="center" style="margin-bottom: 0px")
+      p.col-sm-8
+        span(style="display: inline-block; font-weight: bold; padding-right: 10px") #{user.google.name} &nbsp;
+          span(style="; font-weight: normal; color: gray;") Today at 10:05am
+        span(style="display: inline-block;") Is Aleesha in her office?
+      p.col-sm-4(style="text-align: right;")
         button.btn.btn-default.btn-xs(type="button", disabled="disabled", style="opacity: 1;") deadline at 10:20am
         | &nbsp;&nbsp;
         button.btn.btn-default.btn-xs(type="button", disabled="disabled", style="opacity: 1;") in queue
-      p.col-sm-12(style="text-align: center")
-        span(style="display: inline-block; font-weight: bold; padding-right: 0px") #{user.google.name} &nbsp;
-          span(style="; font-weight: normal; color: gray;") Today at 10:05am
-        br
-        span(style="display: inline-block;") Is Aleesha in her office?
-      //- p.col-sm-4(align="right")
-      //-   button.btn.btn-default.btn-xs(type="button", disabled="disabled", style="opacity: 1;") deadline at 10:20am
-      //-   | &nbsp;&nbsp;
-      //-   button.btn.btn-default.btn-xs(type="button", disabled="disabled", style="opacity: 1;") in queue
-      .col-xs-12(align="center")
+      .col-xs-12(style="text-align: left;")
         button.btn.btn-default(type="button") Cancel
 
     .row(style="padding-top: 40px")
@@ -45,13 +40,13 @@ block content
         span(style="display: inline-block; font-weight: bold; padding-right: 10px") DUB-E &nbsp;
           span(style="; font-weight: normal; color: gray;") Today at 10:15am
         span(style="display: inline-block;") Yes
-      p.col-sm-4(align="right")
-          button.btn.btn-default.btn-xs(type="button") 80% accuracy
-          | &nbsp;&nbsp;
-          button.btn.btn-success.btn-xs(type="button") success
-      p.col-sm-12(align="center")
-        img#imgresult1.img-rounded(src="img/Image_view_example_resized.png", alt="result")
+      p.col-sm-4(style="text-align: right;")
+        button.btn.btn-default.btn-xs(type="button", disabled="disabled", style="opacity: 1;") 80% accuracy
+        | &nbsp;&nbsp;
+        button.btn.btn-success.btn-xs(type="button", disabled="disabled", style="opacity: 1;") success
       p.col-sm-12(style="text-align: center;")
+        img#imgresult1.img-rounded(src="img/Image_view_example_resized.png", alt="result", style="display: none;")
+      p.col-sm-12(style="text-align: left;")
         button#btnimgresult1.btn.btn-default(type="button") Toggle result picture
 
 
@@ -64,59 +59,5 @@ block content
           b DUB-E
           span(style="color: gray;") &nbsp;&nbsp; Today at 10:15am &nbsp;&nbsp;
           span Yes
-      p.col-sm-4(align="right")
-          button.btn.btn-default.btn-xs(type="button") 80% accuracy
-          | &nbsp;&nbsp;
-          button.btn.btn-danger.btn-xs(type="button") failed
-        //- .col-xs-12
-        //-   button.btn.btn-default(type="button") Cancel
-
-      //- .col-xs-12(style="padding-top: 20px")
-      //-   p.col-xs-6
-      //-     b #{user.google.name}
-      //-     | &nbsp;&nbsp;
-      //-     span(style="color: gray;") Today at 10:05am
-      //-   p.col-xs-6(align="right")
-      //-     button.btn.btn-default.btn-xs(type="button") in queue
-      //-   p.col-xs-12
-      //-     | Is Aleesha in her office?
-      //-   p.col-xs-6 Deadline: 10:20am
-      //-   .col-xs-6(align="right")
-      //-     button.btn.btn-default(type="button") Cancel
-
-        //- a.pull-right(href="#")
-          //-   .media-object
-          //-     img.media-object(src="img/Image_view_example_resized.png", alt="result", style="height: 64px;")
-              //- img.img-thumbnail(src="img/Image_view_example_resized.png", alt="Result",
-
-        //- .media
-        //-   .media-body
-        //-     p.col-xs-6 Today 10:05am
-        //-     p.col-xs-6(align="right") in queue
-        //-     p.col-xs-12 @#{user.google.name}: Is Aleesha in her office?
-        //-     p.col-xs-6 Deadline: 10:20am
-        //-     .col-xs-6(align="right")
-        //-       button.btn.btn-primary(type="button") Cancel
-
-        //- .list-group
-        //-   .list-group-item
-        //-     .row
-        //-       p.list-group-item-text.col-xs-6
-        //-       p.list-group-item-text.col-xs-6(align="right") in queue
-        //-       p.list-group-item-text.col-xs-12 @{{user}}: Is Aleesha in her office?
-        //-       p.list-group-item-text.col-xs-6 Deadline: 10:20am
-        //-       .col-xs-6(align="right")
-        //-         button.btn.btn-primary(type="button") Cancel
-        //-   .list-group-item
-        //-     img.img-thumbnail(src="img/Image_view_example_resized.png", alt="Result", style="width: 100%; height: auto;")
-
-        //-     .row
-        //-       p.list-group-item-text.col-xs-6 Yesterday 1:30pm
-        //-       p.list-group-item-text.col-xs-6(align="right") success
-        //-       p.list-group-item-text.col-xs-12 @{{user}}: Is there food in the kitchen?
-        //-   .list-group-item
-        //-     .row
-        //-       p.list-group-item-text.col-xs-6 Yesterday 10:05am
-        //-       p.list-group-item-text.col-xs-6(align="right") failed
-        //-       p.list-group-item-text.col-xs-12 @{{user}}: Is CSE403 in use?
-
+      p.col-sm-4(style="text-align: right;")
+        button.btn.btn-danger.btn-xs(type="button", disabled="disabled", style="opacity: 1;") failed

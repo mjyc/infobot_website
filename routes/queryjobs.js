@@ -15,12 +15,14 @@ var QueryJob = require('../models/queryjob');
 // POST to adduser.
 router.post('/addqueryjob', function(req, res) {
 
+  console.log(req.user._id)
+  console.log(req.body)
+
   var newQueryJob = new QueryJob();
   newQueryJob.user_id = req.user._id;
-  newQueryJob.notification_sms = req.body
-  newQueryJob.notification_email =
-  newQueryJob.timeissued = req.body.timeissued;
   newQueryJob.typed_cmd = req.body.typed_cmd;
+  newQueryJob.notification_sms = req.body.sms_notification
+  newQueryJob.notification_email = req.body.email_notification
   console.log(newQueryJob);
 
   newQueryJob.save(function(err) {
@@ -28,6 +30,7 @@ router.post('/addqueryjob', function(req, res) {
       (err === null) ? { msg: '' } : { msg: err }
     );
   });
+
 
 
   // // if the user is not already logged in:
