@@ -5,7 +5,7 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
+var mongo = require('mongoskin');
 var passport = require('passport');
 var session = require('express-session');
 
@@ -13,11 +13,12 @@ var session = require('express-session');
 var routes = require('./routes/index');
 var queryjobs = require('./routes/queryjobs');
 var configDB = require('./config/database.js');
+var sessionDB = require('./config/session.js');
 
 
 // DB and passport setups.
-mongoose.connect(configDB.url);  // connect to db
-require('./config/passport')(passport);  // load passport
+var db = mongo.db(configDB.url, {native_parser:true});  // connect to db
+require('./config/passport')(passport, db);  // load passport
 
 
 var app = express();
@@ -33,9 +34,15 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({secret: 'ilovescotchscotchyscotchscotch'}));
+app.use(session({ secret: sessionDB.secret }));
 app.use(passport.initialize());
 app.use(passport.session());  // persistent login sessions
+
+// Make our db accessible to our router
+app.use(function(req,res,next){
+    req.db = db;
+    next();
+});
 
 app.use('/', routes);
 app.use('/queryjobs', queryjobs);
