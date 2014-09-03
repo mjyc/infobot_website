@@ -31,33 +31,14 @@ html(class="no-js")
       | to improve your experience.
     <![endif]-->
 
-    //- NAVBAR HEADER
-    if isAuthenticated
-      .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
-        .container
-          .navbar-header
-            button.navbar-toggle(type="button", data-toggle="collapse",
-              data-target=".navbar-collapse")
-              span.sr-only Toggle navigation
-              span.icon-bar
-              span.icon-bar
-              span.icon-bar
-          .navbar-collapse.collapse
-            ul.nav.navbar-nav
-              li
-                a(href="/home") Ask DUB-E
-              li
-                a(href="#") Question Feed
-            p.navbar-text.navbar-right
-              | Signed in as user
+    //- HEADER
+    include header
 
-
-    //- Add your site or application content here
+    //- SITE CONTENT
     block content
 
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
-    script window.jQuery || document.write(
-      '<script src="javascripts/vendor/jquery-1.11.1.min.js"><\/script>')
+    script window.jQuery || document.write('<script src="javascripts/vendor/jquery-1.11.1.min.js"><\/script>')
     script(src="js/vendor/bootstrap.min.js")
     script(src="js/vendor/bootstrap-switch.min.js")
     script(src="js/vendor/bootstrap-timepicker.min.js")
