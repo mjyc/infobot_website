@@ -1,4 +1,4 @@
-// Middlewares
+// Requires.
 var express = require('express');
 var path = require('path');
 var favicon = require('static-favicon');
@@ -8,18 +8,21 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var session = require('express-session');
-// Locals
+
+// Locals.
 var routes = require('./routes/index');
 var queryjobs = require('./routes/queryjobs');
 var configDB = require('./config/database.js');
 
-// DB and passport setups
+
+// DB and passport setups.
 mongoose.connect(configDB.url);  // connect to db
 require('./config/passport')(passport);  // load passport
 
+
 var app = express();
 
-// view engine setup
+// View engine setup.
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -37,17 +40,17 @@ app.use(passport.session());  // persistent login sessions
 app.use('/', routes);
 app.use('/queryjobs', queryjobs);
 
-/// catch 404 and forward to error handler
+// Catch 404 and forward to error handler.
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
-/// error handlers
+// Error handlers
 
-// development error handler
-// will print stacktrace
+// Development error handler.
+// Will print stacktrace.
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
@@ -58,8 +61,8 @@ if (app.get('env') === 'development') {
     });
 }
 
-// production error handler
-// no stacktraces leaked to user
+// Production error handler.
+// No stacktraces leaked to user.
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {

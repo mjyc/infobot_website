@@ -1,0 +1,5 @@
+.jshintrc
+.rebooted
+config
+db
+node_modules

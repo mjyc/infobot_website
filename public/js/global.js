@@ -1,4 +1,7 @@
-// DOM Ready ===========================================================
+// =====================================================================
+// DOM Ready
+// =====================================================================
+
 $(document).ready(function() {
 
   $('#btnimgresult1').click(function() {
@@ -25,25 +28,25 @@ $(document).ready(function() {
   // // Populate the user table on initial page load
   // populateTable();
 
-  // // Add User button click
+  // // Add User button click.
   // $('#btnGetQuery').on('click', getQuery);
 
-  // // Add User button click
+  // // Add User button click.
   // $('#btnPatrol').on('click', sendPatrol);
 
-  // // Add User button click
+  // // Add User button click.
   // $('#btnCSEXXX').on('click', sendCSE4XX);
 
-  // // Add User button click
+  // // Add User button click.
   // $('#btnSTART').on('click', sendSTART);
 
-  // // Username link click
+  // // Username link click.
   // $('#userList table tbody').on('click', 'td a.linkshowuser', showUserInfo);
 
-  // Add User button click
+  // Add User button click.
   $('#btnSubmitQuestion').on('click', submitQuestion);
 
-  // // Delete User link click
+  // // Delete User link click.
   // $('#userList table tbody').on('click', 'td a.linkdeleteuser', deleteUser);
 
 
@@ -89,12 +92,11 @@ function (queryjob_id, timeissued) {
 }
 
 
-
 // =====================================================================
 // Functions
 // =====================================================================
 
-// Add User
+// Add User.
 function submitQuestion(event) {
   event.preventDefault();
 
@@ -110,7 +112,7 @@ function submitQuestion(event) {
   // Check and make sure errorCount's still at zero
   // if(errorCount === 0) {
 
-    // If it is, compile all user info into one object
+    // If it is, compile all user info into one object.
     var newQueryJob = {
       'timeissued': new Date(),
       'typed_cmd': $('#submitQuestion input#inputTypedCmd').val(),
@@ -118,7 +120,7 @@ function submitQuestion(event) {
       'email_notification': $('#submitQuestion button#btnToggleEmail').hasClass('active'),
     }
 
-    // Use AJAX to post the object to our adduser service
+    // Use AJAX to post the object to our adduser service.
     $.ajax({
       type: 'POST',
       data: newQueryJob,

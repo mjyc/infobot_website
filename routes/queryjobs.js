@@ -1,16 +1,17 @@
+// =====================================================================
+// Requires
+// =====================================================================
+
 var express = require('express');
 var router = express.Router();
 
 var User = require('../models/user');
 var QueryJob = require('../models/queryjob');
 
-// // GET userlist.
-// router.get('/queryjob', function(req, res) {
-//     var db = req.db;
-//     db.collection('userlist').find().toArray(function (err, items) {
-//         res.json(items);
-//     });
-// });
+
+// =====================================================================
+// Routes
+// =====================================================================
 
 // POST to adduser.
 router.post('/addqueryjob', function(req, res) {
@@ -30,8 +31,6 @@ router.post('/addqueryjob', function(req, res) {
       (err === null) ? { msg: '' } : { msg: err }
     );
   });
-
-
 
   // // if the user is not already logged in:
   // if (!req.user) {
@@ -69,13 +68,5 @@ router.post('/addqueryjob', function(req, res) {
   // });
 });
 
-// // DELETE to deleteuser.
-// router.delete('/deleteuser/:id', function(req, res) {
-//     var db = req.db;
-//     var userToDelete = req.params.id;
-//     db.collection('userlist').removeById(userToDelete, function(err, result) {
-//         res.send((result === 1) ? { msg: '' } : { msg:'error: ' + err });
-//     });
-// });
 
 module.exports = router;
