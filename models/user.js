@@ -1,19 +1,22 @@
 // Load the things we need.
 var mongoose = require('mongoose');
-var bcrypt   = require('bcrypt-nodejs');
+var bcrypt = require('bcrypt-nodejs');
 
 // Define the schema for our user model.
 var userSchema = mongoose.Schema({
 
-  google   : {
-    id     : String,
-    token  : String,
-    email  : String,
-    name   : String
+  google: {
+    id: String,
+    token: String,
+    email: String,
+    name: String
   },
 
-  queryjob_hitory : [{
-    queryjob_id : {type: mongoose.Schema.ObjectId, required: true}
+  queryjob_hitory: [{
+    queryjob_id: {
+      type: mongoose.Schema.ObjectId,
+      required: true
+    }
   }]
 });
 

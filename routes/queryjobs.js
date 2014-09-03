@@ -28,7 +28,7 @@ router.post('/addqueryjob', function(req, res) {
 
   newQueryJob.save(function(err) {
     res.send(
-      (err === null) ? { msg: '' } : { msg: err }
+      (err === null) ? {msg: ''} : {msg: err}
     );
   });
 

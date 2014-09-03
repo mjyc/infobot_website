@@ -1,6 +1,8 @@
 module.exports = function(grunt) {
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+
     concurrent: {
       dev: {
         tasks: ['nodemon', 'node-inspector', 'watch'],
@@ -9,6 +11,7 @@ module.exports = function(grunt) {
         }
       }
     },
+
     jshint: {
       options: {
         jshintrc: '.jshintrc'
@@ -19,6 +22,7 @@ module.exports = function(grunt) {
         '!public/js/vendor/**/*.js'
       ]
     },
+
     'node-inspector': {
       dev: {
         options: {
@@ -28,6 +32,7 @@ module.exports = function(grunt) {
         }
       }
     },
+
     nodemon: {
       dev: {
         script: 'bin/www',
@@ -36,24 +41,24 @@ module.exports = function(grunt) {
           env: {
             PORT: '8080'
           },
-          callback: function (nodemon) {
-            nodemon.on('log', function (event) {
+          callback: function(nodemon) {
+            nodemon.on('log', function(event) {
               console.log(event.colour);
             });
 
             // Opens browser on initial server start.
-            nodemon.on('config:update', function () {
+            nodemon.on('config:update', function() {
               // Delay before server listens on port.
               setTimeout(function() {
                 require('open')('http://localhost:8080');
-              }, 1000);
+              }, 300);
             });
 
             // Refreshes browser when server reboots.
-            nodemon.on('restart', function () {
+            nodemon.on('restart', function() {
               setTimeout(function() {
                 require('fs').writeFileSync('.rebooted', 'rebooted');
-              }, 1000);
+              }, 300);
             });
           }
         }
@@ -61,8 +66,9 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      server: {
-        files: ['.rebooted'],
+      js: {
+        files: ['.rebooted', 'public/js/**/*.js'],
+        tasks: ['jshint'],
         options: {
           livereload: true
         }
@@ -70,6 +76,7 @@ module.exports = function(grunt) {
     }
 
   });
+
 
   grunt.loadNpmTasks('grunt-concurrent');
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -79,5 +86,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-open');
 
   grunt.registerTask('default', ['concurrent:dev']);
-  grunt.registerTask('hint', ['jshint']);
+  grunt.registerTask('lint', ['jshint']);
 };

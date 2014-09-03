@@ -1,17 +1,19 @@
-/* Existing ***********************************************************/
+/* Existing */
 
 body {
   padding-bottom: 20px;
 }
 
-/* New ****************************************************************/
+/* Custom */
 
 .right-inner-addon {
   position: relative;
 }
+
 .right-inner-addon input {
   padding-right: 30px;
 }
+
 .right-inner-addon i {
   position: absolute;
   right: 0px;

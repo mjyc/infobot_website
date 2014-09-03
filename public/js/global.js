@@ -112,33 +112,32 @@ function submitQuestion(event) {
   // Check and make sure errorCount's still at zero
   // if(errorCount === 0) {
 
-    // If it is, compile all user info into one object.
-    var newQueryJob = {
-      'timeissued': new Date(),
-      'typed_cmd': $('#submitQuestion input#inputTypedCmd').val(),
-      'sms_notification': $('#submitQuestion button#btnToggleSMS').hasClass('active'),
-      'email_notification': $('#submitQuestion button#btnToggleEmail').hasClass('active'),
-    };
+  // If it is, compile all user info into one object.
+  var newQueryJob = {
+    'timeissued': new Date(),
+    'typed_cmd': $('#submitQuestion input#inputTypedCmd').val(),
+    'sms_notification': $('#submitQuestion button#btnToggleSMS').hasClass('active'),
+    'email_notification': $('#submitQuestion button#btnToggleEmail').hasClass('active'),
+  };
 
-    // Use AJAX to post the object to our adduser service.
-    $.ajax({
-      type: 'POST',
-      data: newQueryJob,
-      url: '/queryjobs/addqueryjob',
-      dataType: 'JSON'
-    }).done(function( response ) {
-      // Check for successful (blank) response
+  // Use AJAX to post the object to our adduser service.
+  $.ajax({
+    type: 'POST',
+    data: newQueryJob,
+    url: '/queryjobs/addqueryjob',
+    dataType: 'JSON'
+  }).done(function(response) {
+    // Check for successful (blank) response
+    if (response.msg === '') {
+      console.log('successful!! Yay!!');
       if (response.msg === '') {
-        console.log('successful!! Yay!!');
-        if (response.msg === '') {
-          console.log();
-        }
+        console.log();
       }
-      else {
-        // If something goes wrong, alert the error message that our service returned
-        alert('Error: ' + response.msg);
-      }
-    });
+    } else {
+      // If something goes wrong, alert the error message that our service returned
+      alert('Error: ' + response.msg);
+    }
+  });
   // }
   // else {
   //     // If errorCount is more than 0, error out
