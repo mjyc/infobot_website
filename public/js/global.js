@@ -52,44 +52,44 @@ $(document).ready(function() {
 
   // ROS
 
-  var ros = new ROSLIB.Ros({
-    url : 'ws://localhost:9090'
-  });
+  // var ros = new ROSLIB.Ros({
+  //   url : 'ws://localhost:9090'
+  // });
 
-  ros.on('connection', function() {
-    console.log('Connected to websocket server.');
-  });
+  // ros.on('connection', function() {
+  //   console.log('Connected to websocket server.');
+  // });
 
-  ros.on('error', function(error) {
-    console.log('Error connecting to websocket server: ', error);
-  });
+  // ros.on('error', function(error) {
+  //   console.log('Error connecting to websocket server: ', error);
+  // });
 
-  ros.on('close', function() {
-    console.log('Connection to websocket server closed.');
-  });
+  // ros.on('close', function() {
+  //   console.log('Connection to websocket server closed.');
+  // });
 
 });
 
 
-function (queryjob_id, timeissued) {
+// function (queryjob_id, timeissued) {
 
-  var scheduleQueryJobClient = new ROSLIB.Service({
-    ros : ros,
-    name : '/schedule_query',
-    serviceType : 'sara_queryjob_manager/ScheduleQueryJob'
-  });
+//   var scheduleQueryJobClient = new ROSLIB.Service({
+//     ros : ros,
+//     name : '/schedule_query',
+//     serviceType : 'sara_queryjob_manager/ScheduleQueryJob'
+//   });
 
-  var request = new ROSLIB.ServiceRequest({
-    queryjob_id : queryjob_id,
-    queryjob_id : timeissued
-  });
+//   var request = new ROSLIB.ServiceRequest({
+//     queryjob_id : queryjob_id,
+//     queryjob_id : timeissued
+//   });
 
-  addTwoIntsClient.callService(request, function(result) {
-    return
-  });
+//   addTwoIntsClient.callService(request, function(result) {
+//     return
+//   });
 
-  // return
-}
+//   // return
+// }
 
 
 // =====================================================================
@@ -118,7 +118,7 @@ function submitQuestion(event) {
       'typed_cmd': $('#submitQuestion input#inputTypedCmd').val(),
       'sms_notification': $('#submitQuestion button#btnToggleSMS').hasClass('active'),
       'email_notification': $('#submitQuestion button#btnToggleEmail').hasClass('active'),
-    }
+    };
 
     // Use AJAX to post the object to our adduser service.
     $.ajax({
@@ -131,7 +131,7 @@ function submitQuestion(event) {
       if (response.msg === '') {
         console.log('successful!! Yay!!');
         if (response.msg === '') {
-          console.log()
+          console.log();
         }
       }
       else {
@@ -145,4 +145,4 @@ function submitQuestion(event) {
   //     alert('Please fill in all fields');
   //     return false;
   // }
-};
+}

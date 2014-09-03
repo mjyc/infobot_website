@@ -16,14 +16,14 @@ var QueryJob = require('../models/queryjob');
 // POST to adduser.
 router.post('/addqueryjob', function(req, res) {
 
-  console.log(req.user._id)
-  console.log(req.body)
+  console.log(req.user._id);
+  console.log(req.body);
 
   var newQueryJob = new QueryJob();
   newQueryJob.user_id = req.user._id;
   newQueryJob.typed_cmd = req.body.typed_cmd;
-  newQueryJob.notification_sms = req.body.sms_notification
-  newQueryJob.notification_email = req.body.email_notification
+  newQueryJob.notification_sms = req.body.sms_notification;
+  newQueryJob.notification_email = req.body.email_notification;
   console.log(newQueryJob);
 
   newQueryJob.save(function(err) {

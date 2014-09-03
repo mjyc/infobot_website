@@ -13,8 +13,9 @@ var passport = require('passport');
 
 // Route middleware to ensure user is logged in.
 function isLoggedIn(req, res, next) {
-  if (req.isAuthenticated())
+  if (req.isAuthenticated()) {
     return next();
+  }
 
   res.redirect('/');
 }
@@ -26,19 +27,20 @@ function isLoggedIn(req, res, next) {
 
 // Login.
 router.get('/', function(req, res) {
-  if (req.isAuthenticated())
-  res.redirect('/home')
-  else
-  res.render('login.jade', {
-    isAuthenticated: req.isAuthenticated()
-  });
+  if (req.isAuthenticated()) {
+    res.redirect('/home');
+  } else {
+    res.render('login.jade', {
+      isAuthenticated: req.isAuthenticated()
+    });
+  }
 });
 
 // Home.
 router.get('/home', isLoggedIn, function(req, res) {
   res.render('home.jade', {
-  isAuthenticated: req.isAuthenticated(),
-  user: req.user
+    isAuthenticated: req.isAuthenticated(),
+    user: req.user
   });
 });
 

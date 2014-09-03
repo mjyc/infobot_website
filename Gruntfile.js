@@ -1,7 +1,6 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-
     concurrent: {
       dev: {
         tasks: ['nodemon', 'node-inspector', 'watch'],
@@ -10,7 +9,16 @@ module.exports = function(grunt) {
         }
       }
     },
-
+    jshint: {
+      options: {
+        jshintrc: '.jshintrc'
+      },
+      files: [
+        '**/*.js',
+        '!node_modules/**/*.js',
+        '!public/js/vendor/**/*.js'
+      ]
+    },
     'node-inspector': {
       dev: {
         options: {
@@ -20,7 +28,6 @@ module.exports = function(grunt) {
         }
       }
     },
-
     nodemon: {
       dev: {
         script: 'bin/www',
@@ -65,10 +72,12 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-concurrent');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-node-inspector');
   grunt.loadNpmTasks('grunt-nodemon');
   grunt.loadNpmTasks('grunt-open');
 
   grunt.registerTask('default', ['concurrent:dev']);
+  grunt.registerTask('hint', ['jshint']);
 };
