@@ -1,4 +1,4 @@
-/* Overwriting ********************************************************/
+/* Existing ***********************************************************/
 
 body {
   padding-bottom: 20px;
@@ -18,35 +18,3 @@ body {
   padding: 10px 10px;
   pointer-events: none;
 }
-
-/* Media Queries ******************************************************/
-
-/*@media (max-width: 767px) {
-  .main-width {
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .askdube {
-    font-size: 0em;
-  }
-  .btn-submitquestion {
-    width: 100%;
-  }
-}
-@media (min-width: 768px) {
-  .main-width {
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .askdube {
-    text-align: center;
-    font-size: 2.5em;
-    margin: 0.67em 0;
-    font-family: inherit;
-    font-weight: 500;
-    line-height: 1.1;
-  }
-}
-*/
