@@ -18,6 +18,12 @@ module.exports = function(grunt) {
       }
     },
 
+    env: {
+      test: {
+        TEST: '1'  // anything not will trigger the test.
+      }
+    },
+
     jshint: {
       options: {
         jshintrc: '.jshintrc'
@@ -71,6 +77,12 @@ module.exports = function(grunt) {
       }
     },
 
+    shell: {
+      ros4test: {
+        command: 'roslaunch launch/run_rosnodes_test.launch'
+      }
+    },
+
     watch: {
       js: {
         files: ['.rebooted', 'public/js/**/*.js'],
@@ -87,10 +99,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-concurrent');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-env');
   grunt.loadNpmTasks('grunt-node-inspector');
   grunt.loadNpmTasks('grunt-nodemon');
   grunt.loadNpmTasks('grunt-open');
+  grunt.loadNpmTasks('grunt-shell');
 
   grunt.registerTask('default', ['concurrent:dev']);
-  grunt.registerTask('lint', ['jshint']);
+  grunt.registerTask('debug', ['concurrent:debug']);
+  grunt.registerTask('test', ['env:test','concurrent:debug']);
 };
