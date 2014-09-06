@@ -11,16 +11,18 @@ var loremIpsum=require('lorem-ipsum');  // function
 var ObjectID = require('mongodb').ObjectID;  // class
 
 // Locals.
+var configDB = require('../config/database.js');
 var configTest = require('../config/test.js');
 
 // DB setups.
-var db = mongo.db(configTest.dbUrl, {native_parser:true});
 // Make sure the test database is clean.
-db.collectionNames(function(err, items) {
-  console.log('items');
-  console.log(items);
-  expect(items).to.eql([]);
+var sara_db = mongo.db(configDB.url, {native_parser:true});
+sara_db.collectionNames(function(err, items) {
+  expect(items).to.eql([]);  // MUST NOT BE USED!
 });
+// Connect to test db.
+var db = mongo.db(configTest.dbUrl, {native_parser:true});
+
 
 
 // =====================================================================

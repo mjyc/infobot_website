@@ -15,6 +15,12 @@ module.exports = function(grunt) {
         options: {
           logConcurrentOutput: true
         }
+      },
+      test: {
+        tasks: ['nodemon', 'node-inspector', 'shell:ros4test', 'watch'],
+        options: {
+          logConcurrentOutput: true
+        }
       }
     },
 
@@ -107,5 +113,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['concurrent:dev']);
   grunt.registerTask('debug', ['concurrent:debug']);
-  grunt.registerTask('test', ['env:test','concurrent:debug']);
+  grunt.registerTask('test', ['env:test','concurrent:test']);
 };
