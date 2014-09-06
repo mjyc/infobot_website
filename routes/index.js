@@ -8,7 +8,7 @@ var passport = require('passport');
 
 
 // =====================================================================
-// Helper Function
+// Functions
 // =====================================================================
 
 // Route middleware to ensure user is logged in.
@@ -55,6 +55,22 @@ router.get('/logout', function(req, res) {
 // Authenticate (First Login)
 // =====================================================================
 
+// Local
+
+// Process the login form.
+router.post('/login', passport.authenticate('local-login', {
+  successRedirect : '/home',
+  failureRedirect : '/',
+  failureFlash : true
+}));
+
+// Process the signup form.
+router.post('/signup', passport.authenticate('local-signup', {
+  successRedirect : '/home',
+  failureRedirect : '/',
+  failureFlash : true
+}));
+
 // Google
 
 // Send to google to do the authentication.
@@ -74,6 +90,14 @@ router.get('/auth/google/callback',
 // Authorize (Already Logged In / Connecting Other Social Account)
 // =====================================================================
 
+// Local
+
+router.post('/connect/local', passport.authenticate('local-signup', {
+  successRedirect : '/home',
+  failureRedirect : '/',
+  failureFlash : true
+}));
+
 // Google
 
 // Send to google to do the authentication.
@@ -87,21 +111,6 @@ router.get('/connect/google/callback',
     successRedirect: '/home',
     failureRedirect: '/'
   }));
-
-
-// =====================================================================
-// Unlink Accounts
-// =====================================================================
-
-// Google
-
-router.get('/unlink/google', isLoggedIn, function(req, res) {
-  var user = req.user;
-  user.google.token = undefined;
-  user.save(function(err) {
-    res.redirect('/home');
-  });
-});
 
 
 module.exports = router;
