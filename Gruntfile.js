@@ -84,6 +84,9 @@ module.exports = function(grunt) {
     },
 
     shell: {
+      ros: {
+        command: 'roslaunch launch/run_rosnodes.launch'
+      },
       ros4test: {
         command: 'roslaunch launch/run_rosnodes_test.launch'
       }
