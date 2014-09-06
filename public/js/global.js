@@ -23,10 +23,10 @@ $(document).ready(function() {
 
   // });
 
-  $('#submitQuestion #inputDeadline').timepicker();
+  // $('#submitQuestion #inputDeadline').timepicker();
 
-  // // Populate the user table on initial page load
-  // populateTable();
+  // Populate the user table on initial page load
+  // populateFeed();
 
   // // Add User button click.
   // $('#btnGetQuery').on('click', getQuery);
@@ -48,76 +48,82 @@ $(document).ready(function() {
 
   // // Delete User link click.
   // $('#userList table tbody').on('click', 'td a.linkdeleteuser', deleteUser);
-
-
-  // ROS
-
-  // var ros = new ROSLIB.Ros({
-  //   url : 'ws://localhost:9090'
-  // });
-
-  // ros.on('connection', function() {
-  //   console.log('Connected to websocket server.');
-  // });
-
-  // ros.on('error', function(error) {
-  //   console.log('Error connecting to websocket server: ', error);
-  // });
-
-  // ros.on('close', function() {
-  //   console.log('Connection to websocket server closed.');
-  // });
-
 });
 
 
-// function (queryjob_id, timeissued) {
+// ROS
+var ros = new ROSLIB.Ros({
+  url : 'ws://localhost:9090'
+});
 
-//   var scheduleQueryJobClient = new ROSLIB.Service({
-//     ros : ros,
-//     name : '/schedule_query',
-//     serviceType : 'sara_queryjob_manager/ScheduleQueryJob'
-//   });
+ros.on('connection', function() {
+  console.log('Connected to websocket server.');
+});
 
-//   var request = new ROSLIB.ServiceRequest({
-//     queryjob_id : queryjob_id,
-//     queryjob_id : timeissued
-//   });
+ros.on('error', function(error) {
+  console.log('Error connecting to websocket server: ', error);
+});
 
-//   addTwoIntsClient.callService(request, function(result) {
-//     return
-//   });
+ros.on('close', function() {
+  console.log('Connection to websocket server closed.');
+});
 
-//   // return
-// }
+var testService = function(queryjob_id, timeissued, cb) {
+  var scheduleQueryJobClient = new ROSLIB.Service({
+    ros : ros,
+    name : '/schedule_query',
+    serviceType : 'sara_queryjob_manager/ScheduleQueryJob'
+  });
 
+  var request = new ROSLIB.ServiceRequest({
+    'queryjob_id' : queryjob_id,
+    'timeissued' : timeissued
+  });
+
+  scheduleQueryJobClient.callService(request, cb);
+};
 
 // =====================================================================
 // Functions
 // =====================================================================
 
+// // Fill table with data
+// function populateTable() {
+
+//     // Empty content string
+//     var feedContent = '';
+
+//     // jQuery AJAX call for JSON
+//     $.getJSON('/queryjobs/listqueryjob', function( data ) {
+
+//         // Stick our user data array into a userlist variable in the global object
+//         userListData = data;
+
+//         // // For each item in our JSON, add a table row and cells to the content string
+//         // $.each(data, function(){
+//         //     feedContent += '<tr>';
+//         //     feedContent += '<td><a href="#" class="linkshowuser" rel="' + this.username + '" title="Show Details">' + this.username + '</a></td>';
+//         //     feedContent += '<td>' + this.email + '</td>';
+//         //     feedContent += '<td><a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></td>';
+//         //     feedContent += '</tr>';
+//         // });
+
+//         // // Inject the whole content string into our existing HTML table
+//         // $('#userList table tbody').html(tableContent);
+//     });
+// }
+
 // Add User.
 function submitQuestion(event) {
   event.preventDefault();
 
-  // get toggle state and other state
-  // then send to the server
+  // TODO(mjyc): implement input validation.
 
-  // // TODO(mjyc): do better validation
-  // var errorCount = 0;
-  // $('#addUser input').each(function(index, val) {
-  //     if($(this).val() === '') { errorCount++; }
-  // });
-
-  // Check and make sure errorCount's still at zero
-  // if(errorCount === 0) {
-
-  // If it is, compile all user info into one object.
   var newQueryJob = {
     'timeissued': new Date(),
     'typed_cmd': $('#submitQuestion input#inputTypedCmd').val(),
-    'sms_notification': $('#submitQuestion button#btnToggleSMS').hasClass('active'),
-    'email_notification': $('#submitQuestion button#btnToggleEmail').hasClass('active'),
+    'notification_sms': $('#submitQuestion button#btnToggleSMS').hasClass('active'),
+    'notification_email': $('#submitQuestion button#btnToggleEmail').hasClass('active'),
   };
 
   // Use AJAX to post the object to our adduser service.
@@ -126,22 +132,9 @@ function submitQuestion(event) {
     data: newQueryJob,
     url: '/queryjobs/addqueryjob',
     dataType: 'JSON'
-  }).done(function(response) {
-    // Check for successful (blank) response
-    if (response.msg === '') {
-      console.log('successful!! Yay!!');
-      if (response.msg === '') {
-        console.log();
-      }
-    } else {
-      // If something goes wrong, alert the error message that our service returned
-      alert('Error: ' + response.msg);
-    }
+  }).done(function(res) {
+    console.log(res);
+  }).fail(function() {
+    console.log('error occured');
   });
-  // }
-  // else {
-  //     // If errorCount is more than 0, error out
-  //     alert('Please fill in all fields');
-  //     return false;
-  // }
 }
