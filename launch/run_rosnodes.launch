@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <launch>
 
-  <!-- TODO(mjyc): finish this up -->
+  <!-- TODO: think about restructuring two launch files -->
 
   <arg name="host" default="localhost"/>
   <arg name="port" default="27017"/>

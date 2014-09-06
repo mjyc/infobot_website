@@ -84,6 +84,7 @@ module.exports = function(grunt) {
     },
 
     shell: {
+      // TODO: use option-like strategy.
       ros: {
         command: 'roslaunch launch/run_rosnodes.launch'
       },
@@ -94,7 +95,7 @@ module.exports = function(grunt) {
 
     watch: {
       js: {
-        files: ['.rebooted', 'public/js/**/*.js'],
+        files: ['.rebooted'],
         tasks: ['jshint'],
         options: {
           livereload: true
