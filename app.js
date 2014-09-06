@@ -7,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongo = require('mongoskin');
 var passport = require('passport');
+var flash = require('connect-flash');
 var session = require('express-session');
 
 // Locals.
@@ -14,10 +15,15 @@ var routes = require('./routes/index');
 var queryjobs = require('./routes/queryjobs');
 var configDB = require('./config/database.js');
 var sessionDB = require('./config/session.js');
+var configTest = require('./config/test.js');
 
 
 // DB and passport setups.
-var db = mongo.db(configDB.url, {native_parser:true});  // connect to db
+var dbUrl = configDB.url;
+if (process.env.TEST) {
+  dbUrl = configTest.dbUrl;
+}
+var db = mongo.db(dbUrl, {native_parser:true});  // connect to db
 require('./config/passport')(passport, db);  // load passport
 
 
@@ -37,6 +43,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: sessionDB.secret }));
 app.use(passport.initialize());
 app.use(passport.session());  // persistent login sessions
+app.use(flash());  // use connect-flash for flash messages stored in
+//   session
 
 // Make our db accessible to our router
 app.use(function(req,res,next){
@@ -77,6 +85,7 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
+
 
 
 module.exports = app;
