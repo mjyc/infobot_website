@@ -16,6 +16,7 @@
     "passport": "~0.1.17",
     "passport-google-oauth": "~0.1.5",
     "passport-local": "~0.1.6",
+    "roslib": "^0.8.3",
     "static-favicon": "~1.0.0"
   },
   "devDependencies": {
