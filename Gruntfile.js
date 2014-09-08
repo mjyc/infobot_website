@@ -64,14 +64,6 @@ module.exports = function(grunt) {
               console.log(event.colour);
             });
 
-            // // Opens browser on initial server start.
-            // nodemon.on('config:update', function() {
-            //   // Delay before server listens on port.
-            //   setTimeout(function() {
-            //     require('open')('http://localhost:8080');
-            //   }, 300);
-            // });
-
             // Refreshes browser when server reboots.
             nodemon.on('restart', function() {
               setTimeout(function() {
