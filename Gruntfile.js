@@ -17,7 +17,7 @@ module.exports = function(grunt) {
         }
       },
       test: {
-        tasks: ['nodemon', 'node-inspector', 'shell:ros4test', 'watch'],
+        tasks: ['node-inspector', 'shell:nodemon', 'shell:ros4test', 'watch'],
         options: {
           logConcurrentOutput: true
         }
@@ -26,7 +26,7 @@ module.exports = function(grunt) {
 
     env: {
       test: {
-        TEST: '1'  // anything not will trigger the test.
+        TEST: '1'  // any value will trigger the test.
       }
     },
 
@@ -84,12 +84,15 @@ module.exports = function(grunt) {
     },
 
     shell: {
-      // TODO: use option-like strategy.
       ros: {
         command: 'roslaunch launch/run_rosnodes.launch'
       },
       ros4test: {
         command: 'roslaunch launch/run_rosnodes_test.launch'
+      },
+      // Delays nodemon start time to wait for ros programs.
+      nodemon: {
+        command: 'sleep 3; grunt nodemon:dev'
       }
     },
 
@@ -114,6 +117,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-nodemon');
   grunt.loadNpmTasks('grunt-open');
   grunt.loadNpmTasks('grunt-shell');
+
+  grunt.registerTask('nodemon-delay', ['shell:sleep', 'nodemon']);
 
   grunt.registerTask('default', ['concurrent:dev']);
   grunt.registerTask('debug', ['concurrent:debug']);
