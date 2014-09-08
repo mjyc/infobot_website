@@ -82,7 +82,7 @@ module.exports = function(grunt) {
       ros4test: {
         command: 'roslaunch launch/run_rosnodes_test.launch'
       },
-      // Delays nodemon start time to wait for ros programs.
+      // Delays nodemon start time to wait for ROS programs.
       nodemon: {
         command: 'sleep 3; grunt nodemon:dev'
       }

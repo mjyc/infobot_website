@@ -1,8 +1,6 @@
 <?xml version="1.0" ?>
 <launch>
 
-  <!-- TODO: think about restructuring two launch files -->
-
   <arg name="host" default="localhost"/>
   <arg name="port" default="27017"/>
   <arg name="dbname" default="sara_uw_website"/>
