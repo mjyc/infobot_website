@@ -109,46 +109,6 @@ describe('queryjobs routing test', function() {
 
   beforeEach(loginUser(agent));
 
-  // // TODO: finish or remove this
-  // it('get queryjob', function(done) {
-
-  //   // Create test QueryJobs.
-  //   var N = 100;
-  //   // 30 days ago (~month ago).
-  //   var startDate = new Date(new Date.getTime() - 1000*60*60*24*5);
-  //   var endDate = new Date();
-  //   for (var i = N - 1; i >= 0; i--) {
-  //     var timeissuedDate = randomDate(startDate, endDate);
-  //     var timeissued = timeissuedDate.toISOString();
-  //     var typed_cmd = loremIpsum();
-  //     var notification_sms = randomBoolean();
-  //     var notification_email = randomBoolean();
-  //     var deadline = new Date(
-  //       timeissued.getTime() + 1000*60*60*1*1).toISOString();
-
-  //     agent
-  //       .post('http://localhost:8080/queryjobs/addqueryjob')
-  //       .send({
-  //         'timeissued': timeissued,
-  //         'typed_cmd': typed_cmd,
-  //         'notification_sms': notification_sms,
-  //         'notification_email': notification_email,
-  //         'deadline': deadline
-  //       })
-  //       .end(function(err, res) {
-  //         expect(err).to.eql(null);
-  //         console.log(res.body.length);
-  //         // expect(res.body.length).to.eql(1);
-  //         // expect(res.body[0].timeissued).to.eql(timeissued);
-  //         // expect(res.body[0].typed_cmd).to.eql(typed_cmd);
-  //         // expect(res.body[0].notification_sms).to.eql(notification_sms);
-  //         // expect(res.body[0].notification_email).to.eql(notification_email);
-  //         // expect(res.body[0].deadline).to.eql(deadline);
-  //         return done();
-  //       });
-  //   }
-  // });
-
   it('post queryjob', function(done) {
     var timeissued = new Date().toISOString();  // ISO is the date
     //   format MongoDB expects
