@@ -11,9 +11,12 @@ var passport = require('passport');
 // Functions
 // =====================================================================
 
-// Route middleware to ensure user is logged in.
-function isLoggedIn(req, res, next) {
-  if (req.isAuthenticated()) {
+// Route middleware to ensure (1) the server is connected to ROS and
+// (2) user is logged in.
+function isServerReady(req, res, next) {
+  if (!req.ros.connection) {
+    return next(new Error('Cannot connect to ROS.'));
+  } else if (req.isAuthenticated()) {
     return next();
   }
 
@@ -30,18 +33,13 @@ router.get('/', function(req, res) {
   if (req.isAuthenticated()) {
     res.redirect('/home');
   } else {
-    res.render('login.jade', {
-      isAuthenticated: req.isAuthenticated()
-    });
+    res.render('login.jade');
   }
 });
 
 // Home.
-router.get('/home', isLoggedIn, function(req, res) {
-  res.render('home.jade', {
-    isAuthenticated: req.isAuthenticated(),
-    user: req.user
-  });
+router.get('/home', isServerReady, function(req, res) {
+  res.render('home.jade', { user: req.user });
 });
 
 // Logout.
