@@ -11,7 +11,7 @@ module.exports = function(grunt) {
         }
       },
       test: {
-        tasks: ['node-inspector', 'shell:nodemon-dev', 'shell:ros4test', 'watch'],
+        tasks: ['node-inspector', 'shell:nodemon', 'shell:ros4test', 'watch'],
         options: {
           logConcurrentOutput: true
         }
