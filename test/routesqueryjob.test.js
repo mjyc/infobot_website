@@ -110,14 +110,13 @@ describe('queryjobs routing test', function() {
   beforeEach(loginUser(agent));
 
   it('post queryjob', function(done) {
-    var timeissued = new Date().toISOString();  // ISO is the date
-    //   format MongoDB expects
+    var timeissued = new Date().toISOString();
     var typed_cmd = loremIpsum();
     var notification_sms = randomBoolean();
     var notification_email = randomBoolean();
     var deadline = new Date(
-      new Date().getTime() + 1000*60*60*1*1).toISOString();
-    //   1 hr from now
+      new Date().getTime() + 1000*60*60*1*1).toISOString(); // 1 hr from
+    //   now
 
     agent
       .post('http://localhost:8080/queryjobs/addqueryjob')
