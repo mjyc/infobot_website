@@ -15,7 +15,6 @@ var router = express.Router();
 // List QueryJobs.
 router.post('/listqueryjobs', function(req, res, next) {
   var db = req.db;
-  console.log(req.body);
   // Parse inputs.
   var limit = parseInt(req.body.limit || '0');
   var startDate = new Date(req.body.startDate);
