@@ -1,0 +1,18 @@
+//- NOTE: Use this template only when a user is authenticated.
+.navbar.navbar-inverse.navbar-fixed-top(role="navigation")
+  .container
+    .navbar-header
+      button.navbar-toggle(type="button", data-toggle="collapse",
+        data-target=".navbar-collapse")
+        span.sr-only Toggle navigation
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+    .navbar-collapse.collapse
+      ul.nav.navbar-nav
+        li#Home
+          a(href="#") Ask DUB-E
+        li#QFeed
+          a(href="#") Question Feed
+      p.navbar-text.navbar-right
+        | Signed in as #{user.name}

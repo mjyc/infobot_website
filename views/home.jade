@@ -1,6 +1,10 @@
 extends layout
 
 block content
+
+  //- MENUBAR
+  include menubar
+
   //- JUMBOTRON
   .jumbotron(style="padding: 70px 0px 20px; margin-bottom: 0px;")
     .container
@@ -20,45 +24,45 @@ block content
               data-toggle="button") Email
 
   //- MAIN CONTENTS
-  .container
-    .row(style="padding-top: 30px")
-      p.col-sm-8
-        span(style="display: inline-block; font-weight: bold;\
-          padding-right: 10px") #{user.google.name} &nbsp;
-          span(style="; font-weight: normal; color: gray;") Today at 10:05am
-        span(style="display: inline-block;") Is Aleesha in her office?
-      p.col-sm-4(style="text-align: right;")
-        button.btn.btn-default.btn-xs(type="button", disabled="disabled",
-          style="opacity: 1;") deadline at 10:20am
-        | &nbsp;&nbsp;
-        button.btn.btn-default.btn-xs(type="button", disabled="disabled",
-          style="opacity: 1;") in queue
-      .col-xs-12(style="text-align: left;")
-        button.btn.btn-default(type="button") Cancel
+  .container#feedList
+    //- .row(style="padding-top: 30px")
+    //-   p.col-sm-8
+    //-     span(style="display: inline-block; font-weight: bold;\
+    //-       padding-right: 10px") #{user.google.name} &nbsp;
+    //-       span(style="font-weight: normal; color: gray;") Today at 10:05am
+    //-     span(style="display: inline-block;") Is Aleesha in her office?
+    //-   p.col-sm-4(style="text-align: right;")
+    //-     button.btn.btn-default.btn-xs(type="button", disabled="disabled",
+    //-       style="opacity: 1;") deadline at 10:20am
+    //-     | &nbsp;&nbsp;
+    //-     button.btn.btn-default.btn-xs(type="button", disabled="disabled",
+    //-       style="opacity: 1;") in queue
+    //-   .col-xs-12(style="text-align: left;")
+    //-     button.btn.btn-default(type="button") Cancel
 
-    .row(style="padding-top: 40px")
-      p.col-sm-12
-        span(style="display: inline-block; font-weight: bold;\
-          padding-right: 10px") #{user.google.name} &nbsp;
-          span(style="; font-weight: normal; color: gray;") Today at 10:05am
-        span(style="display: inline-block;") Is Aleesha in her office?
-      p.col-sm-8
-        span(style="display: inline-block; font-weight: bold;\
-          padding-right: 10px") DUB-E &nbsp;
-          span(style="; font-weight: normal; color: gray;") Today at 10:15am
-        span(style="display: inline-block;") Yes
-      p.col-sm-4(style="text-align: right;")
-        button.btn.btn-default.btn-xs(type="button", disabled="disabled",
-          style="opacity: 1;") 80% accuracy
-        | &nbsp;&nbsp;
-        button.btn.btn-success.btn-xs(type="button", disabled="disabled",
-          style="opacity: 1;") success
-      p.col-sm-12(style="text-align: center;")
-        img#imgresult1.img-rounded(src="img/Image_view_example_resized.png",
-          alt="result", style="display: none;")
-      p.col-sm-12(style="text-align: left;")
-        button#btnimgresult1.btn.btn-default(type="button")
-          | Toggle result picture
+    //- .row(style="padding-top: 40px")
+    //-   p.col-sm-12
+    //-     span(style="display: inline-block; font-weight: bold;\
+    //-       padding-right: 10px") #{user.google.name} &nbsp;
+    //-       span(style="; font-weight: normal; color: gray;") Today at 10:05am
+    //-     span(style="display: inline-block;") Is Aleesha in her office?
+    //-   p.col-sm-8
+    //-     span(style="display: inline-block; font-weight: bold;\
+    //-       padding-right: 10px") DUB-E &nbsp;
+    //-       span(style="; font-weight: normal; color: gray;") Today at 10:15am
+    //-     span(style="display: inline-block;") Yes
+    //-   p.col-sm-4(style="text-align: right;")
+    //-     button.btn.btn-default.btn-xs(type="button", disabled="disabled",
+    //-       style="opacity: 1;") 80% accuracy
+    //-     | &nbsp;&nbsp;
+    //-     button.btn.btn-success.btn-xs(type="button", disabled="disabled",
+    //-       style="opacity: 1;") success
+    //-   p.col-sm-12(style="text-align: center;")
+    //-     img#imgresult1.img-rounded(src="img/Image_view_example_resized.png",
+    //-       alt="result", style="display: none;")
+    //-   p.col-sm-12(style="text-align: left;")
+    //-     button#btnimgresult1.btn.btn-default(type="button")
+    //-       | Toggle result picture
 
 
     //- .row(style="padding-top: 40px")
@@ -73,3 +77,6 @@ block content
     //-       span Yes
     //-   p.col-sm-4(style="text-align: right;")
     //-     button.btn.btn-danger.btn-xs(type="button", disabled="disabled", style="opacity: 1;") failed
+
+block javascript
+  script(src="js/home.js")
