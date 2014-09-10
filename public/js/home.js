@@ -78,6 +78,14 @@ var Home = function() {
   this.userOnly = true;
   this.lastTimeissued = new Date();
 
+  // Copied from
+  this.RECEIVED = 0;
+  this.SCHEDULED = 1;
+  this.RUNNING = 2;
+  this.SUCCEEDED = 3;
+  this.CANCELLED = 4;
+  this.FAILED = 5;
+
   // Heck to prevent creating multiple, overlapping feeds.
   this.lock = false;
 
@@ -96,6 +104,24 @@ var Home = function() {
   this.ros.on('close', function() {
     console.log('Connection to websocket server closed.');
     location.reload(true);
+  });
+
+  var listener = new ROSLIB.Topic({
+    ros : this.ros,
+    name : '/queryjob_update',
+    messageType : 'sara_queryjob_manager/QueryJobUpdate'
+  });
+
+  listener.subscribe(function(message) {
+    console.log('Received message');
+    console.log(message);
+
+    // if ($.inArray("status", message.field_names)) {
+    //   $.('#btn-'+message.queryjob_id).removeClass('btn-default');
+
+    //   $.('#btn-'+message.queryjob_id).addClass('btn-default');
+    //   $.('#btn-'+message.queryjob_id).addClass('btn-default');
+    // }
   });
 };
 
@@ -121,37 +147,13 @@ Home.prototype.callScheduleQueryJob = function(queryjob, callback) {
 
 };
 
-Home.prototype.createFeed = function(queryjob) {
-  var feed = '';
-  feed += '<div style="padding-top: 30px" class="row">';
-  feed += '<p class="col-sm-8">';
-  feed += '<span style="display: inline-block; font-weight: bold; padding-right: 10px">' + queryjob.user_name + '&nbsp;';
-  feed += '<span style="font-weight: normal; color: gray;">' + formatTodayYesterday(new Date(queryjob.timeissued)) + '</span>';
-  feed += '</span>';
-  feed += '<span style="display: inline-block;">' + queryjob.typed_cmd + '</span>';
-  feed += '</p>';
-  feed += '<p style="text-align: right;" class="col-sm-4">';
-  feed += '<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">deadline at ' + formatAMPM(new Date(queryjob.deadline)) + '</button>';
-  feed += '&nbsp;&nbsp;';
-  feed += '<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">in queue</button>';
-  feed += '</p>';
-  feed += '<div style="text-align: left;" class="col-xs-12">';
-  feed += '<button type="button" class="btn btn-default">Cancel</button>';
-  feed += '</div>';
-  feed += '</div>';
-  return feed;
-};
-
 Home.prototype.populateFeed = function(data, callback) {
   var that = this;
 
   if (!that.lock) {
     that.lock = true;
   } else {
-    return callback({
-      'timeissued': null,
-      'feedContent': ''
-    });
+    return callback(null);  // return null
   }
   $.post('/queryjobs/listqueryjobs', data, function(results) {
     var timeissued = null;
@@ -160,14 +162,89 @@ Home.prototype.populateFeed = function(data, callback) {
     }
 
     var feedContent = '';
-    $.each(results, function(index, value){
-      feedContent += that.createFeed(value);
+    $.each(results, function(index, value) {
+      var queryjob = value;
+      var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
+      // var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
+      // var id_result_dashboard = queryjob._id + '-result-dashboard';
+
+      // feedContent += that.createFeed(value);
+      feedContent += '<div style="padding-top: 30px" class="row" id="' + queryjob._id + '">';
+      feedContent += '<p class="col-sm-8">';
+      feedContent += '<span style="display: inline-block; font-weight: bold; padding-right: 10px">' + queryjob.user_name + '&nbsp;';
+      feedContent += '<span style="font-weight: normal; color: gray;">' + formatTodayYesterday(new Date(queryjob.timeissued)) + '</span>';
+      feedContent += '</span>';
+      feedContent += '<span style="display: inline-block;">' + queryjob.typed_cmd + '</span>';
+      feedContent += '</p>';
+      feedContent += '<p style="text-align: right;" class="col-sm-4" id="' + id_userinput_dashboard + '">';
+      feedContent += '</p>';
+      // feedContent += '<div style="text-align: left;" class="col-xs-12">';
+      // feedContent += '<button type="button" class="btn btn-default">Cancel</button>';
+      // feedContent += '</div>';
+      feedContent += '</div>';
     });
 
-    callback({
-      'timeissued': timeissued,
-      'feedContent': feedContent
+    // Assumes feedContents are set to HTML in callback.
+    if (timeissued !== null) {
+      callback({ 'timeissued': timeissued, 'feedContent': feedContent });
+    } else {
+      callback(null);
+    }
+
+    // Update userinput dashboard
+    $.each(results, function(index, value) {
+      var queryjob = value;
+      var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
+
+      if (queryjob.deadline) {
+        $('#'+id_userinput_dashboard).append('<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">deadline at ' + formatAMPM(new Date(queryjob.deadline)) + '</button>');
+      }
+
+      var cancelBtn = '';
+      cancelBtn += '<div style="text-align: left;" class="col-xs-12">';
+      cancelBtn += '<button type="button" class="btn btn-default">Cancel</button>';
+      cancelBtn += '</div>';
+      if (queryjob.status === that.RECEIVED || queryjob.status === that.SCHEDULED) {
+        $('#'+id_userinput_dashboard).append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">in queue</button>');
+        $('#'+id_userinput_dashboard).add(cancelBtn);
+      } else if (queryjob.status === that.RUNNING) {
+        $('#'+id_userinput_dashboard).append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-warning btn-xs">running</button>');
+        $('#'+id_userinput_dashboard).add(cancelBtn);
+      }
     });
+
+    // Update result dashboard
+    $.each(results, function(index, value) {
+      var queryjob = value;
+      var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
+      // var id_result_dashboard = queryjob._id + '-result-dashboard';
+      var id_result_dashboard = queryjob._id + '-userinput-dashboard';
+
+      var resultP = '';
+      resultP += '<p style="text-align: right;" class="col-sm-4" id="' + id_result_dashboard + '">';
+      resultP += '</p>';
+
+      var toggleBtn = '';
+      toggleBtn += '<div style="text-align: left;" class="col-xs-12">';
+      toggleBtn += '<button type="button" class="btn btn-default">Cancel</button>';
+      toggleBtn += '</div>';
+
+      if (queryjob.status === that.SUCCEEDED || queryjob.status === that.CANCELLED || queryjob.status === that.FAILED) {
+        $('#'+id_userinput_dashboard).add(resultP);
+
+        if (queryjob.status === that.SUCCEEDED) {
+          $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-success btn-xs">succeeded</button>');
+          $('#'+id_result_dashboard).append(toggleBtn);
+        } else if (queryjob.status === that.CANCELLED) {
+          $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-danger btn-xs">cancelled</button>');
+          $('#'+id_result_dashboard).append(toggleBtn);
+        } else if (queryjob.status === that.FAILED) {
+          $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-danger btn-xs">failed</button>');
+          $('#'+id_result_dashboard).append(toggleBtn);
+        }
+      }
+    });
+
     that.lock = false;
   }, 'JSON');
 };
@@ -181,8 +258,10 @@ Home.prototype.displayFeed = function() {
     'userOnly': that.userOnly
   };
   var callback = function(result) {
-    $('#feedList').html(result.feedContent);
-    that.lastTimeissued = result.timeissued;
+    if (result) {
+      $('#feedList').html(result.feedContent);
+      that.lastTimeissued = result.timeissued;
+    }
   };
 
   that.populateFeed(data, callback);
@@ -197,8 +276,10 @@ Home.prototype.appendFeed = function() {
     'userOnly': that.userOnly
   };
   var callback = function(result) {
-    $('#feedList').append(result.feedContent);
-    that.lastTimeissued = result.timeissued;
+    if (result) {
+      $('#feedList').append(result.feedContent);
+      that.lastTimeissued = result.timeissued;
+    }
   };
 
   that.populateFeed(data, callback);
@@ -223,9 +304,9 @@ Home.prototype.submitQuestion = function() {
 
     // Use AJAX to post the object to our adduser service.
     $.post('/queryjobs/addqueryjob', newQueryJob, function(result) {
-      that.displayFeed();
       that.callScheduleQueryJob(result[0], function(res) {
         console.log(res);
+        that.displayFeed();
       });
     }, 'JSON');
   };
