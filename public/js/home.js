@@ -163,6 +163,14 @@ Home.prototype.populateFeed = function(data) {
     }
 
     $.each(results, function(index, queryjob) {
+
+      // var divQueryJob = $('<div/>').css('padding-top', '30px').addClass("row");
+      // var userInputLeftP = $('<p/>', {
+      //   class: 'col-sm-8'
+      // });
+      // $('#feedList').append(queryJobDiv);
+
+
       // Create div for each QueryJob.
       $('#feedList').append('<div " id="' + queryjob._id + '"></div>');
       $('#'+queryjob._id).css('padding-top', '30px').addClass("row");
@@ -192,67 +200,6 @@ Home.prototype.populateFeed = function(data) {
         $('#'+queryjob._id + '-buttons').append('<button type="button" class="btn btn-default">Show & Hide</button>');
       }
     });
-
-    // // Assumes feedContents are set to HTML in callback.
-    // if (timeissued !== null) {
-    //   callback({ 'timeissued': timeissued, 'feedContent': feedContent });
-    // } else {
-    //   callback(null);
-    // }
-
-    // // Update userinput dashboard
-    // $.each(results, function(index, value) {
-    //   var queryjob = value;
-    //   var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
-
-    //   if (queryjob.deadline) {
-    //     $('#'+id_userinput_dashboard).append('<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">deadline at ' + formatAMPM(new Date(queryjob.deadline)) + '</button>');
-    //   }
-
-    //   var cancelBtn = '';
-    //   cancelBtn += '<div style="text-align: left;" class="col-xs-12">';
-    //   cancelBtn += '<button type="button" class="btn btn-default">Cancel</button>';
-    //   cancelBtn += '</div>';
-    //   if (queryjob.status === that.RECEIVED || queryjob.status === that.SCHEDULED) {
-    //     $('#'+id_userinput_dashboard).append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">in queue</button>');
-    //     $('#'+id_userinput_dashboard).add(cancelBtn);
-    //   } else if (queryjob.status === that.RUNNING) {
-    //     $('#'+id_userinput_dashboard).append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-warning btn-xs">running</button>');
-    //     $('#'+id_userinput_dashboard).add(cancelBtn);
-    //   }
-    // });
-
-    // // Update result dashboard
-    // $.each(results, function(index, value) {
-    //   var queryjob = value;
-    //   var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
-    //   // var id_result_dashboard = queryjob._id + '-result-dashboard';
-    //   var id_result_dashboard = queryjob._id + '-userinput-dashboard';
-
-    //   var resultP = '';
-    //   resultP += '<p style="text-align: right;" class="col-sm-4" id="' + id_result_dashboard + '">';
-    //   resultP += '</p>';
-
-    //   var toggleBtn = '';
-    //   toggleBtn += '<div style="text-align: left;" class="col-xs-12">';
-    //   toggleBtn += '<button type="button" class="btn btn-default">Cancel</button>';
-    //   toggleBtn += '</div>';
-
-    //   if (queryjob.status === that.SUCCEEDED || queryjob.status === that.CANCELLED || queryjob.status === that.FAILED) {
-    //     $('#'+id_userinput_dashboard).add(resultP);
-
-    //     if (queryjob.status === that.SUCCEEDED) {
-    //       $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-success btn-xs">succeeded</button>');
-    //       $('#'+id_result_dashboard).append(toggleBtn);
-    //     } else if (queryjob.status === that.CANCELLED) {
-    //       $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-danger btn-xs">cancelled</button>');
-    //       $('#'+id_result_dashboard).append(toggleBtn);
-    //     } else if (queryjob.status === that.FAILED) {
-    //       $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-danger btn-xs">failed</button>');
-    //       $('#'+id_result_dashboard).append(toggleBtn);
-    //     }
-    //   }
-    // });
 
     that.lock = false;
   }, 'JSON');
