@@ -249,7 +249,8 @@ Home.prototype.displayFeeds = function() {
   var data = {
     startDate: new Date().toISOString(),
     limit: that.LIMIT,
-    userOnly: that.userOnly
+    userOnly: that.userOnly,
+    publicOnly: !that.userOnly
   };
 
   $('#feedList').children().remove();
@@ -280,7 +281,7 @@ Home.prototype.submitQuestion = function() {
       notification_sms: false,
       notification_email: $('#submitQuestion button#btnToggleEmail')
         .hasClass('active'),
-      'public': $('#submitQuestion button#btnTogglePublic')
+      'is_public': $('#submitQuestion button#btnTogglePublic')
         .hasClass('active'),
       deadline: new Date(new Date().getTime() + 1000*60*60*1*1)
         .toISOString()

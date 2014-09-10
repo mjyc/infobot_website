@@ -46,12 +46,15 @@ router.post('/getqueryjobs', function(req, res, next) {
   var limit = parseInt(req.body.limit || '0');  // get limit #
   var startDate = req.body.startDate;  // get QueryJobs from startDate
   var userOnly = req.body.userOnly === 'true';  // get user's QueryJobs
+  var publicOnly = req.body.publicOnly === 'true';  // get public
+  //   QueryJobs
 
   // Set query.
   var criteria = {};
   if (queryjobID) { criteria._id = new ObjectID(queryjobID); }
   if (startDate) { criteria.timeissued = {'$lt': new Date(startDate)}; }
   if (userOnly) { criteria.user_id = req.user._id; }
+  if (publicOnly) { criteria.is_public = 'true'; }
 
   db.collection('queryjobs').find(criteria).sort({'timeissued': -1})
     .limit(limit).toArray(function(err, results) {
