@@ -114,6 +114,7 @@ describe('queryjobs routing test', function() {
     var typed_cmd = loremIpsum();
     var notification_sms = randomBoolean();
     var notification_email = randomBoolean();
+    var is_public = randomBoolean();
     var deadline = new Date(
       new Date().getTime() + 1000*60*60*1*1).toISOString(); // 1 hr from
     //   now
@@ -125,6 +126,7 @@ describe('queryjobs routing test', function() {
         typed_cmd: typed_cmd,
         notification_sms: notification_sms,
         notification_email: notification_email,
+        is_public: is_public,
         deadline: deadline
       })
       .end(function(err, res) {
@@ -134,6 +136,7 @@ describe('queryjobs routing test', function() {
         expect(res.body[0].typed_cmd).to.eql(typed_cmd);
         expect(res.body[0].notification_sms).to.eql(notification_sms);
         expect(res.body[0].notification_email).to.eql(notification_email);
+        expect(res.body[0].is_public).to.eql(is_public);
         expect(res.body[0].deadline).to.eql(deadline);
         return done();
       });
