@@ -147,103 +147,112 @@ Home.prototype.callScheduleQueryJob = function(queryjob, callback) {
 
 };
 
-Home.prototype.populateFeed = function(data, callback) {
+Home.prototype.populateFeed = function(data) {
   var that = this;
 
   if (!that.lock) {
     that.lock = true;
   } else {
-    return callback(null);  // return null
+    return;
   }
+
   $.post('/queryjobs/listqueryjobs', data, function(results) {
-    var timeissued = null;
+    // var timeissued = null;
     if (results.length > 1) {
-      timeissued = results[results.length-1].timeissued;
+      that.lastTimeissued = results[results.length-1].timeissued;
     }
 
-    var feedContent = '';
-    $.each(results, function(index, value) {
-      var queryjob = value;
-      var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
-      // var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
-      // var id_result_dashboard = queryjob._id + '-result-dashboard';
+    $.each(results, function(index, queryjob) {
+      // Create div for each QueryJob.
+      $('#feedList').append('<div " id="' + queryjob._id + '"></div>');
+      $('#'+queryjob._id).css('padding-top', '30px').addClass("row");
 
-      // feedContent += that.createFeed(value);
-      feedContent += '<div style="padding-top: 30px" class="row" id="' + queryjob._id + '">';
-      feedContent += '<p class="col-sm-8">';
-      feedContent += '<span style="display: inline-block; font-weight: bold; padding-right: 10px">' + queryjob.user_name + '&nbsp;';
-      feedContent += '<span style="font-weight: normal; color: gray;">' + formatTodayYesterday(new Date(queryjob.timeissued)) + '</span>';
-      feedContent += '</span>';
-      feedContent += '<span style="display: inline-block;">' + queryjob.typed_cmd + '</span>';
-      feedContent += '</p>';
-      feedContent += '<p style="text-align: right;" class="col-sm-4" id="' + id_userinput_dashboard + '">';
-      feedContent += '</p>';
-      // feedContent += '<div style="text-align: left;" class="col-xs-12">';
-      // feedContent += '<button type="button" class="btn btn-default">Cancel</button>';
-      // feedContent += '</div>';
-      feedContent += '</div>';
-    });
+      // User info.
+      $('#'+queryjob._id).append('<p class="col-sm-8" id="' + queryjob._id + '-userinput-left"></p>');
+      $('#'+queryjob._id + '-userinput-left').append('<span class="name-text">' + queryjob.user_name + '&nbsp;&nbsp;<span class="time-text">' + formatTodayYesterday(new Date(queryjob.timeissued)) + '</span></span>');
+      $('#'+queryjob._id + '-userinput-left').append('<span class="cmd-text">' + queryjob.typed_cmd + '</span>');
 
-    // Assumes feedContents are set to HTML in callback.
-    if (timeissued !== null) {
-      callback({ 'timeissued': timeissued, 'feedContent': feedContent });
-    } else {
-      callback(null);
-    }
-
-    // Update userinput dashboard
-    $.each(results, function(index, value) {
-      var queryjob = value;
-      var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
-
+      // User input buttons.
+      $('#'+queryjob._id).append('<p style="text-align: right;" class="col-sm-4" id="' + queryjob._id + '-userinput-right"></p>');
+      if (queryjob.notification_email) {
+        $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">email</button>');
+      }
       if (queryjob.deadline) {
-        $('#'+id_userinput_dashboard).append('<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">deadline at ' + formatAMPM(new Date(queryjob.deadline)) + '</button>');
+        $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">deadline at ' + formatAMPM(new Date(queryjob.deadline)) + '</button>');
       }
 
-      var cancelBtn = '';
-      cancelBtn += '<div style="text-align: left;" class="col-xs-12">';
-      cancelBtn += '<button type="button" class="btn btn-default">Cancel</button>';
-      cancelBtn += '</div>';
-      if (queryjob.status === that.RECEIVED || queryjob.status === that.SCHEDULED) {
-        $('#'+id_userinput_dashboard).append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">in queue</button>');
-        $('#'+id_userinput_dashboard).add(cancelBtn);
-      } else if (queryjob.status === that.RUNNING) {
-        $('#'+id_userinput_dashboard).append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-warning btn-xs">running</button>');
-        $('#'+id_userinput_dashboard).add(cancelBtn);
+      // Cancel button.
+      $('#'+queryjob._id).append('<div style="text-align: left;" class="col-xs-12" id="' + queryjob._id + '-buttons"></div>');
+      if (queryjob.status === that.RECEIVED || queryjob.status === that.SCHEDULED || queryjob.status === that.RUNNING) {
+        $('#'+queryjob._id + '-buttons').append('<button type="button" class="btn btn-default">Cancel</button>');
       }
-    });
 
-    // Update result dashboard
-    $.each(results, function(index, value) {
-      var queryjob = value;
-      var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
-      // var id_result_dashboard = queryjob._id + '-result-dashboard';
-      var id_result_dashboard = queryjob._id + '-userinput-dashboard';
-
-      var resultP = '';
-      resultP += '<p style="text-align: right;" class="col-sm-4" id="' + id_result_dashboard + '">';
-      resultP += '</p>';
-
-      var toggleBtn = '';
-      toggleBtn += '<div style="text-align: left;" class="col-xs-12">';
-      toggleBtn += '<button type="button" class="btn btn-default">Cancel</button>';
-      toggleBtn += '</div>';
-
+      // Robot output buttons
       if (queryjob.status === that.SUCCEEDED || queryjob.status === that.CANCELLED || queryjob.status === that.FAILED) {
-        $('#'+id_userinput_dashboard).add(resultP);
-
-        if (queryjob.status === that.SUCCEEDED) {
-          $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-success btn-xs">succeeded</button>');
-          $('#'+id_result_dashboard).append(toggleBtn);
-        } else if (queryjob.status === that.CANCELLED) {
-          $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-danger btn-xs">cancelled</button>');
-          $('#'+id_result_dashboard).append(toggleBtn);
-        } else if (queryjob.status === that.FAILED) {
-          $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-danger btn-xs">failed</button>');
-          $('#'+id_result_dashboard).append(toggleBtn);
-        }
+        $('#'+queryjob._id + '-buttons').append('<button type="button" class="btn btn-default">Show & Hide</button>');
       }
     });
+
+    // // Assumes feedContents are set to HTML in callback.
+    // if (timeissued !== null) {
+    //   callback({ 'timeissued': timeissued, 'feedContent': feedContent });
+    // } else {
+    //   callback(null);
+    // }
+
+    // // Update userinput dashboard
+    // $.each(results, function(index, value) {
+    //   var queryjob = value;
+    //   var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
+
+    //   if (queryjob.deadline) {
+    //     $('#'+id_userinput_dashboard).append('<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">deadline at ' + formatAMPM(new Date(queryjob.deadline)) + '</button>');
+    //   }
+
+    //   var cancelBtn = '';
+    //   cancelBtn += '<div style="text-align: left;" class="col-xs-12">';
+    //   cancelBtn += '<button type="button" class="btn btn-default">Cancel</button>';
+    //   cancelBtn += '</div>';
+    //   if (queryjob.status === that.RECEIVED || queryjob.status === that.SCHEDULED) {
+    //     $('#'+id_userinput_dashboard).append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">in queue</button>');
+    //     $('#'+id_userinput_dashboard).add(cancelBtn);
+    //   } else if (queryjob.status === that.RUNNING) {
+    //     $('#'+id_userinput_dashboard).append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-warning btn-xs">running</button>');
+    //     $('#'+id_userinput_dashboard).add(cancelBtn);
+    //   }
+    // });
+
+    // // Update result dashboard
+    // $.each(results, function(index, value) {
+    //   var queryjob = value;
+    //   var id_userinput_dashboard = queryjob._id + '-userinput-dashboard';
+    //   // var id_result_dashboard = queryjob._id + '-result-dashboard';
+    //   var id_result_dashboard = queryjob._id + '-userinput-dashboard';
+
+    //   var resultP = '';
+    //   resultP += '<p style="text-align: right;" class="col-sm-4" id="' + id_result_dashboard + '">';
+    //   resultP += '</p>';
+
+    //   var toggleBtn = '';
+    //   toggleBtn += '<div style="text-align: left;" class="col-xs-12">';
+    //   toggleBtn += '<button type="button" class="btn btn-default">Cancel</button>';
+    //   toggleBtn += '</div>';
+
+    //   if (queryjob.status === that.SUCCEEDED || queryjob.status === that.CANCELLED || queryjob.status === that.FAILED) {
+    //     $('#'+id_userinput_dashboard).add(resultP);
+
+    //     if (queryjob.status === that.SUCCEEDED) {
+    //       $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-success btn-xs">succeeded</button>');
+    //       $('#'+id_result_dashboard).append(toggleBtn);
+    //     } else if (queryjob.status === that.CANCELLED) {
+    //       $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-danger btn-xs">cancelled</button>');
+    //       $('#'+id_result_dashboard).append(toggleBtn);
+    //     } else if (queryjob.status === that.FAILED) {
+    //       $('#'+id_result_dashboard).append('&nbsp;&nbsp;<button type="button" class="btn btn-danger btn-xs">failed</button>');
+    //       $('#'+id_result_dashboard).append(toggleBtn);
+    //     }
+    //   }
+    // });
 
     that.lock = false;
   }, 'JSON');
@@ -257,14 +266,9 @@ Home.prototype.displayFeed = function() {
     'limit': that.LIMIT,
     'userOnly': that.userOnly
   };
-  var callback = function(result) {
-    if (result) {
-      $('#feedList').html(result.feedContent);
-      that.lastTimeissued = result.timeissued;
-    }
-  };
 
-  that.populateFeed(data, callback);
+  $('feedList').html('');
+  that.populateFeed(data);
 };
 
 Home.prototype.appendFeed = function() {
@@ -275,14 +279,8 @@ Home.prototype.appendFeed = function() {
     'limit': that.LIMIT,
     'userOnly': that.userOnly
   };
-  var callback = function(result) {
-    if (result) {
-      $('#feedList').append(result.feedContent);
-      that.lastTimeissued = result.timeissued;
-    }
-  };
 
-  that.populateFeed(data, callback);
+  that.populateFeed(data);
 };
 
 Home.prototype.submitQuestion = function() {

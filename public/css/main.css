@@ -20,3 +20,18 @@ body {
   padding: 10px 10px;
   pointer-events: none;
 }
+
+.name-text {
+  display: inline-block;
+  font-weight: bold;
+  padding-right: 10px
+}
+
+.time-text {
+  font-weight: normal;
+  color: gray;
+}
+
+.cmd-text{
+  display: inline-block;
+}
