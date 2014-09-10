@@ -173,7 +173,7 @@ Home.prototype.populateFeed = function(data) {
 
       // Create div for each QueryJob.
       $('#feedList').append('<div " id="' + queryjob._id + '"></div>');
-      $('#'+queryjob._id).css('padding-top', '30px').addClass("row");
+      $('#'+queryjob._id).css('padding-top', '30px').addClass('row');
 
       // User info.
       $('#'+queryjob._id).append('<p class="col-sm-8" id="' + queryjob._id + '-userinput-left"></p>');
@@ -209,9 +209,9 @@ Home.prototype.displayFeed = function() {
   var that = this;
 
   var data = {
-    'startDate': new Date().toISOString(),
-    'limit': that.LIMIT,
-    'userOnly': that.userOnly
+    startDate: new Date().toISOString(),
+    limit: that.LIMIT,
+    userOnly: that.userOnly
   };
 
   $('feedList').html('');
@@ -222,9 +222,9 @@ Home.prototype.appendFeed = function() {
   var that = this;
 
   var data = {
-    'startDate': that.lastTimeissued,
-    'limit': that.LIMIT,
-    'userOnly': that.userOnly
+    startDate: that.lastTimeissued,
+    limit: that.LIMIT,
+    userOnly: that.userOnly
   };
 
   that.populateFeed(data);
@@ -237,13 +237,13 @@ Home.prototype.submitQuestion = function() {
     event.preventDefault();
 
     var newQueryJob = {
-      'timeissued': new Date().toISOString(),
-      'typed_cmd': $('#submitQuestion input#inputTypedCmd').val(),
-      'notification_sms': $('#submitQuestion button#btnToggleSMS')
+      timeissued: new Date().toISOString(),
+      typed_cmd: $('#submitQuestion input#inputTypedCmd').val(),
+      notification_sms: $('#submitQuestion button#btnToggleSMS')
         .hasClass('active'),
-      'notification_email': $('#submitQuestion button#btnToggleEmail')
+      notification_email: $('#submitQuestion button#btnToggleEmail')
         .hasClass('active'),
-      'deadline': new Date(new Date().getTime() + 1000*60*60*1*1)
+      deadline: new Date(new Date().getTime() + 1000*60*60*1*1)
         .toISOString()
     };
 

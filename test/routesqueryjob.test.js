@@ -121,11 +121,11 @@ describe('queryjobs routing test', function() {
     agent
       .post('http://localhost:8080/queryjobs/addqueryjob')
       .send({
-        'timeissued': timeissued,
-        'typed_cmd': typed_cmd,
-        'notification_sms': notification_sms,
-        'notification_email': notification_email,
-        'deadline': deadline
+        timeissued: timeissued,
+        typed_cmd: typed_cmd,
+        notification_sms: notification_sms,
+        notification_email: notification_email,
+        deadline: deadline
       })
       .end(function(err, res) {
         expect(err).to.eql(null);
