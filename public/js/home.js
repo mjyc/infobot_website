@@ -6,17 +6,17 @@ $(document).ready(function() {
   var home = new Home();
 
   // Show feeds
-  home.displayFeed();
+  home.displayFeeds();
 
   // Set up menu buttons.
   $('#Home').on('click', 'a', function() {
     home.userOnly = true;
-    home.displayFeed();
+    home.displayFeeds();
   });
 
   $('#QFeed').on('click', 'a', function() {
     home.userOnly = null;
-    home.displayFeed();
+    home.displayFeeds();
   });
 
   // Submit Question button click.
@@ -30,7 +30,7 @@ $(document).ready(function() {
     var scrolltrigger = 0.95;
 
     if  ((wintop/(docheight-winheight)) > scrolltrigger) {
-      home.appendFeed();
+      home.appendFeeds();
     }
   });
 
@@ -74,7 +74,7 @@ function formatTodayYesterday(date) {
 
 var Home = function() {
   var that = this;
-  this.LIMIT = 5;
+  this.LIMIT = 10;
   this.userOnly = true;
   this.lastTimeissued = new Date();
 
@@ -113,16 +113,15 @@ var Home = function() {
   });
 
   listener.subscribe(function(message) {
-    console.log('Received message');
-    console.log(message);
-
-    // if ($.inArray("status", message.field_names)) {
-    //   $.('#btn-'+message.queryjob_id).removeClass('btn-default');
-
-    //   $.('#btn-'+message.queryjob_id).addClass('btn-default');
-    //   $.('#btn-'+message.queryjob_id).addClass('btn-default');
-    // }
+    that.displayFeeds();
   });
+
+  this.cancel = new ROSLIB.Topic({
+    ros : that.ros,
+    name : '/run_query/cancel',
+    messageType : 'actionlib_msgs/GoalID'
+  });
+  this.goalID = new ROSLIB.Message({});
 };
 
 Home.prototype.callScheduleQueryJob = function(queryjob, callback) {
@@ -144,10 +143,9 @@ Home.prototype.callScheduleQueryJob = function(queryjob, callback) {
   scheduleQueryJob.callService(request, function(result) {
     callback(result);
   });
-
 };
 
-Home.prototype.populateFeed = function(data) {
+Home.prototype.populateFeed = function(queryjob) {
   var that = this;
 
   if (!that.lock) {
@@ -156,56 +154,96 @@ Home.prototype.populateFeed = function(data) {
     return;
   }
 
-  $.post('/queryjobs/listqueryjobs', data, function(results) {
+  // User info.
+  $('#'+queryjob._id).append('<p class="col-sm-8" id="' + queryjob._id + '-userinput-left"></p>');
+  $('#'+queryjob._id + '-userinput-left').append('<span class="name-text">' + queryjob.user_name + '&nbsp;&nbsp;<span class="time-text">' + formatTodayYesterday(new Date(queryjob.timeissued)) + '</span></span>');
+  $('#'+queryjob._id + '-userinput-left').append('<span class="cmd-text">' + queryjob.typed_cmd + '</span>');
+
+  // User status buttons.
+  $('#'+queryjob._id).append('<p style="text-align: right;" class="col-sm-4" id="' + queryjob._id + '-userinput-right"></p>');
+  if (queryjob.notification_email === 'true') {
+    $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">email</button>');
+  }
+  if (queryjob.deadline) {
+    $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">deadline at ' + formatAMPM(new Date(queryjob.deadline)) + '</button>');
+  }
+  // Show "in queue".
+  if (queryjob.status === that.RECEIVED || queryjob.status === that.SCHEDULED) {
+    $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-info btn-xs">in queue</button>');
+  }
+  // Show "running".
+  if (queryjob.status === that.RUNNING) {
+    $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-warning btn-xs">running</button>');
+  }
+
+  // Cancel button.
+  $('#'+queryjob._id).append('<div style="text-align: left;" class="col-xs-12" id="' + queryjob._id + '-user-buttons"></div>');
+  // if (queryjob.status === that.RECEIVED || queryjob.status === that.SCHEDULED || queryjob.status === that.RUNNING) {
+  if (queryjob.status === that.RUNNING) {
+    $('#'+queryjob._id + '-user-buttons').append('<button type="button" class="btn btn-default" id="' + queryjob._id + '-user-buttons-cancel">Cancel</button>');
+    $('#'+queryjob._id + '-user-buttons-cancel').click(function() {
+      that.cancel.publish(that.goalID);
+    });
+  }
+
+  // Show results.
+  if (queryjob.status === that.SUCCEEDED || queryjob.status === that.CANCELLED || queryjob.status === that.FAILED) {
+
+    // DUB-E info.
+    $('#'+queryjob._id).append('<p class="col-sm-8" id="' + queryjob._id + '-dube-left"></p>');
+    $('#'+queryjob._id + '-dube-left').append('<span class="name-text">DUB-E&nbsp;&nbsp;<span class="time-text">' + formatTodayYesterday(new Date(queryjob.timeissued)) + '</span></span>');
+    if (queryjob.response_text) {
+      $('#'+queryjob._id + '-dube-left').append('<span class="cmd-text">' + queryjob.response_text + '</span>');
+    }
+
+    // DUB-E status buttons.
+    $('#'+queryjob._id).append('<p style="text-align: right;" class="col-sm-4" id="' + queryjob._id + '-dube-right"></p>');
+    if (queryjob.status === that.SUCCEEDED) {
+      $('#'+queryjob._id + '-dube-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">' + queryjob.response_confidence + '% confidence</button>');
+      $('#'+queryjob._id + '-dube-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-success btn-xs">success</button>');
+    } else if (queryjob.status === that.CANCELLED) {
+      $('#'+queryjob._id + '-dube-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-danger btn-xs">cancelled</button>');
+    } else if (queryjob.status === that.FAILED) {
+      $('#'+queryjob._id + '-dube-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-danger btn-xs">failed</button>');
+    }
+
+    // Show results.
+    if (queryjob.status === that.SUCCEEDED) {
+      $('#'+queryjob._id).append('<div style="text-align: center; padding-bottom: 10px;" class="col-xs-12" id="' + queryjob._id + '-result-img"></div>');
+      $('#'+queryjob._id + '-result-img').append('<img src="' + queryjob.response_img_path + '" class="img-thumbnail" alt="Result">');
+
+      // Robot output buttons
+      $('#'+queryjob._id).append('<div style="text-align: center;" class="col-xs-12" id="' + queryjob._id + '-result-buttons"></div>');
+      $('#'+queryjob._id + '-result-buttons').append('<button type="button" class="btn btn-default"><i class="fa fa-thumbs-o-up"></i></button>&nbsp;&nbsp;');
+      $('#'+queryjob._id + '-result-buttons').append('<button type="button" class="btn btn-default"><i class="fa fa-thumbs-o-down"></i></button>');
+    }
+
+  }
+
+  that.lock = false;
+};
+
+Home.prototype.populateFeeds = function(data) {
+  var that = this;
+
+  $.post('/queryjobs/getqueryjobs', data, function(results) {
     // var timeissued = null;
     if (results.length > 1) {
       that.lastTimeissued = results[results.length-1].timeissued;
     }
 
     $.each(results, function(index, queryjob) {
-
-      // var divQueryJob = $('<div/>').css('padding-top', '30px').addClass("row");
-      // var userInputLeftP = $('<p/>', {
-      //   class: 'col-sm-8'
-      // });
-      // $('#feedList').append(queryJobDiv);
-
-
       // Create div for each QueryJob.
       $('#feedList').append('<div " id="' + queryjob._id + '"></div>');
       $('#'+queryjob._id).css('padding-top', '30px').addClass('row');
+      that.populateFeed(queryjob);
 
-      // User info.
-      $('#'+queryjob._id).append('<p class="col-sm-8" id="' + queryjob._id + '-userinput-left"></p>');
-      $('#'+queryjob._id + '-userinput-left').append('<span class="name-text">' + queryjob.user_name + '&nbsp;&nbsp;<span class="time-text">' + formatTodayYesterday(new Date(queryjob.timeissued)) + '</span></span>');
-      $('#'+queryjob._id + '-userinput-left').append('<span class="cmd-text">' + queryjob.typed_cmd + '</span>');
-
-      // User input buttons.
-      $('#'+queryjob._id).append('<p style="text-align: right;" class="col-sm-4" id="' + queryjob._id + '-userinput-right"></p>');
-      if (queryjob.notification_email) {
-        $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">email</button>');
-      }
-      if (queryjob.deadline) {
-        $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">deadline at ' + formatAMPM(new Date(queryjob.deadline)) + '</button>');
-      }
-
-      // Cancel button.
-      $('#'+queryjob._id).append('<div style="text-align: left;" class="col-xs-12" id="' + queryjob._id + '-buttons"></div>');
-      if (queryjob.status === that.RECEIVED || queryjob.status === that.SCHEDULED || queryjob.status === that.RUNNING) {
-        $('#'+queryjob._id + '-buttons').append('<button type="button" class="btn btn-default">Cancel</button>');
-      }
-
-      // Robot output buttons
-      if (queryjob.status === that.SUCCEEDED || queryjob.status === that.CANCELLED || queryjob.status === that.FAILED) {
-        $('#'+queryjob._id + '-buttons').append('<button type="button" class="btn btn-default">Show & Hide</button>');
-      }
     });
 
-    that.lock = false;
   }, 'JSON');
 };
 
-Home.prototype.displayFeed = function() {
+Home.prototype.displayFeeds = function() {
   var that = this;
 
   var data = {
@@ -214,11 +252,11 @@ Home.prototype.displayFeed = function() {
     userOnly: that.userOnly
   };
 
-  $('feedList').html('');
-  that.populateFeed(data);
+  $('#feedList').children().remove();
+  that.populateFeeds(data);
 };
 
-Home.prototype.appendFeed = function() {
+Home.prototype.appendFeeds = function() {
   var that = this;
 
   var data = {
@@ -227,7 +265,7 @@ Home.prototype.appendFeed = function() {
     userOnly: that.userOnly
   };
 
-  that.populateFeed(data);
+  that.populateFeeds(data);
 };
 
 Home.prototype.submitQuestion = function() {
@@ -239,9 +277,10 @@ Home.prototype.submitQuestion = function() {
     var newQueryJob = {
       timeissued: new Date().toISOString(),
       typed_cmd: $('#submitQuestion input#inputTypedCmd').val(),
-      notification_sms: $('#submitQuestion button#btnToggleSMS')
-        .hasClass('active'),
+      notification_sms: false,
       notification_email: $('#submitQuestion button#btnToggleEmail')
+        .hasClass('active'),
+      'public': $('#submitQuestion button#btnTogglePublic')
         .hasClass('active'),
       deadline: new Date(new Date().getTime() + 1000*60*60*1*1)
         .toISOString()
@@ -250,8 +289,7 @@ Home.prototype.submitQuestion = function() {
     // Use AJAX to post the object to our adduser service.
     $.post('/queryjobs/addqueryjob', newQueryJob, function(result) {
       that.callScheduleQueryJob(result[0], function(res) {
-        console.log(res);
-        that.displayFeed();
+        that.displayFeeds();
       });
     }, 'JSON');
   };
