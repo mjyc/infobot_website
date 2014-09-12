@@ -16,8 +16,8 @@
     "it": true,
     // roslibjs
     "module": true,
-    "EventEmitter2" : true,
-    "ROSLIB" : true
+    "EventEmitter2": true,
+    "ROSLIB": true
   },
   // roslibjs
   "curly": true,
