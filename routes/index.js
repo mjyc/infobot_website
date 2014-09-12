@@ -39,7 +39,9 @@ router.get('/', function(req, res) {
 
 // Home.
 router.get('/home', isServerReady, function(req, res) {
-  res.render('home.jade', { user: req.user });
+  res.render('home.jade', {
+    user: req.user
+  });
 });
 
 // Logout.
@@ -57,16 +59,16 @@ router.get('/logout', function(req, res) {
 
 // Process the login form.
 router.post('/login', passport.authenticate('local-login', {
-  successRedirect : '/home',
-  failureRedirect : '/',
-  failureFlash : true
+  successRedirect: '/home',
+  failureRedirect: '/',
+  failureFlash: true
 }));
 
 // Process the signup form.
 router.post('/signup', passport.authenticate('local-signup', {
-  successRedirect : '/home',
-  failureRedirect : '/',
-  failureFlash : true
+  successRedirect: '/home',
+  failureRedirect: '/',
+  failureFlash: true
 }));
 
 // Google
@@ -91,9 +93,9 @@ router.get('/auth/google/callback',
 // Local
 
 router.post('/connect/local', passport.authenticate('local-signup', {
-  successRedirect : '/home',
-  failureRedirect : '/',
-  failureFlash : true
+  successRedirect: '/home',
+  failureRedirect: '/',
+  failureFlash: true
 }));
 
 // Google

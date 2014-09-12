@@ -26,7 +26,9 @@ var sessionDB = require('./config/session.js');
 // =====================================================================
 
 // ROS setup.
-var ros = new ROSLIB.Ros({ url : 'ws://localhost:9090' });
+var ros = new ROSLIB.Ros({
+  url: 'ws://localhost:9090'
+});
 ros.connection = false;
 ros.on('connection', function() {
   ros.connection = true;
@@ -44,13 +46,17 @@ ros.on('close', function() {
 // DB setup.
 var dbUrl = (JSON.parse(process.env.TEST || false) ?
   configDB.urlTest : configDB.url);
-var db = mongo.db(dbUrl, { native_parser:true });  // connect to db
+var db = mongo.db(dbUrl, {
+  native_parser: true
+}); // connect to db
 
 // Passport setup.
 require('./config/passport')(passport, db, process.env.NODE_ENV);
 
 
+// =====================================================================
 // Express
+// =====================================================================
 
 var app = express();
 
@@ -65,13 +71,15 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({ secret: sessionDB.secret }));
+app.use(session({
+  secret: sessionDB.secret
+}));
 app.use(passport.initialize());
-app.use(passport.session());  // persistent login sessions
-app.use(flash());  // use connect-flash for flash messages stored in
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in
 //   session
 
-// Make our ros and db accessible to our router
+// Make our ros and db accessible to our router.
 app.use(function(req, res, next) {
   req.ros = ros;
   req.db = db;

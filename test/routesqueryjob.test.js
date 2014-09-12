@@ -7,8 +7,8 @@ var colors = require('colors');
 var expect = require('expect.js');
 var mongo = require('mongoskin');
 var superagent = require('superagent');
-var loremIpsum=require('lorem-ipsum');  // function
-var ObjectID = require('mongodb').ObjectID;  // class
+var loremIpsum = require('lorem-ipsum'); // function
+var ObjectID = require('mongodb').ObjectID; // class
 
 // Locals.
 var configAuth = require('../config/auth.js');
@@ -16,12 +16,16 @@ var configDB = require('../config/database.js');
 
 // DB setups.
 // Make sure the test database is clean.
-var sara_db = mongo.db(configDB.url, {native_parser:true});
+var sara_db = mongo.db(configDB.url, {
+  native_parser: true
+});
 sara_db.collectionNames(function(err, items) {
-  expect(items).to.eql([]);  // MUST NOT BE USED!
+  expect(items).to.eql([]); // MUST NOT BE USED!
 });
 // Connect to test db.
-var db = mongo.db(configDB.urlTest, {native_parser:true});
+var db = mongo.db(configDB.urlTest, {
+  native_parser: true
+});
 
 
 
@@ -31,10 +35,12 @@ var db = mongo.db(configDB.urlTest, {native_parser:true});
 
 // Utilities
 
-function randomBoolean() { return Math.random() < 0.5; }
+function randomBoolean() {
+  return Math.random() < 0.5;
+}
 
 function randomInt(min, max) {
-    return Math.floor(Math.random()*(max-min+1)+min);
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 function randomDate(startDate, endDate) {
@@ -73,27 +79,28 @@ function loginUser(agent) {
 function removeCollections(agent) {
   return function(done) {
     async.series([
-      function(callback) {
-        console.log('Dropping "users" collection...');
-        db.collection('users').drop(callback);
-      },
-      function(callback) {
-        console.log('Dropping "queryjobs" collection...');
-        db.collection('queryjobs').drop(callback);
-      }
-    ],
-    function(err, results) {
-      console.log('removeCollections err and results:'.yellow);
-      console.log('err =');
-      console.log(err);
-      console.log('results =');
-      console.log(results);
 
-      console.log('Dropping database...');
-      db.dropDatabase();
-      db.close();
-      done();
-    });
+        function(callback) {
+          console.log('Dropping "users" collection...');
+          db.collection('users').drop(callback);
+        },
+        function(callback) {
+          console.log('Dropping "queryjobs" collection...');
+          db.collection('queryjobs').drop(callback);
+        }
+      ],
+      function(err, results) {
+        console.log('removeCollections err and results:'.yellow);
+        console.log('err =');
+        console.log(err);
+        console.log('results =');
+        console.log(results);
+
+        console.log('Dropping database...');
+        db.dropDatabase();
+        db.close();
+        done();
+      });
   };
 }
 
@@ -116,8 +123,8 @@ describe('queryjobs routing test', function() {
     var notification_email = randomBoolean();
     var is_public = randomBoolean();
     var deadline = new Date(
-      new Date().getTime() + 1000*60*60*1*1).toISOString(); // 1 hr from
-    //   now
+      new Date().getTime() + 1000 * 60 * 60 * 1 * 1).toISOString(); // 1
+      //   hr from now
 
     agent
       .post('http://localhost:8080/queryjobs/addqueryjob')
