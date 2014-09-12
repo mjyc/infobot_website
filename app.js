@@ -42,11 +42,12 @@ ros.on('close', function() {
 });
 
 // DB setup.
-var dbUrl = (process.env.TEST === 'true') ? configDB.urlTest : configDB.url;
+var dbUrl = (JSON.parse(process.env.TEST || false) ?
+  configDB.urlTest : configDB.url);
 var db = mongo.db(dbUrl, { native_parser:true });  // connect to db
 
 // Passport setup.
-require('./config/passport')(passport, db, process.env.NODE_ENV);  // load passport
+require('./config/passport')(passport, db, process.env.NODE_ENV);
 
 
 // Express

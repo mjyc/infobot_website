@@ -24,9 +24,11 @@ router.post('/addqueryjob', function(req, res, next) {
   // Data from req.
   newQueryJob.timeissued = new Date(req.body.timeissued);
   newQueryJob.typed_cmd = req.body.typed_cmd;
+  // newQueryJob.notification_sms = JSON.parse(req.body.notification_sms);
   newQueryJob.notification_sms = req.body.notification_sms;
-  newQueryJob.notification_email = req.body.notification_email;
-  newQueryJob.is_public = req.body.is_public;
+  newQueryJob.notification_email = JSON.parse(
+    req.body.notification_email || false);
+  newQueryJob.is_public = JSON.parse(req.body.is_public || false);
   newQueryJob.deadline = new Date(req.body.deadline);
 
   db.collection('queryjobs').insert(newQueryJob, function(err, result) {
@@ -45,9 +47,10 @@ router.post('/getqueryjobs', function(req, res, next) {
   var queryjobID = req.body.queryjobID;   // get one QueryJob with id
   var limit = parseInt(req.body.limit || '0');  // get limit #
   var startDate = req.body.startDate;  // get QueryJobs from startDate
-  var userOnly = req.body.userOnly === 'true';  // get user's QueryJobs
-  var publicOnly = req.body.publicOnly === 'true';  // get public
+  var userOnly = JSON.parse(req.body.userOnly || false);  // get user's
   //   QueryJobs
+  var publicOnly = JSON.parse(req.body.publicOnly || false);  // get
+  //   public QueryJobs
 
   // Set query.
   var criteria = {};
