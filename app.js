@@ -19,6 +19,10 @@ var routes = require('./routes/index');
 var queryjobs = require('./routes/queryjobs');
 var configDB = require('./config/database.js');
 var sessionDB = require('./config/session.js');
+// TODO: create config file for ROS
+var urlROS = (JSON.parse(process.env.TEST || false) ?
+  'ws://dub-e.org:9090' : 'ws://localhost:9090'
+);
 
 
 // =====================================================================
@@ -79,10 +83,11 @@ app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in
 //   session
 
-// Make our ros and db accessible to our router.
+// Make our ros, db and MODE accessible to our router.
 app.use(function(req, res, next) {
   req.ros = ros;
   req.db = db;
+  req.DEV = !(JSON.parse(process.env.NODE_ENV || false));
   next();
 });
 

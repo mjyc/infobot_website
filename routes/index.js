@@ -33,14 +33,17 @@ router.get('/', function(req, res) {
   if (req.isAuthenticated()) {
     res.redirect('/home');
   } else {
-    res.render('login.jade');
+    res.render('login.jade', {
+      dev: req.DEV
+    });
   }
 });
 
 // Home.
 router.get('/home', isServerReady, function(req, res) {
   res.render('home.jade', {
-    user: req.user
+    user: req.user,
+    dev: req.DEV
   });
 });
 

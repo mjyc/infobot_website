@@ -161,7 +161,7 @@ Home.prototype.populateFeed = function(queryjob) {
 
   // User status buttons.
   $('#'+queryjob._id).append('<p style="text-align: right;" class="col-sm-4" id="' + queryjob._id + '-userinput-right"></p>');
-  if (queryjob.notification_email === 'true') {
+  if (JSON.parse(queryjob.notification_email || false)) {
     $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">email</button>');
   }
   if (queryjob.deadline) {
