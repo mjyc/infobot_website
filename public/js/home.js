@@ -90,7 +90,7 @@ var Home = function() {
   this.lock = false;
 
   this.ros = new ROSLIB.Ros({
-    url : 'ws://localhost:9090'
+    url : urlROS
   });
 
   this.ros.on('connection', function() {

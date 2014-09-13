@@ -34,7 +34,7 @@ router.get('/', function(req, res) {
     res.redirect('/home');
   } else {
     res.render('login.jade', {
-      dev: req.DEV
+      prod: req.PROD
     });
   }
 });
@@ -43,7 +43,7 @@ router.get('/', function(req, res) {
 router.get('/home', isServerReady, function(req, res) {
   res.render('home.jade', {
     user: req.user,
-    dev: req.DEV
+    prod: req.PROD
   });
 });
 

@@ -20,7 +20,7 @@ var queryjobs = require('./routes/queryjobs');
 var configDB = require('./config/database.js');
 var sessionDB = require('./config/session.js');
 // TODO: create config file for ROS
-var urlROS = (JSON.parse(process.env.TEST || false) ?
+var urlROS = (process.env.NODE_ENV === 'production' ?
   'ws://dub-e.org:9090' : 'ws://localhost:9090'
 );
 
@@ -87,7 +87,7 @@ app.use(flash()); // use connect-flash for flash messages stored in
 app.use(function(req, res, next) {
   req.ros = ros;
   req.db = db;
-  req.DEV = !(JSON.parse(process.env.NODE_ENV || false));
+  req.PROD = (process.env.NODE_ENV === 'production');
   next();
 });
 
