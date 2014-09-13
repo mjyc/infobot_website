@@ -21,7 +21,7 @@ html(class="no-js")
     link(rel="stylesheet", href="css/normalize.css")
     link(rel="stylesheet", href="css/main.css")
     script(src="js/vendor/modernizr-2.8.3.min.js")
-    //- Remove below line when in production mode.
+    //- TODO: find general solution for below approach (grunt inject?).
     unless prod
       script(src="//localhost:35729/livereload.js")
   body

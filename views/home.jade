@@ -31,8 +31,11 @@ block content
 block javascript
   script(src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js")
   script(src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js")
-  script(src="js/home.js")
+  //- TODO: find general solution for below approach (grunt inject?).
+  //- Hack to pass variable from the server to the client.
   if prod
     script. var urlROS = 'ws://dub-e.org:9090';
   unless prod
     script. var urlROS = 'ws://localhost:9090';
+  script(src="js/home.js")
+
