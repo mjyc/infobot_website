@@ -22,8 +22,9 @@ html(class="no-js")
     link(rel="stylesheet", href="css/main.css")
     script(src="js/vendor/modernizr-2.8.3.min.js")
     //- TODO: find general solution for below approach (grunt inject?).
-    unless prod
-      script(src="//localhost:35729/livereload.js")
+    //- unless prod
+      //- script(src="//localhost:35729/livereload.js")
+    block css
   body
     <!--[if lt IE 8]>
     p.browsehappy
@@ -38,8 +39,6 @@ html(class="no-js")
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
     script window.jQuery || document.write('<script src="javascripts/vendor/jquery-1.11.1.min.js"><\/script>')
     script(src="js/vendor/bootstrap.min.js")
-    script(src="js/vendor/bootstrap-switch.min.js")
-    script(src="js/vendor/bootstrap-timepicker.min.js")
     block javascript
 
     //- Google Analytics: change UA-XXXXX-X to be your site's ID.

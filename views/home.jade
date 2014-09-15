@@ -1,41 +1,47 @@
 extends layout
 
+block css
+  link(rel="stylesheet", href="css/switchery.min.css")
+
 block content
 
   //- MENUBAR
   include menubar
 
   //- JUMBOTRON
-  .jumbotron(style="padding: 70px 0px 20px; margin-bottom: 0px;")
+  .jumbotron.jumbotron-home
     .container
-      form#submitQuestion(role="form")
+      form#submitQuestion
         .form-group
-          .right-inner-addon
-            i.fa.fa-question-circle.fa-lg
-            input#inputTypedCmd.form-control(type="text",
-              placeholder="Type question here")
+          input#inputTypedCmd.form-control(type="text",
+            placeholder="Type question here")
         .form-inline(align="center")
-            button#btnSubmitQuestion.btn.btn-primary Submit Question
+            b Public
             | &nbsp;&nbsp;
-            //- button#btnToggleSMS.btn.btn-default.btn-sm(type="button",
-            //-   data-toggle="button") SMS
-            button#btnTogglePublic.btn.btn-default.btn-sm(type="button",
-              data-toggle="button") Public
+            input#inputPublic.js-switch(type="checkbox")
             | &nbsp;&nbsp;
-            button#btnToggleEmail.btn.btn-default.btn-sm(type="button",
-              data-toggle="button") Email
+            b Email
+            | &nbsp;&nbsp;
+            input#inputEmail.js-switch(type="checkbox")
+            | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            a#aSubmitQuestion.btn.btn-primary Submit Question
+            //- For using "Enter" key.
+            button#btnSubmitQuestion(style='display: none')
 
   //- MAIN CONTENTS
-  .container#feedList
+  .container#queryjobContainer
 
 block javascript
   script(src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js")
   script(src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js")
+  script(src="js/vendor/switchery.min.js")
+
   //- TODO: find general solution for below approach (grunt inject?).
   //- Hack to pass variable from the server to the client.
   if prod
     script. var urlROS = 'ws://dub-e.org:9090';
   unless prod
     script. var urlROS = 'ws://localhost:9090';
-  script(src="js/home.js")
 
+  script(src="js/modules.js")
+  script(src="js/home.js")

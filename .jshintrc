@@ -8,6 +8,7 @@
     "__dirname": true,
     "process": true,
     "require": true,
+    "Switchery": true,
     // test
     "after": true,
     "before": true,

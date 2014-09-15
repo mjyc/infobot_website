@@ -1,43 +1,4 @@
 // =====================================================================
-// DOM Ready
-// =====================================================================
-
-$(document).ready(function() {
-  var home = new Home();
-
-  // Show feeds
-  home.displayFeeds();
-
-  // Set up menu buttons.
-  $('#Home').on('click', 'a', function() {
-    home.userOnly = true;
-    home.displayFeeds();
-  });
-
-  $('#QFeed').on('click', 'a', function() {
-    home.userOnly = null;
-    home.displayFeeds();
-  });
-
-  // Submit Question button click.
-  $('#btnSubmitQuestion').on('click', home.submitQuestion());
-
-  // Infinite scroll.
-  $(window).scroll(function() {
-    var wintop = $(window).scrollTop();
-    var docheight = $(document).height();
-    var winheight = $(window).height();
-    var scrolltrigger = 0.95;
-
-    if  ((wintop/(docheight-winheight)) > scrolltrigger) {
-      home.appendFeeds();
-    }
-  });
-
-});
-
-
-// =====================================================================
 // Functions
 // =====================================================================
 
@@ -47,7 +8,7 @@ function formatAMPM(date) {
   var ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
-  minutes = minutes < 10 ? '0'+minutes : minutes;
+  minutes = minutes < 10 ? '0' + minutes : minutes;
   var strTime = hours + ':' + minutes + ' ' + ampm;
   return strTime;
 }
@@ -55,14 +16,14 @@ function formatAMPM(date) {
 function formatTodayYesterday(date) {
   var strTime = '';
   var todayDate = new Date();
-  var yesterdayDate = new Date(new Date().getTime() - 1000*60*60*24*1);
+  var yesterdayDate = new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 1);
 
   if (date.getDate() === todayDate.getDate()) {
     strTime += 'Today at ' + formatAMPM(date);
   } else if (date.getDate() === yesterdayDate.getDate()) {
     strTime += 'Yesterday at ' + formatAMPM(date);
   } else {
-    strTime += date.toDateString().slice(4,11) + formatAMPM(date);
+    strTime += date.toDateString().slice(4, 11) + formatAMPM(date);
   }
   return strTime;
 }
@@ -72,207 +33,193 @@ function formatTodayYesterday(date) {
 // Module
 // =====================================================================
 
-var Home = function() {
-  var that = this;
-  this.LIMIT = 10;
-  this.userOnly = true;
-  this.lastTimeissued = new Date();
+var queryjobCardCreator = (function() {
 
-  // Copied from
-  this.RECEIVED = 0;
-  this.SCHEDULED = 1;
-  this.RUNNING = 2;
-  this.SUCCEEDED = 3;
-  this.CANCELLED = 4;
-  this.FAILED = 5;
+  // ROS QueryJob status.
+  var RECEIVED = 0;
+  var SCHEDULED = 1;
+  var RUNNING = 2;
+  var SUCCEEDED = 3;
+  var CANCELLED = 4;
+  var FAILED = 5;
 
-  // Heck to prevent creating multiple, overlapping feeds.
-  this.lock = false;
+  // DOM templates.
+  var cardTemplate = $('<div>').addClass('thumbnail').append(
+    $('<div>').addClass('caption'));
+  var nameTemplate = $('<span>').addClass('name-text');
+  var timeTemplate = $('<span>').addClass('time-text');
+  var tagTemplate = $('<button>').addClass('btn btn-xs')
+    .css('opacity', 1).attr('disabled', 'disabled');
 
-  this.ros = new ROSLIB.Ros({
-    url : urlROS
-  });
+  // JQuery object for a card.
+  var createQueryJobCard = function(queryjob) {
+    var queryjobCard = cardTemplate.clone();
 
-  this.ros.on('connection', function() {
-    console.log('Connected to websocket server.');
-  });
-
-  this.ros.on('error', function(error) {
-    console.log('Error connecting to websocket server: ', error);
-  });
-
-  this.ros.on('close', function() {
-    console.log('Connection to websocket server closed.');
-    location.reload(true);
-  });
-
-  var listener = new ROSLIB.Topic({
-    ros : this.ros,
-    name : '/queryjob_update',
-    messageType : 'sara_queryjob_manager/QueryJobUpdate'
-  });
-
-  listener.subscribe(function(message) {
-    that.displayFeeds();
-  });
-
-  this.cancel = new ROSLIB.Topic({
-    ros : that.ros,
-    name : '/run_query/cancel',
-    messageType : 'actionlib_msgs/GoalID'
-  });
-  this.goalID = new ROSLIB.Message({});
-};
-
-Home.prototype.callScheduleQueryJob = function(queryjob, callback) {
-  var that = this;
-
-  var scheduleQueryJob = new ROSLIB.Service({
-    ros : that.ros,
-    name : '/schedule_queryjob',
-    serviceType : 'sara_queryjob_manager/ScheduleQueryJob'
-  });
-
-  var timeissuedSec = Math.floor(new Date(queryjob.timeissued).getTime()/1000);
-
-  var request = new ROSLIB.ServiceRequest({
-    queryjob_id : queryjob._id,
-    timeissued : timeissuedSec
-  });
-
-  scheduleQueryJob.callService(request, function(result) {
-    callback(result);
-  });
-};
-
-Home.prototype.populateFeed = function(queryjob) {
-  var that = this;
-
-  if (!that.lock) {
-    that.lock = true;
-  } else {
-    return;
-  }
-
-  // User info.
-  $('#'+queryjob._id).append('<p class="col-sm-8" id="' + queryjob._id + '-userinput-left"></p>');
-  $('#'+queryjob._id + '-userinput-left').append('<span class="name-text">' + queryjob.user_name + '&nbsp;&nbsp;<span class="time-text">' + formatTodayYesterday(new Date(queryjob.timeissued)) + '</span></span>');
-  $('#'+queryjob._id + '-userinput-left').append('<span class="cmd-text">' + queryjob.typed_cmd + '</span>');
-
-  // User status buttons.
-  $('#'+queryjob._id).append('<p style="text-align: right;" class="col-sm-4" id="' + queryjob._id + '-userinput-right"></p>');
-  if (JSON.parse(queryjob.notification_email || false)) {
-    $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">email</button>');
-  }
-  if (queryjob.deadline) {
-    $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">deadline at ' + formatAMPM(new Date(queryjob.deadline)) + '</button>');
-  }
-  // Show "in queue".
-  if (queryjob.status === that.RECEIVED || queryjob.status === that.SCHEDULED) {
-    $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-info btn-xs">in queue</button>');
-  }
-  // Show "running".
-  if (queryjob.status === that.RUNNING) {
-    $('#'+queryjob._id + '-userinput-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-warning btn-xs">running</button>');
-  }
-
-  // Cancel button.
-  $('#'+queryjob._id).append('<div style="text-align: left;" class="col-xs-12" id="' + queryjob._id + '-user-buttons"></div>');
-  // if (queryjob.status === that.RECEIVED || queryjob.status === that.SCHEDULED || queryjob.status === that.RUNNING) {
-  if (queryjob.status === that.RUNNING) {
-    $('#'+queryjob._id + '-user-buttons').append('<button type="button" class="btn btn-default" id="' + queryjob._id + '-user-buttons-cancel">Cancel</button>');
-    $('#'+queryjob._id + '-user-buttons-cancel').click(function() {
-      that.cancel.publish(that.goalID);
-    });
-  }
-
-  // Show results.
-  if (queryjob.status === that.SUCCEEDED || queryjob.status === that.CANCELLED || queryjob.status === that.FAILED) {
-
-    // DUB-E info.
-    $('#'+queryjob._id).append('<p class="col-sm-8" id="' + queryjob._id + '-dube-left"></p>');
-    $('#'+queryjob._id + '-dube-left').append('<span class="name-text">DUB-E&nbsp;&nbsp;<span class="time-text">' + formatTodayYesterday(new Date(queryjob.timeissued)) + '</span></span>');
-    if (queryjob.response_text) {
-      $('#'+queryjob._id + '-dube-left').append('<span class="cmd-text">' + queryjob.response_text + '</span>');
-    }
-
-    // DUB-E status buttons.
-    $('#'+queryjob._id).append('<p style="text-align: right;" class="col-sm-4" id="' + queryjob._id + '-dube-right"></p>');
-    if (queryjob.status === that.SUCCEEDED) {
-      $('#'+queryjob._id + '-dube-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-default btn-xs">' + queryjob.response_confidence + '% confidence</button>');
-      $('#'+queryjob._id + '-dube-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-success btn-xs">success</button>');
-    } else if (queryjob.status === that.CANCELLED) {
-      $('#'+queryjob._id + '-dube-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-danger btn-xs">cancelled</button>');
-    } else if (queryjob.status === that.FAILED) {
-      $('#'+queryjob._id + '-dube-right').append('&nbsp;&nbsp;<button type="button" disabled="disabled" style="opacity: 1;" class="btn btn-danger btn-xs">failed</button>');
-    }
-
-    // Show results.
-    if (queryjob.status === that.SUCCEEDED) {
-      $('#'+queryjob._id).append('<div style="text-align: center; padding-bottom: 10px;" class="col-xs-12" id="' + queryjob._id + '-result-img"></div>');
-      $('#'+queryjob._id + '-result-img').append('<img src="' + queryjob.response_img_path + '" class="img-thumbnail" alt="Result">');
-
-      // Robot output buttons
-      $('#'+queryjob._id).append('<div style="text-align: center;" class="col-xs-12" id="' + queryjob._id + '-result-buttons"></div>');
-      $('#'+queryjob._id + '-result-buttons').append('<button type="button" class="btn btn-default"><i class="fa fa-thumbs-o-up"></i></button>&nbsp;&nbsp;');
-      $('#'+queryjob._id + '-result-buttons').append('<button type="button" class="btn btn-default"><i class="fa fa-thumbs-o-down"></i></button>');
-    }
-
-  }
-
-  that.lock = false;
-};
-
-Home.prototype.populateFeeds = function(data) {
-  var that = this;
-
-  $.post('/queryjobs/getqueryjobs', data, function(results) {
-    // var timeissued = null;
-    if (results.length > 1) {
-      that.lastTimeissued = results[results.length-1].timeissued;
-    }
-
-    $.each(results, function(index, queryjob) {
-      // Create div for each QueryJob.
-      $('#feedList').append('<div " id="' + queryjob._id + '"></div>');
-      $('#'+queryjob._id).css('padding-top', '30px').addClass('row');
-      that.populateFeed(queryjob);
-
+    $.each(['populateCard'], function(index, event) {
+      queryjobCard.on(event, cardEvents[event]);
     });
 
-  }, 'JSON');
-};
+    queryjobCard.trigger('populateCard', queryjob);
 
-Home.prototype.displayFeeds = function() {
-  var that = this;
-
-  var data = {
-    startDate: new Date().toISOString(),
-    limit: that.LIMIT,
-    userOnly: that.userOnly,
-    publicOnly: !that.userOnly
+    return queryjobCard;
   };
 
-  $('#feedList').children().remove();
-  that.populateFeeds(data);
-};
+  // Possible events.
+  var cardEvents = {
 
-Home.prototype.appendFeeds = function() {
-  var that = this;
+    populateCard: function(event, queryjob) {
+      var card = $(this).addClass('queryjobCard');
 
-  var data = {
-    startDate: that.lastTimeissued,
-    limit: that.LIMIT,
-    userOnly: that.userOnly
+      var cardRow = card.children() //caption
+        .append($('<div>').addClass('row'))
+        .children(); // row
+
+      // Create user name and issued time.
+      var userName = nameTemplate.clone()
+        .text(queryjob.user_name).append('&nbsp;&nbsp;');
+      var userTime = timeTemplate.clone()
+        .text(formatTodayYesterday(new Date(queryjob.timeissued)));
+      var userInfo = $('<p>').addClass('col-sm-12').css('text-align', 'left')
+        .append(userName.append(userTime))
+        .appendTo(cardRow);
+
+      // Create typed command.
+      cardRow.append($('<p>').addClass('col-sm-12').css('text-align', 'left').text(queryjob.typed_cmd));
+
+      // Create user status tags.
+      var userTags = $('<p>').addClass('col-sm-12').css('text-align', 'left')
+        .appendTo(cardRow);
+      if (JSON.parse(queryjob.notification_email || false)) {
+        userTags.append(tagTemplate.clone().addClass('btn-default').text('text'));
+      }
+      if (queryjob.deadline) {
+        userTags.append(tagTemplate.clone().addClass('btn-default').text('deadline at' + formatAMPM(new Date(queryjob.deadline))));
+      }
+      if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED) {
+        userTags.append('&nbsp;&nbsp;').append(tagTemplate.clone().text('in queue'));
+      } else if (queryjob.status === RUNNING) {
+        userTags.append('&nbsp;&nbsp;').append(tagTemplate.clone().removeClass('btn-xs').addClass('btn-warning btn-lg').text('running'));
+      }
+    }
   };
 
-  that.populateFeeds(data);
-};
+  return {
+    createQueryJobCard: createQueryJobCard
+  };
 
-Home.prototype.submitQuestion = function() {
-  var that = this;
+})();
 
-  return function(event) {
+var home = (function() {
+
+  var NUM_INITIAL_CARDS = 5;
+  var NUM_ADDITIONAL_CARDS = 5;
+
+  var container = $('#queryjobContainer');
+  var queryjobCards = {};
+  var lastTimeissued = new Date();
+
+  container.on('refresh', function(event) {
+    // Condition check.
+    var elem = $(this);
+    if (elem.is('.refreshing') || elem.is('.loading') || elem.is('.adding')) {
+      console.log('Previous event not finished.');
+      return;
+    }
+
+    // Set container state.
+    elem.addClass('refreshing');
+
+    // Remove contents in container.
+    elem.find('div.thumbnail').remove();
+    queryjobCards = {};
+
+    var data = {
+      startDate: new Date().toISOString(),
+      limit: NUM_INITIAL_CARDS,
+      userOnly: false,
+      publicOnly: false
+    };
+    $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
+      $.each(queryjobs, function(i, queryjob) {
+        queryjobCards[queryjob._id] = queryjobCardCreator
+          .createQueryJobCard(queryjob);
+        queryjobCards[queryjob._id].appendTo(elem);
+      });
+      if (queryjobs.length > 1) {
+        lastTimeissued = queryjobs[queryjobs.length - 1].timeissued;
+      }
+    }, 'JSON').fail(function() {
+      alert('Error while posting to /queryjobs/getqueryjobs.');
+    }).always(function() {
+      elem.removeClass('refreshing');
+    });
+  });
+
+  container.on('loadMore', function(event) {
+    // Condition check.
+    var elem = $(this);
+    if (elem.is('.refreshing') || elem.is('.loading') || elem.is('.adding')) {
+      console.log('Previous event not finished.');
+      return;
+    }
+
+    elem.addClass('loading');
+
+    var data = {
+      startDate: lastTimeissued,
+      limit: NUM_ADDITIONAL_CARDS,
+      userOnly: false,
+      publicOnly: false
+    };
+    $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
+      $.each(queryjobs, function(index, queryjob) {
+        // queryjobCards[queryjob._id] = createCard(queryjob);
+        queryjobCards[queryjob._id] = queryjobCardCreator
+          .createQueryJobCard(queryjob);
+        queryjobCards[queryjob._id].appendTo(elem);
+      });
+      if (queryjobs.length > 1) {
+        lastTimeissued = queryjobs[queryjobs.length - 1].timeissued;
+      }
+    }, 'JSON').fail(function() {
+      alert('Error while posting to /queryjobs/getqueryjobs.');
+    }).always(function() {
+      elem.removeClass('loading');
+    });
+  });
+
+  // TODO: make this like a function instead of event.
+  container.on('add', function(event, queryjob) {
+    // Condition checks.
+    if (queryjobCards[queryjob._id]) {
+      alert('QueryJob with ID=' + queryjob._id + ' already exists. ' +
+        'Not submitting this question.');
+      return;
+    }
+    var elem = $(this);
+    if (elem.is('.refreshing') || elem.is('.loading') || elem.is('.adding')) {
+      alert('Previous event was not finished, try again.');
+      return;
+    }
+
+    // Set container state.
+    elem.addClass('adding');
+
+    // queryjobCards[queryjob._id] = createCard(queryjob);
+    queryjobCards[queryjob._id] = queryjobCardCreator
+          .createQueryJobCard(queryjob);
+    queryjobCards[queryjob._id].css('opacity', 0).prependTo(elem);
+    queryjobCards[queryjob._id].animate({
+      'opacity': 1
+    }, 200, function() {
+      elem.removeClass('adding');
+    });
+
+  });
+
+  var submitQuestion = function() {
+
+    // return function(event) {
     event.preventDefault();
 
     var newQueryJob = {
@@ -283,15 +230,66 @@ Home.prototype.submitQuestion = function() {
         .hasClass('active'),
       'is_public': $('#submitQuestion button#btnTogglePublic')
         .hasClass('active'),
-      deadline: new Date(new Date().getTime() + 1000*60*60*1*1)
+      deadline: new Date(new Date().getTime() + 1000 * 60 * 60 * 1 * 1)
         .toISOString()
     };
 
     // Use AJAX to post the object to our adduser service.
     $.post('/queryjobs/addqueryjob', newQueryJob, function(result) {
-      that.callScheduleQueryJob(result[0], function(res) {
-        that.displayFeeds();
-      });
-    }, 'JSON');
+      if (result.length !== 1) {
+        alert('Error while posting to /queryjobs/addqueryjob.');
+      }
+      container.trigger('add', [result[0]]);
+
+      $('#submitQuestion input#inputTypedCmd').val('');
+    }, 'JSON').fail(function() {
+      alert('Error while posting to /queryjobs/addqueryjob.');
+    });
+    // };
   };
-};
+
+  var init = function() {
+    container.trigger('refresh');
+  };
+
+  return {
+    container: container,
+    submitQuestion: submitQuestion,
+    init: init
+  };
+
+})();
+
+
+// =====================================================================
+// DOM Ready
+// =====================================================================
+
+$(document).ready(function() {
+
+  // Make switches pretty.
+  $('.js-switch').each(function(index) {
+    new Switchery(this);
+  });
+
+  // Initialize contents.
+  home.init();
+
+  // Infinite scroll setups.
+  $(window).scroll(function() {
+    var wintop = $(window).scrollTop();
+    var docheight = $(document).height();
+    var winheight = $(window).height();
+    var scrolltrigger = 0.95;
+
+    if ((wintop / (docheight - winheight)) > scrolltrigger) {
+      home.container.trigger('loadMore');
+    }
+  });
+
+  // Submit Question button click.
+  $('#aSubmitQuestion').on('click', home.submitQuestion);
+  //- For using "Enter" key.
+  $('#btnSubmitQuestion').on('click', home.submitQuestion);
+
+});

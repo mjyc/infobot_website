@@ -4,27 +4,19 @@ body {
   padding-bottom: 20px;
 }
 
+.jumbotron-home {
+  padding: 70px 0px 20px;
+  margin-bottom: 25px;
+}
+
+.jumbotron .sublead {
+  font-size: 15px; padding-top: 10px;
+}
+
 /* Custom */
 
-.right-inner-addon {
-  position: relative;
-}
-
-.right-inner-addon input {
-  padding-right: 30px;
-}
-
-.right-inner-addon i {
-  position: absolute;
-  right: 0px;
-  padding: 10px 10px;
-  pointer-events: none;
-}
-
 .name-text {
-  display: inline-block;
   font-weight: bold;
-  padding-right: 10px
 }
 
 .time-text {
@@ -32,6 +24,3 @@ body {
   color: gray;
 }
 
-.cmd-text{
-  display: inline-block;
-}
