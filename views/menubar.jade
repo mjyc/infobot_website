@@ -10,9 +10,15 @@
         span.icon-bar
     .navbar-collapse.collapse
       ul.nav.navbar-nav
-        li#Home
-          a(href="#") Your Question
-        li#QFeed
-          a(href="#") Everyone's Question
+        if isHome
+          li.active#Home
+            a(href="/home") Your Question
+          li#Wall
+            a(href="/wall") Everyone's Question
+        unless isHome
+          li#0
+            a(href="/home") Your Question
+          li.active#Wall
+            a(href="/wall") Everyone's Question
       p.navbar-text.navbar-right
         | Signed in as #{user.name}

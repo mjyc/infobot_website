@@ -41,8 +41,18 @@ router.get('/', function(req, res) {
 
 // Home.
 router.get('/home', isServerReady, function(req, res) {
-  res.render('home.jade', {
+  res.render('main.jade', {
     user: req.user,
+    isHome: true,
+    prod: req.PROD
+  });
+});
+
+// Home.
+router.get('/wall', isServerReady, function(req, res) {
+  res.render('main.jade', {
+    user: req.user,
+    isHome: false,
     prod: req.PROD
   });
 });
