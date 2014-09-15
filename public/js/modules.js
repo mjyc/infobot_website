@@ -33,7 +33,7 @@ function formatTodayYesterday(date) {
 // Module
 // =====================================================================
 
-var queryjobCardCreator = (function() {
+var queryjobCardManager = (function() {
 
   // ROS QueryJob status.
   var RECEIVED = 0;
@@ -52,20 +52,20 @@ var queryjobCardCreator = (function() {
     .css('opacity', 1).attr('disabled', 'disabled');
 
   // JQuery object for a card.
-  var createQueryJobCard = function(queryjob) {
-    var queryjobCard = cardTemplate.clone();
+  var create = function(queryjob) {
+    var card = cardTemplate.clone();
 
     $.each(['populateCard'], function(index, event) {
-      queryjobCard.on(event, cardEvents[event]);
+      card.on(event, events[event]);
     });
 
-    queryjobCard.trigger('populateCard', queryjob);
+    card.trigger('populateCard', queryjob);
 
-    return queryjobCard;
+    return card;
   };
 
   // Possible events.
-  var cardEvents = {
+  var events = {
 
     populateCard: function(event, queryjob) {
       var card = $(this).addClass('queryjobCard');
@@ -104,23 +104,26 @@ var queryjobCardCreator = (function() {
   };
 
   return {
-    createQueryJobCard: createQueryJobCard
+    create: create
   };
 
 })();
+
 
 var home = (function() {
 
   var NUM_INITIAL_CARDS = 5;
   var NUM_ADDITIONAL_CARDS = 5;
 
-  var container = $('#queryjobContainer');
-  var queryjobCards = {};
+  var cardManager = null;
+
+  var container = $('#container');
+  var cards = {};
   var lastTimeissued = new Date();
 
-  container.on('refresh', function(event) {
+  function refresh() {
+    var elem = container;
     // Condition check.
-    var elem = $(this);
     if (elem.is('.refreshing') || elem.is('.loading') || elem.is('.adding')) {
       console.log('Previous event not finished.');
       return;
@@ -131,7 +134,7 @@ var home = (function() {
 
     // Remove contents in container.
     elem.find('div.thumbnail').remove();
-    queryjobCards = {};
+    cards = {};
 
     var data = {
       startDate: new Date().toISOString(),
@@ -141,11 +144,11 @@ var home = (function() {
     };
     $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
       $.each(queryjobs, function(i, queryjob) {
-        queryjobCards[queryjob._id] = queryjobCardCreator
-          .createQueryJobCard(queryjob);
-        queryjobCards[queryjob._id].appendTo(elem);
+        cards[queryjob._id] = cardManager
+          .create(queryjob);
+        cards[queryjob._id].appendTo(elem);
       });
-      if (queryjobs.length > 1) {
+      if (queryjobs.length >= 1) {
         lastTimeissued = queryjobs[queryjobs.length - 1].timeissued;
       }
     }, 'JSON').fail(function() {
@@ -153,11 +156,12 @@ var home = (function() {
     }).always(function() {
       elem.removeClass('refreshing');
     });
-  });
+  }
 
-  container.on('loadMore', function(event) {
+  // Append more QueryJobs to the container.
+  function loadMore() {
+    var elem = container;
     // Condition check.
-    var elem = $(this);
     if (elem.is('.refreshing') || elem.is('.loading') || elem.is('.adding')) {
       console.log('Previous event not finished.');
       return;
@@ -173,12 +177,11 @@ var home = (function() {
     };
     $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
       $.each(queryjobs, function(index, queryjob) {
-        // queryjobCards[queryjob._id] = createCard(queryjob);
-        queryjobCards[queryjob._id] = queryjobCardCreator
-          .createQueryJobCard(queryjob);
-        queryjobCards[queryjob._id].appendTo(elem);
+        cards[queryjob._id] = cardManager
+          .create(queryjob);
+        cards[queryjob._id].appendTo(elem);
       });
-      if (queryjobs.length > 1) {
+      if (queryjobs.length >= 1) {
         lastTimeissued = queryjobs[queryjobs.length - 1].timeissued;
       }
     }, 'JSON').fail(function() {
@@ -186,17 +189,17 @@ var home = (function() {
     }).always(function() {
       elem.removeClass('loading');
     });
-  });
+  }
 
-  // TODO: make this like a function instead of event.
-  container.on('add', function(event, queryjob) {
+  // Prepend newest QueryJob to the container.
+  function add(queryjob) {
     // Condition checks.
-    if (queryjobCards[queryjob._id]) {
+    if (cards[queryjob._id]) {
       alert('QueryJob with ID=' + queryjob._id + ' already exists. ' +
         'Not submitting this question.');
       return;
     }
-    var elem = $(this);
+    var elem = container;
     if (elem.is('.refreshing') || elem.is('.loading') || elem.is('.adding')) {
       alert('Previous event was not finished, try again.');
       return;
@@ -205,21 +208,19 @@ var home = (function() {
     // Set container state.
     elem.addClass('adding');
 
-    // queryjobCards[queryjob._id] = createCard(queryjob);
-    queryjobCards[queryjob._id] = queryjobCardCreator
-          .createQueryJobCard(queryjob);
-    queryjobCards[queryjob._id].css('opacity', 0).prependTo(elem);
-    queryjobCards[queryjob._id].animate({
+    cards[queryjob._id] = cardManager
+          .create(queryjob);
+    cards[queryjob._id].css('opacity', 0).prependTo(elem);
+    cards[queryjob._id].animate({
       'opacity': 1
     }, 200, function() {
       elem.removeClass('adding');
     });
 
-  });
+  }
 
   var submitQuestion = function() {
 
-    // return function(event) {
     event.preventDefault();
 
     var newQueryJob = {
@@ -245,51 +246,18 @@ var home = (function() {
     }, 'JSON').fail(function() {
       alert('Error while posting to /queryjobs/addqueryjob.');
     });
-    // };
   };
 
-  var init = function() {
-    container.trigger('refresh');
+  var init = function(options) {
+    cardManager = options.cardManager;
+    refresh();
   };
 
   return {
-    container: container,
+    loadMore: loadMore,
+    add: add,
     submitQuestion: submitQuestion,
     init: init
   };
 
 })();
-
-
-// =====================================================================
-// DOM Ready
-// =====================================================================
-
-$(document).ready(function() {
-
-  // Make switches pretty.
-  $('.js-switch').each(function(index) {
-    new Switchery(this);
-  });
-
-  // Initialize contents.
-  home.init();
-
-  // Infinite scroll setups.
-  $(window).scroll(function() {
-    var wintop = $(window).scrollTop();
-    var docheight = $(document).height();
-    var winheight = $(window).height();
-    var scrolltrigger = 0.95;
-
-    if ((wintop / (docheight - winheight)) > scrolltrigger) {
-      home.container.trigger('loadMore');
-    }
-  });
-
-  // Submit Question button click.
-  $('#aSubmitQuestion').on('click', home.submitQuestion);
-  //- For using "Enter" key.
-  $('#btnSubmitQuestion').on('click', home.submitQuestion);
-
-});

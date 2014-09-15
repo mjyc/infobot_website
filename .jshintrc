@@ -9,6 +9,8 @@
     "process": true,
     "require": true,
     "Switchery": true,
+    "queryjobCardManager":true,
+    "home":true,
     // test
     "after": true,
     "before": true,
