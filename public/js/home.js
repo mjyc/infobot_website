@@ -24,6 +24,20 @@ $(document).ready(function() {
     }
   });
 
+  $('#inputDeadline').datetimepicker({
+    icons: {
+      time: 'fa fa-clock-o fa-lg',
+      date: 'fa fa-calendar fa-lg',
+      up: 'fa fa-arrow-up fa-lg',
+      down: 'fa fa-arrow-down fa-lg'
+    },
+    minuteStepping: 5,
+    minDate: new Date(),
+    maxDate: new Date(new Date().getTime() +
+      1000 * 60 * 60 * 24 * 7), // week later
+    sideBySide: true
+  });
+
   // Submit Question button click.
   $('#aSubmitQuestion').on('click', home.submitQuestion);
   //- For using "Enter" key.

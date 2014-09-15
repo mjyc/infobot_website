@@ -2,6 +2,7 @@ extends layout
 
 block css
   link(rel="stylesheet", href="css/switchery.min.css")
+  link(rel="stylesheet", href="css/bootstrap-datetimepicker.min.css")
 
 block content
 
@@ -19,10 +20,17 @@ block content
             b Public
             | &nbsp;&nbsp;
             input#inputPublic.js-switch(type="checkbox")
-            | &nbsp;&nbsp;
+            | &nbsp;&nbsp;&nbsp;&nbsp;
             b Email
             | &nbsp;&nbsp;
             input#inputEmail.js-switch(type="checkbox")
+            | &nbsp;&nbsp;&nbsp;&nbsp;
+            b Deadline
+            | &nbsp;&nbsp;
+            #inputDeadline.input-group.input-group-sm.date
+              input.form-control(type="text")
+              span.input-group-addon
+                span.glyphicon.glyphicon-calendar
             | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             a#aSubmitQuestion.btn.btn-primary Submit Question
             //- For using "Enter" key.
@@ -34,6 +42,8 @@ block content
 block javascript
   script(src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js")
   script(src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js")
+  script(src="js/vendor/moment.js")
+  script(src="js/vendor/bootstrap-datetimepicker.min.js")
   script(src="js/vendor/switchery.min.js")
 
   //- TODO: find general solution for below approach (grunt inject?).

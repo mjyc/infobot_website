@@ -11,14 +11,14 @@
     .navbar-collapse.collapse
       ul.nav.navbar-nav
         if isHome
-          li.active#Home
+          li#Home.active
             a(href="/home") Your Question
           li#Wall
             a(href="/wall") Everyone's Question
         unless isHome
           li#0
             a(href="/home") Your Question
-          li.active#Wall
+          li#Wall.active
             a(href="/wall") Everyone's Question
       p.navbar-text.navbar-right
         | Signed in as #{user.name}
