@@ -140,8 +140,7 @@ $(document).ready(function() {
     sideBySide: true
   });
 
-
-
+  // Submit question callback setup.
   var submitQuestion = function() {
     event.preventDefault();
 
@@ -184,7 +183,6 @@ $(document).ready(function() {
       $('#submitQuestion input#inputTypedCmd').val('');
     });
   };
-
 
   // Submit Question button click.
   $('#aSubmitQuestion').on('click', submitQuestion);

@@ -38,6 +38,44 @@ router.post('/addqueryjob', function(req, res, next) {
   });
 });
 
+router.post('/updatequeryjob', function(req, res, next) {
+  var db = req.db;
+
+  db.collection('queryjobs').findAndModify({
+    _id: req.body.queryjobID
+  }, {
+    $set: {
+      comment: req.body.comment
+    }
+  }, function(err, result) {
+    if (err) {
+      return next(err);
+    }
+    res.send(result);
+  });
+
+  // var db = req.db;
+  // var newQueryJob = {};
+  // // Add user info.
+  // newQueryJob.user_id = req.user._id;
+  // newQueryJob.user_name = req.user.name;
+  // // Data from req.
+  // newQueryJob.timeissued = new Date(req.body.timeissued);
+  // newQueryJob.typed_cmd = req.body.typed_cmd;
+  // newQueryJob.notification_sms = JSON.parse(req.body.notification_sms);
+  // newQueryJob.notification_email = JSON.parse(
+  //   req.body.notification_email || false);
+  // newQueryJob.is_public = JSON.parse(req.body.is_public || false);
+  // newQueryJob.deadline = new Date(req.body.deadline);
+
+  // db.collection('queryjobs').insert(newQueryJob, function(err, result) {
+  //   if (err) {
+  //     return next(err);
+  //   }
+  //   res.send(result);
+  // });
+});
+
 // Get QueryJobs.
 // Returns QueryJobs in decreasing timeissued sorted manner. Can provide
 // parameters to control types of QueryJobs being returned.

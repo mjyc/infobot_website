@@ -4,6 +4,10 @@ body {
   padding-bottom: 20px;
 }
 
+.container {
+  max-width: 730px;
+}
+
 .jumbotron-home {
   padding: 70px 0px 20px;
   margin-bottom: 25px;
@@ -24,3 +28,12 @@ body {
   color: gray;
 }
 
+.result-img-sm {
+  /*height: 600px;*/
+  width: 100px;
+}
+
+.result-img-lg {
+  /*height: 600px;*/
+  width: 600px;
+}

@@ -74,7 +74,7 @@ var queryjobCards = (function() {
       .css('text-align', 'right');
     if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED) {
       statusTag.append(
-        statusTemplate.clone().text('in queue'));
+        statusTemplate.clone().addClass('btn-info').text('in queue'));
     } else if (queryjob.status === RUNNING) {
       statusTag.append(
         statusTemplate.clone().addClass('btn-warning').text('running'));
@@ -115,6 +115,17 @@ var queryjobCards = (function() {
     card.data('dubeInfo').html(dubeInfo.html());
   };
 
+  var updateDUBETags = function(card, queryjob) {
+    card.data('dubeTags').children().remove();
+    if (queryjob.status === SUCCEEDED) {
+      card.data('dubeTags').show()
+        .append(tagTemplate.clone().text(
+          queryjob.response_confidence + ' % confidence'));
+    } else {
+      card.data('dubeTags').hide();
+    }
+  };
+
   var updateDUBEResp = function(card, queryjob) {
     var dubeResp = $('<p>').addClass('col-sm-12').css('text-align', 'right');
 
@@ -134,21 +145,73 @@ var queryjobCards = (function() {
     card.data('dubeResp').html(dubeResp.html());
   };
 
+  var updateDUBEPic = function(card, queryjob) {
+    card.data('dubePic').children().remove();
+    if (queryjob.status === SUCCEEDED) {
+      var img = $('<img src="' + queryjob.response_img_path + '" class="img-thumbnail" alt="Result">').addClass('result-img-sm');
+      img.click(function(event) {
+        if ($(this).is('.result-img-lg')) {
+          $(this).removeClass('result-img-lg');
+          $(this).addClass('result-img-sm');
+        } else {
+          $(this).removeClass('result-img-sm');
+          $(this).addClass('result-img-lg');
+        }
+      });
+      card.data('dubePic').show()
+        .append(img);
+    } else {
+      card.data('dubePic').hide();
+    }
+  };
+
   var updateButtons = function(card, queryjob) {
     var buttons = card.data('buttons');
     if (queryjob.status === RUNNING && !buttons.data('btnCancel')) {
       var btnCancel = $('<button>').addClass('btn btn-default').text('Cancel')
         .appendTo(buttons);
+      buttons.show();
       buttons.data('btnCancel', btnCancel);
       btnCancel.click(function() {
         btnCancel.attr('disabled', 'disabled');
         cancelCard(queryjob._id);
       });
-      console.log('should of created on');
-    } else if (queryjob.status !== RUNNING) {
+    } else if (queryjob.status === SUCCEEDED || queryjob.status === FAILED) {
+      if (!buttons.data('inputComment')) {
+        var inputComment = $('<div>').addClass('form-inline')
+          .append(
+            $('<div>').addClass('form-group')
+              .append($('<input>').addClass('form-control').attr('id', 'inputComment')
+                .css('width', '400px')
+                .attr('placeholder', 'Please leave your comment here.')
+                .attr('type', 'text')))
+          .append('&nbsp;&nbsp;')
+          .append(
+            $('<button>').addClass('btn btn-default').attr('type', 'submit')
+              .text('Submit'))
+          .appendTo(buttons);
+        buttons.show();
+        buttons.data(inputComment, 'inputComment');
+        inputComment.click(function() {
+          var data = {
+            queryjobID: queryjob._id,
+            comment: $('#inputComment').val()
+          };
+          // $.post('/', param1: 'value1', function(data, textStatus, xhr) {
+          //   /*optional stuff to do after success */
+          // });
+        });
+      }
+    } else if (queryjob.status !== RUNNING && queryjob.status !== SUCCEEDED &&
+        queryjob.status !== FAILED) {
+      buttons.hide();
       if (buttons.data('btnCancel')) {
         buttons.data('btnCancel').remove();
         buttons.removeData('btnCancel');
+      }
+      if (buttons.data('inputComment')) {
+        buttons.data('inputComment').remove();
+        buttons.removeData('inputComment');
       }
     }
   };
@@ -211,14 +274,20 @@ var queryjobCards = (function() {
     updateDUBEInfo(card, queryjob);
 
     var dubeTags = $('<p>').addClass('col-sm-12').css('text-align', 'right')
-      .appendTo(cardRow);
+      .appendTo(cardRow).hide();
     card.data('dubeTags', dubeTags);
+    updateDUBETags(card, queryjob);
 
     // Create response.
     var dubeResp = $('<p>').addClass('col-sm-12').css('text-align', 'right')
       .appendTo(cardRow);
     card.data('dubeResp', dubeResp);
     updateDUBEResp(card, queryjob);
+
+    var dubePic = $('<p>').addClass('col-sm-12').css('text-align', 'right')
+      .appendTo(cardRow);
+    card.data('dubePic', dubePic);
+    updateDUBEPic(card, queryjob);
 
     // // Status.
     // if (queryjob.status === SUCCEEDED) {
@@ -235,7 +304,7 @@ var queryjobCards = (function() {
     // }
 
     var buttons = $('<p>').addClass('col-sm-12').css('text-align', 'left')
-      .appendTo(cardRow);
+      .appendTo(cardRow).hide();
     card.data('buttons', buttons);
     updateButtons(card, queryjob);
     // if (queryjob.status === RUNNING) {
