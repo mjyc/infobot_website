@@ -145,15 +145,6 @@ $(document).ready(function() {
   var submitQuestion = function() {
     event.preventDefault();
 
-    // var inputDeadline = $('#inputDeadline').data('DateTimePicker').getDate();
-    // var soonestDeadline = new Date(
-    //   new Date().getTime() + 1000 * 60 * 10 * 1 * 1);
-    // if (inputDeadline < soonestDeadline) {
-    //   alert('Input deadline is too close. Please give more than 10min for ' +
-    //     'DUB-E');
-    //   return;
-    // }
-
     // Parse data from DOM.
     var newQueryJob = {
       timeissued: new Date().toISOString(),
