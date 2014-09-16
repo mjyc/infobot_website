@@ -132,7 +132,9 @@ $(document).ready(function() {
       down: 'fa fa-arrow-down fa-lg'
     },
     minuteStepping: 5,
-    minDate: new Date(),
+    // minDate: new Date(),
+    minDate: new Date(
+      new Date().getTime() + 1000 * 60 * 10 * 1 * 1), // at least 10min
     maxDate: new Date(new Date().getTime() +
       1000 * 60 * 60 * 24 * 7), // week later
     sideBySide: true
@@ -143,29 +145,14 @@ $(document).ready(function() {
   var submitQuestion = function() {
     event.preventDefault();
 
-    var inputDeadline = $('#inputDeadline').data('DateTimePicker').getDate();
-    var soonestDeadline = new Date(
-      new Date().getTime() + 1000 * 60 * 10 * 1 * 1);
-    if (inputDeadline < soonestDeadline) {
-      alert('Input deadline is too close. Please give more than 10min for ' +
-        'DUB-E');
-      return;
-    }
-    // var data =  {
-    //   startDate: new Date(),
-    //   userOnly: true
-    // };
-    // $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
-    //   var stop = false;
-    //   for (var i = queryjobs.length - 1; i >= 0; i--) {
-    //     // Look for a task with running status.
-    //     if (queryjobs[i].status === 2) {
-    //       stop = true;
-    //     }
-    //   }
-    // }, 'JSON').fail(function() {
-    //   alert('Error while posting to /queryjobs/getqueryjobs.');
-    // });
+    // var inputDeadline = $('#inputDeadline').data('DateTimePicker').getDate();
+    // var soonestDeadline = new Date(
+    //   new Date().getTime() + 1000 * 60 * 10 * 1 * 1);
+    // if (inputDeadline < soonestDeadline) {
+    //   alert('Input deadline is too close. Please give more than 10min for ' +
+    //     'DUB-E');
+    //   return;
+    // }
 
     // Parse data from DOM.
     var newQueryJob = {
