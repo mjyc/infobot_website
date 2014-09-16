@@ -11,6 +11,12 @@ module.exports = function(grunt) {
           logConcurrentOutput: true
         }
       },
+      debug: {
+        tasks: ['node-inspector', 'nodemon', 'watch'],
+        options: {
+          logConcurrentOutput: true
+        }
+      },
       'test-setup': {
         tasks: ['node-inspector', 'shell:nodemon-delayed', 'shell:ros4test',
           'watch'],
@@ -107,5 +113,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-shell');
 
   grunt.registerTask('default', ['concurrent:dev']);
+  grunt.registerTask('debug', ['concurrent:debug']);
   grunt.registerTask('test_setup', ['env:test','concurrent:test-setup']);
 };

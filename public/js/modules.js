@@ -16,7 +16,8 @@ function formatAMPM(date) {
 function formatTodayYesterday(date) {
   var strTime = '';
   var todayDate = new Date();
-  var yesterdayDate = new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 1);
+  var yesterdayDate = new Date(
+    new Date().getTime() - 1000 * 60 * 60 * 24 * 1);
 
   if (date.getDate() === todayDate.getDate()) {
     strTime += 'Today at ' + formatAMPM(date);
@@ -33,7 +34,13 @@ function formatTodayYesterday(date) {
 // Module
 // =====================================================================
 
-var queryjobCardManager = (function() {
+var queryjobCards = (function() {
+
+  // Variables
+
+  // Constants
+  var NUM_INITIAL_CARDS = 10;
+  var NUM_ADDITIONAL_CARDS = 5;
 
   // ROS QueryJob status.
   var RECEIVED = 0;
@@ -43,98 +50,311 @@ var queryjobCardManager = (function() {
   var CANCELLED = 4;
   var FAILED = 5;
 
-  // DOM templates.
+  // DOM templates for a card.
   var cardTemplate = $('<div>').addClass('thumbnail').append(
     $('<div>').addClass('caption'));
   var nameTemplate = $('<span>').addClass('name-text');
   var timeTemplate = $('<span>').addClass('time-text');
   var tagTemplate = $('<button>').addClass('btn btn-xs')
     .css('opacity', 1).attr('disabled', 'disabled');
+  var statusTemplate = $('<button>').addClass('btn btn-xs')
+    .css('opacity', 1).attr('disabled', 'disabled');
 
-  // JQuery object for a card.
-  var create = function(queryjob) {
+  // Selectors.
+  var container = $('#container');
+  var cards = {};
+  var lastTimeissued = new Date();
+  var callCancelQueryJob = null;
+
+
+  // Single Card Operations
+
+  var updateStatus = function(card, queryjob) {
+    var statusTag = $('<p>').addClass('col-xs-2')
+      .css('text-align', 'right');
+    if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED) {
+      statusTag.append(
+        statusTemplate.clone().text('in queue'));
+    } else if (queryjob.status === RUNNING) {
+      statusTag.append(
+        statusTemplate.clone().addClass('btn-warning').text('running'));
+    } else if (queryjob.status === SUCCEEDED) {
+      statusTag.append(
+        statusTemplate.clone().addClass('btn-success').text('success'));
+    } else if (queryjob.status === CANCELLED) {
+      statusTag.append(
+        statusTemplate.clone().addClass('btn-danger').text('cancelled'));
+    } else if (queryjob.status === FAILED) {
+      statusTag.append(
+        statusTemplate.clone().addClass('btn-danger').text('failed'));
+    }
+    card.data('queryjob', queryjob);
+    card.data('statusTag').html(statusTag.html());
+  };
+
+  var updateDUBEInfo = function(card, queryjob) {
+    var dubeInfo = $('<p>').addClass('col-sm-12').css('text-align', 'right');
+    var dubeName = nameTemplate.clone().text('DUB-E').append('&nbsp;&nbsp;');
+    var dubeTime = timeTemplate.clone();
+
+    if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED) {
+      dubeTime
+        .text(formatTodayYesterday(new Date(queryjob.timeissued)));
+    } else if (queryjob.status === RUNNING) {
+      dubeTime
+        .text(formatTodayYesterday(new Date(queryjob.timestarted)));
+    } else if (queryjob.status === SUCCEEDED ||
+        queryjob.status === CANCELLED || queryjob.status === FAILED) {
+      dubeTime
+        .text(formatTodayYesterday(new Date(queryjob.timecompleted)));
+    }
+
+    dubeInfo.append(dubeName.append(dubeTime));
+
+    card.data('queryjob', queryjob);
+    card.data('dubeInfo').html(dubeInfo.html());
+  };
+
+  var updateDUBEResp = function(card, queryjob) {
+    var dubeResp = $('<p>').addClass('col-sm-12').css('text-align', 'right');
+
+    if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED) {
+      dubeResp
+        .text('Received your question.');
+    } else if (queryjob.status === RUNNING) {
+      dubeResp
+        .text('Working on your question!');
+    } else if (queryjob.status === SUCCEEDED ||
+        queryjob.status === CANCELLED || queryjob.status === FAILED) {
+      dubeResp
+        .text(queryjob.response_text);
+    }
+
+    card.data('queryjob', queryjob);
+    card.data('dubeResp').html(dubeResp.html());
+  };
+
+  var updateButtons = function(card, queryjob) {
+    var buttons = card.data('buttons');
+    if (queryjob.status === RUNNING && !buttons.data('btnCancel')) {
+      var btnCancel = $('<button>').addClass('btn btn-default').text('Cancel')
+        .appendTo(buttons);
+      buttons.data('btnCancel', btnCancel);
+      btnCancel.click(function() {
+        btnCancel.attr('disabled', 'disabled');
+        cancelCard(queryjob._id);
+      });
+      console.log('should of created on');
+    } else if (queryjob.status !== RUNNING) {
+      if (buttons.data('btnCancel')) {
+        buttons.data('btnCancel').remove();
+        buttons.removeData('btnCancel');
+      }
+    }
+  };
+
+  var createCard = function(queryjob) {
     var card = cardTemplate.clone();
+    card.data('queryjob', queryjob);
 
-    $.each(['populateCard'], function(index, event) {
-      card.on(event, events[event]);
-    });
+    var cardRow = card.children() //caption
+      .append($('<div>').addClass('row'))
+      .children(); // row
 
-    card.trigger('populateCard', queryjob);
+    // Create user name and issued time.
+    var userName = nameTemplate.clone()
+      .text(queryjob.user_name).append('&nbsp;&nbsp;');
+    var userTime = timeTemplate.clone()
+      .text(formatTodayYesterday(new Date(queryjob.timeissued)));
+    var userInfo = $('<p>').addClass('col-xs-10').css('text-align', 'left')
+      .append(userName.append(userTime))
+      .appendTo(cardRow);
+
+    // Status tag.
+    var statusTag = $('<p>').addClass('col-xs-2').css('text-align', 'right')
+      .appendTo(cardRow);
+    card.data('statusTag', statusTag);
+    updateStatus(card, queryjob);
+
+    // Create user status tags.
+    var userTags = $('<p>').addClass('col-sm-12').css('text-align', 'left')
+      .appendTo(cardRow);
+    // Public.
+    if (JSON.parse(queryjob.is_public || false)) {
+      userTags.append(
+        tagTemplate.clone().text('public')).append('&nbsp;&nbsp;');
+    } else {
+      userTags.append(
+        tagTemplate.clone().text('private')).append('&nbsp;&nbsp;');
+    }
+    // Email.
+    if (JSON.parse(queryjob.notification_email || false)) {
+      userTags.append(
+        tagTemplate.clone().text('email')).append('&nbsp;&nbsp;');
+    }
+    // Deadline.
+    if (queryjob.deadline) {
+      userTags.append(
+        tagTemplate.clone().text('deadline ' + formatTodayYesterday(
+          new Date(queryjob.deadline)).toLowerCase()).append('&nbsp;&nbsp;'));
+    }
+
+    // Create typed command.
+    cardRow.append($('<p>').addClass('col-sm-12').css(  'text-align', 'left')
+      .text(queryjob.typed_cmd));
+
+
+    // Create dube name and update time.
+    var dubeInfo = $('<p>').addClass('col-sm-12').css('text-align', 'right')
+      .appendTo(cardRow);
+    card.data('dubeInfo', dubeInfo);
+    updateDUBEInfo(card, queryjob);
+
+    var dubeTags = $('<p>').addClass('col-sm-12').css('text-align', 'right')
+      .appendTo(cardRow);
+    card.data('dubeTags', dubeTags);
+
+    // Create response.
+    var dubeResp = $('<p>').addClass('col-sm-12').css('text-align', 'right')
+      .appendTo(cardRow);
+    card.data('dubeResp', dubeResp);
+    updateDUBEResp(card, queryjob);
+
+    // // Status.
+    // if (queryjob.status === SUCCEEDED) {
+    //   dubeTags.append('&nbsp;&nbsp;').append(
+    //     tagTemplate.clone().addClass('btn-success').text('success'));
+    //   dubeTags.append('&nbsp;&nbsp;').append(
+    //     tagTemplate.clone().text(queryjob.response_confidence + '% confidence'));
+    // } else if (queryjob.status === CANCELLED) {
+    //   dubeTags.append('&nbsp;&nbsp;').append(
+    //     tagTemplate.clone().addClass('btn-danger').text('cancelled'));
+    // } else if (queryjob.status === FAILED) {
+    //   dubeTags.append('&nbsp;&nbsp;').append(
+    //     tagTemplate.clone().addClass('btn-danger').text('failed'));
+    // }
+
+    var buttons = $('<p>').addClass('col-sm-12').css('text-align', 'left')
+      .appendTo(cardRow);
+    card.data('buttons', buttons);
+    updateButtons(card, queryjob);
+    // if (queryjob.status === RUNNING) {
+    //   var btnCancel = $('<button>').addClass('btn btn-default').text('Cancel').appendTo(buttons);
+    //   btnCancel.click(function() {
+    //     btnCancel.attr('disabled', 'disabled');
+    //     cancelCard(queryjob._id);
+    //   });
+    // }
+
+    // // Cancel button.
+    // // if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED || queryjob.status === RUNNING) {
+    // if (queryjob.status === RUNNING) {
+    //   var btnCancel = $('<button>').addClass('btn btn-default').text('Cancel').appendTo(buttons);
+    //   card.data('btnCancel', btnCancel);
+    //   card.data('btnCancelCb', function() {
+    //     btnCancel.attr('disabled', 'disabled');
+    //     cancelCard(queryjob._id);
+    //   });
+    //   btnCancel.click(card.data('btnCancelCb'));
+    // }
+    if (queryjob.status === CANCELLED) {
+      card.css('opacity', 0.5);
+    }
 
     return card;
   };
 
-  // Possible events.
-  var events = {
+  var cancelCard = function(queryjobIDStr) {
+    callCancelQueryJob(queryjobIDStr, function() {
+      // container.data('cards')[queryjobIDStr].hide();
+      // delete container.data('cards')[queryjobIDStr];
+      console.log('refreshing');
+      refreshCard(queryjobIDStr);
+    });
+  };
 
-    populateCard: function(event, queryjob) {
-      var card = $(this).addClass('queryjobCard');
+  var refreshCard = function(queryjobIDStr) {
+    // reloadCards();
+    var data = {
+      queryjobID: queryjobIDStr,
+      limit: 1
+    };
+    $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
+      if (queryjobs.length !== 1) {
+        alert('Error while posting to /queryjobs/getqueryjobs.');
+      } else {
 
-      var cardRow = card.children() //caption
-        .append($('<div>').addClass('row'))
-        .children(); // row
+        // var newCard = createCard(queryjobs[0]);
+        // container.data('cards')[queryjobIDStr].html(newCard.html());
+        var queryjob = queryjobs[0];
+        updateStatus(container.data('cards')[queryjobIDStr], queryjob);
+        updateDUBEInfo(container.data('cards')[queryjobIDStr], queryjob);
+        updateDUBEResp(container.data('cards')[queryjobIDStr], queryjob);
+        updateButtons(container.data('cards')[queryjobIDStr], queryjob);
+        if (queryjob.status === CANCELLED) {
+          container.data('cards')[queryjobIDStr].css('opacity', 0.5);
+        }
 
-      // Create user name and issued time.
-      var userName = nameTemplate.clone()
-        .text(queryjob.user_name).append('&nbsp;&nbsp;');
-      var userTime = timeTemplate.clone()
-        .text(formatTodayYesterday(new Date(queryjob.timeissued)));
-      var userInfo = $('<p>').addClass('col-sm-12').css('text-align', 'left')
-        .append(userName.append(userTime))
-        .appendTo(cardRow);
+        // container.data('cards')[queryjobIDStr].css('opacity', 0);
+        // container.data('cards')[queryjobIDStr].animate({
+        //   opacity: 1
+        // }, 300);
 
-      // Create typed command.
-      cardRow.append($('<p>').addClass('col-sm-12').css('text-align', 'left').text(queryjob.typed_cmd));
-
-      // Create user status tags.
-      var userTags = $('<p>').addClass('col-sm-12').css('text-align', 'left')
-        .appendTo(cardRow);
-      if (JSON.parse(queryjob.notification_email || false)) {
-        userTags.append(tagTemplate.clone().addClass('btn-default').text('text'));
       }
-      if (queryjob.deadline) {
-        userTags.append(tagTemplate.clone().addClass('btn-default').text('deadline at' + formatAMPM(new Date(queryjob.deadline))));
-      }
-      if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED) {
-        userTags.append('&nbsp;&nbsp;').append(tagTemplate.clone().text('in queue'));
-      } else if (queryjob.status === RUNNING) {
-        userTags.append('&nbsp;&nbsp;').append(tagTemplate.clone().removeClass('btn-xs').addClass('btn-warning btn-lg').text('running'));
-      }
+    }, 'JSON').fail(function() {
+      alert('Error while posting to /queryjobs/getqueryjobs.');
+    });
+  };
+
+
+  // Multiple Cards Operations
+
+  var attachCard = function(card, prepend) {
+    if (prepend) {
+      card.prependTo(container);
+    } else {
+      card.appendTo(container);
+    }
+    container.data('cards')[card.data('queryjob')._id] = card;
+    card.data('container', container);
+  };
+
+  var loadCards = function(data, callback) {
+    $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
+      callback(queryjobs);
+    }, 'JSON').fail(function() {
+      alert('Error while posting to /queryjobs/getqueryjobs.');
+    }).always(function() {
+      container.removeClass('loading');
+    });
+  };
+
+  var createCardsNAppend = function(queryjobs) {
+    if (queryjobs.length > 0) {
+      lastTimeissued = queryjobs[queryjobs.length - 1].timeissued;
+      $.each(queryjobs, function(i, queryjob) {
+        attachCard(createCard(queryjob));
+        // if (queryjob.status === CANCELLED) {
+        //   container.data('cards')[queryjob].hide();
+        // }
+      });
+    } else {
+      console.log('Input queryjobs was empty.');
     }
   };
 
-  return {
-    create: create
-  };
-
-})();
-
-
-var home = (function() {
-
-  var NUM_INITIAL_CARDS = 5;
-  var NUM_ADDITIONAL_CARDS = 5;
-
-  var cardManager = null;
-
-  var container = $('#container');
-  var cards = {};
-  var lastTimeissued = new Date();
-
-  function refresh() {
-    var elem = container;
+  var reloadCards = function() {
     // Condition check.
-    if (elem.is('.refreshing') || elem.is('.loading') || elem.is('.adding')) {
-      console.log('Previous event not finished.');
+    if (container.is('.loading')) {
+      console.log('Previous operation not finished.');
       return;
     }
-
     // Set container state.
-    elem.addClass('refreshing');
+    container.addClass('loading');
 
     // Remove contents in container.
-    elem.find('div.thumbnail').remove();
-    cards = {};
+    container.find('div.thumbnail').remove();
+    container.data('cards', {});
 
     var data = {
       startDate: new Date().toISOString(),
@@ -142,32 +362,17 @@ var home = (function() {
       userOnly: false,
       publicOnly: false
     };
-    $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
-      $.each(queryjobs, function(i, queryjob) {
-        cards[queryjob._id] = cardManager
-          .create(queryjob);
-        cards[queryjob._id].appendTo(elem);
-      });
-      if (queryjobs.length >= 1) {
-        lastTimeissued = queryjobs[queryjobs.length - 1].timeissued;
-      }
-    }, 'JSON').fail(function() {
-      alert('Error while posting to /queryjobs/getqueryjobs.');
-    }).always(function() {
-      elem.removeClass('refreshing');
-    });
-  }
+    loadCards(data, createCardsNAppend);
+  };
 
-  // Append more QueryJobs to the container.
-  function loadMore() {
-    var elem = container;
+  var loadMoreCards = function() {
     // Condition check.
-    if (elem.is('.refreshing') || elem.is('.loading') || elem.is('.adding')) {
-      console.log('Previous event not finished.');
+    if (container.is('.loading')) {
+      console.log('Previous operation not finished.');
       return;
     }
-
-    elem.addClass('loading');
+    // Set container state.
+    container.addClass('loading');
 
     var data = {
       startDate: lastTimeissued,
@@ -175,89 +380,41 @@ var home = (function() {
       userOnly: false,
       publicOnly: false
     };
-    $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
-      $.each(queryjobs, function(index, queryjob) {
-        cards[queryjob._id] = cardManager
-          .create(queryjob);
-        cards[queryjob._id].appendTo(elem);
-      });
-      if (queryjobs.length >= 1) {
-        lastTimeissued = queryjobs[queryjobs.length - 1].timeissued;
-      }
-    }, 'JSON').fail(function() {
-      alert('Error while posting to /queryjobs/getqueryjobs.');
-    }).always(function() {
-      elem.removeClass('loading');
-    });
-  }
+    loadCards(data, createCardsNAppend);
+  };
 
-  // Prepend newest QueryJob to the container.
-  function add(queryjob) {
-    // Condition checks.
-    if (cards[queryjob._id]) {
-      alert('QueryJob with ID=' + queryjob._id + ' already exists. ' +
-        'Not submitting this question.');
+  var addQueryJobToCard = function(queryjob) {
+    // Condition check.
+    if (container.is('loading')) {
+      console.log('Previous operation not finished.');
       return;
     }
-    var elem = container;
-    if (elem.is('.refreshing') || elem.is('.loading') || elem.is('.adding')) {
-      alert('Previous event was not finished, try again.');
-      return;
-    }
-
     // Set container state.
-    elem.addClass('adding');
+    container.addClass('loading');
 
-    cards[queryjob._id] = cardManager
-          .create(queryjob);
-    cards[queryjob._id].css('opacity', 0).prependTo(elem);
-    cards[queryjob._id].animate({
-      'opacity': 1
-    }, 200, function() {
-      elem.removeClass('adding');
-    });
-
-  }
-
-  var submitQuestion = function() {
-
-    event.preventDefault();
-
-    var newQueryJob = {
-      timeissued: new Date().toISOString(),
-      typed_cmd: $('#submitQuestion input#inputTypedCmd').val(),
-      notification_sms: false,
-      notification_email: $('#submitQuestion button#btnToggleEmail')
-        .hasClass('active'),
-      'is_public': $('#submitQuestion button#btnTogglePublic')
-        .hasClass('active'),
-      deadline: new Date(new Date().getTime() + 1000 * 60 * 60 * 1 * 1)
-        .toISOString()
-    };
-
-    // Use AJAX to post the object to our adduser service.
-    $.post('/queryjobs/addqueryjob', newQueryJob, function(result) {
-      if (result.length !== 1) {
-        alert('Error while posting to /queryjobs/addqueryjob.');
-      }
-      container.trigger('add', [result[0]]);
-
-      $('#submitQuestion input#inputTypedCmd').val('');
-    }, 'JSON').fail(function() {
-      alert('Error while posting to /queryjobs/addqueryjob.');
+    // Animate it.
+    var card = createCard(queryjob).css('opacity', 0);
+    attachCard(card, true);
+    card.animate({
+      opacity: 1,
+    }, 300, function() {
+      container.removeClass('loading');
     });
   };
 
   var init = function(options) {
-    cardManager = options.cardManager;
-    refresh();
+    callCancelQueryJob = options.callCancelQueryJob;
+
+    reloadCards();
   };
 
   return {
-    loadMore: loadMore,
-    add: add,
-    submitQuestion: submitQuestion,
+    refreshCard: refreshCard,
+
+    loadMoreCards: loadMoreCards,
+    addQueryJobToCard: addQueryJobToCard,
+
     init: init
   };
 
-})();
+}());
