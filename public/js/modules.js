@@ -66,6 +66,8 @@ var queryjobCards = (function() {
   var lastTimeissued = new Date();
   var callCancelQueryJob = null;
 
+  var publicMode = false;
+
 
   // Single Card Operations
 
@@ -247,12 +249,14 @@ var queryjobCards = (function() {
     var userTags = $('<p>').addClass('col-sm-12').css('text-align', 'left')
       .appendTo(cardRow);
     // Public.
-    if (JSON.parse(queryjob.is_public || false)) {
-      userTags.append(
-        tagTemplate.clone().text('public')).append('&nbsp;&nbsp;');
-    } else {
-      userTags.append(
-        tagTemplate.clone().text('private')).append('&nbsp;&nbsp;');
+    if (!publicMode) {
+      if (JSON.parse(queryjob.is_public || false)) {
+        userTags.append(
+          tagTemplate.clone().text('public')).append('&nbsp;&nbsp;');
+      } else {
+        userTags.append(
+          tagTemplate.clone().text('private')).append('&nbsp;&nbsp;');
+      }
     }
     // Email.
     if (JSON.parse(queryjob.notification_email || false)) {
@@ -293,13 +297,15 @@ var queryjobCards = (function() {
     card.data('dubePic', dubePic);
     updateDUBEPic(card, queryjob);
 
-    var buttons = $('<p>').addClass('col-sm-12').css('text-align', 'left')
-      .appendTo(cardRow).hide();
-    card.data('buttons', buttons);
-    updateButtons(card, queryjob);
+    if (!publicMode) {
+      var buttons = $('<p>').addClass('col-sm-12').css('text-align', 'left')
+        .appendTo(cardRow).hide();
+      card.data('buttons', buttons);
+      updateButtons(card, queryjob);
 
-    if (queryjob.status === CANCELLED) {
-      card.css('opacity', 0.5);
+      if (queryjob.status === CANCELLED) {
+        card.css('opacity', 0.5);
+      }
     }
 
     return card;
@@ -405,8 +411,8 @@ var queryjobCards = (function() {
     var data = {
       startDate: new Date().toISOString(),
       limit: NUM_INITIAL_CARDS,
-      userOnly: false,
-      publicOnly: false
+      userOnly: !publicMode,
+      publicOnly: publicMode
     };
     loadCards(data, createCardsNAppend);
   };
@@ -423,8 +429,8 @@ var queryjobCards = (function() {
     var data = {
       startDate: lastTimeissued,
       limit: NUM_ADDITIONAL_CARDS,
-      userOnly: false,
-      publicOnly: false
+      userOnly: !publicMode,
+      publicOnly: publicMode
     };
     loadCards(data, createCardsNAppend);
   };
@@ -450,6 +456,7 @@ var queryjobCards = (function() {
 
   var init = function(options) {
     callCancelQueryJob = options.callCancelQueryJob;
+    publicMode = options.publicMode;
 
     reloadCards();
   };

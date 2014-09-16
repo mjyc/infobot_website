@@ -108,7 +108,7 @@ router.post('/getqueryjobs', function(req, res, next) {
     criteria.user_id = req.user._id;
   }
   if (publicOnly) {
-    criteria.is_public = 'true';
+    criteria.is_public = true;
   }
 
   db.collection('queryjobs').find(criteria).sort({

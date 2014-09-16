@@ -70,29 +70,6 @@ listener.subscribe(function(message) {
   queryjobCards.refreshCard(message.queryjob_id);
 });
 
-//   function(message) {
-//   if (cards[message.queryjob_id]) {
-
-//     var data = {
-//       queryjobID: message.queryjob_id,
-//       limit: 1
-//     };
-//     $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
-//       if (queryjobs.length !== 1) {
-//         alert('Error while posting to /queryjobs/getqueryjobs.');
-//       } else {
-//         var queryjob = queryjobs[0];
-//         cards[message.queryjob_id].html(cardManager.create(queryjob).html());
-//       }
-//     }, 'JSON').fail(function() {
-//       alert('Error while posting to /queryjobs/getqueryjobs.');
-//     });
-
-//   } else {
-//     console.log('unknown queryjob_id = ' + message.queryjob_id);
-//   }
-// });
-
 // =====================================================================
 // DOM Ready
 // =====================================================================

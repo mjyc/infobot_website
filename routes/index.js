@@ -50,7 +50,7 @@ router.get('/home', isServerReady, function(req, res) {
 
 // Home.
 router.get('/wall', isServerReady, function(req, res) {
-  res.render('main.jade', {
+  res.render('wall.jade', {
     user: req.user,
     isHome: false,
     prod: req.PROD
