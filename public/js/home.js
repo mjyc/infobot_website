@@ -121,6 +121,10 @@ $(document).ready(function() {
   var submitQuestion = function() {
     event.preventDefault();
 
+    if ($('#submitQuestion input#inputTypedCmd').val() === '') {
+      return;
+    }
+
     // Parse data from DOM.
     var newQueryJob = {
       timeissued: new Date().toISOString(),
