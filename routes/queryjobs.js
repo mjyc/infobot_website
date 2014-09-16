@@ -42,11 +42,14 @@ router.post('/updatequeryjob', function(req, res, next) {
   var db = req.db;
 
   db.collection('queryjobs').findAndModify({
-    _id: req.body.queryjobID
+    _id: new ObjectID(req.body.queryjobID)
+  }, {
   }, {
     $set: {
       comment: req.body.comment
     }
+  }, {
+    new: true
   }, function(err, result) {
     if (err) {
       return next(err);

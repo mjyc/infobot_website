@@ -149,6 +149,7 @@ var queryjobCards = (function() {
     card.data('dubePic').children().remove();
     if (queryjob.status === SUCCEEDED) {
       var img = $('<img src="' + queryjob.response_img_path + '" class="img-thumbnail" alt="Result">').addClass('result-img-sm');
+      // var img = $('<img class="img-thumbnail" alt="Result">').addClass('result-img-sm');
       img.click(function(event) {
         if ($(this).is('.result-img-lg')) {
           $(this).removeClass('result-img-lg');
@@ -177,7 +178,7 @@ var queryjobCards = (function() {
         cancelCard(queryjob._id);
       });
     } else if (queryjob.status === SUCCEEDED || queryjob.status === FAILED) {
-      if (!buttons.data('inputComment')) {
+      if (!buttons.data('inputComment') && !queryjob.comment) {
         var inputComment = $('<div>').addClass('form-inline')
           .append(
             $('<div>').addClass('form-group')
@@ -187,22 +188,25 @@ var queryjobCards = (function() {
                 .attr('type', 'text')))
           .append('&nbsp;&nbsp;')
           .append(
-            $('<button>').addClass('btn btn-default').attr('type', 'submit')
+            $('<button>').addClass('btn btn-default').attr('id', 'btnComment')
+              .attr('type', 'submit')
               .text('Submit'))
           .appendTo(buttons);
         buttons.show();
         buttons.data(inputComment, 'inputComment');
-        inputComment.click(function() {
+        buttons.children().find('#btnComment').on('click', function() {
           var data = {
             queryjobID: queryjob._id,
             comment: $('#inputComment').val()
           };
-          // $.post('/', param1: 'value1', function(data, textStatus, xhr) {
-          //   /*optional stuff to do after success */
-          // });
+          $.post('/queryjobs/updatequeryjob', data, function(result) {
+            console.log(result);
+            refreshCard(queryjob._id);
+          });
         });
       }
-    } else if (queryjob.status !== RUNNING && queryjob.status !== SUCCEEDED &&
+    }
+    if (queryjob.status !== RUNNING && queryjob.status !== SUCCEEDED &&
         queryjob.status !== FAILED) {
       buttons.hide();
       if (buttons.data('btnCancel')) {
@@ -289,43 +293,11 @@ var queryjobCards = (function() {
     card.data('dubePic', dubePic);
     updateDUBEPic(card, queryjob);
 
-    // // Status.
-    // if (queryjob.status === SUCCEEDED) {
-    //   dubeTags.append('&nbsp;&nbsp;').append(
-    //     tagTemplate.clone().addClass('btn-success').text('success'));
-    //   dubeTags.append('&nbsp;&nbsp;').append(
-    //     tagTemplate.clone().text(queryjob.response_confidence + '% confidence'));
-    // } else if (queryjob.status === CANCELLED) {
-    //   dubeTags.append('&nbsp;&nbsp;').append(
-    //     tagTemplate.clone().addClass('btn-danger').text('cancelled'));
-    // } else if (queryjob.status === FAILED) {
-    //   dubeTags.append('&nbsp;&nbsp;').append(
-    //     tagTemplate.clone().addClass('btn-danger').text('failed'));
-    // }
-
     var buttons = $('<p>').addClass('col-sm-12').css('text-align', 'left')
       .appendTo(cardRow).hide();
     card.data('buttons', buttons);
     updateButtons(card, queryjob);
-    // if (queryjob.status === RUNNING) {
-    //   var btnCancel = $('<button>').addClass('btn btn-default').text('Cancel').appendTo(buttons);
-    //   btnCancel.click(function() {
-    //     btnCancel.attr('disabled', 'disabled');
-    //     cancelCard(queryjob._id);
-    //   });
-    // }
 
-    // // Cancel button.
-    // // if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED || queryjob.status === RUNNING) {
-    // if (queryjob.status === RUNNING) {
-    //   var btnCancel = $('<button>').addClass('btn btn-default').text('Cancel').appendTo(buttons);
-    //   card.data('btnCancel', btnCancel);
-    //   card.data('btnCancelCb', function() {
-    //     btnCancel.attr('disabled', 'disabled');
-    //     cancelCard(queryjob._id);
-    //   });
-    //   btnCancel.click(card.data('btnCancelCb'));
-    // }
     if (queryjob.status === CANCELLED) {
       card.css('opacity', 0.5);
     }
@@ -343,36 +315,41 @@ var queryjobCards = (function() {
   };
 
   var refreshCard = function(queryjobIDStr) {
-    // reloadCards();
-    var data = {
-      queryjobID: queryjobIDStr,
-      limit: 1
-    };
-    $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
-      if (queryjobs.length !== 1) {
-        alert('Error while posting to /queryjobs/getqueryjobs.');
-      } else {
+    reloadCards();
+    // var data = {
+    //   queryjobID: queryjobIDStr,
+    //   limit: 1
+    // };
+    // $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
+    //   if (queryjobs.length !== 1) {
+    //     alert('Error while posting to /queryjobs/getqueryjobs.');
+    //   } else {
 
-        // var newCard = createCard(queryjobs[0]);
-        // container.data('cards')[queryjobIDStr].html(newCard.html());
-        var queryjob = queryjobs[0];
-        updateStatus(container.data('cards')[queryjobIDStr], queryjob);
-        updateDUBEInfo(container.data('cards')[queryjobIDStr], queryjob);
-        updateDUBEResp(container.data('cards')[queryjobIDStr], queryjob);
-        updateButtons(container.data('cards')[queryjobIDStr], queryjob);
-        if (queryjob.status === CANCELLED) {
-          container.data('cards')[queryjobIDStr].css('opacity', 0.5);
-        }
+    //     // var newCard = createCard(queryjobs[0]);
+    //     // container.data('cards')[queryjobIDStr].html(newCard.html());
 
-        // container.data('cards')[queryjobIDStr].css('opacity', 0);
-        // container.data('cards')[queryjobIDStr].animate({
-        //   opacity: 1
-        // }, 300);
+    //     var queryjob = queryjobs[0];
+    //     var newCard = createCard(queryjob);
+    //     newCard.data('container', container);
+    //     container.data('cards')[queryjobIDStr].replaceWith(newCard);
 
-      }
-    }, 'JSON').fail(function() {
-      alert('Error while posting to /queryjobs/getqueryjobs.');
-    });
+    //     // updateStatus(container.data('cards')[queryjobIDStr], queryjob);
+    //     // updateDUBEInfo(container.data('cards')[queryjobIDStr], queryjob);
+    //     // updateDUBEResp(container.data('cards')[queryjobIDStr], queryjob);
+    //     // updateButtons(container.data('cards')[queryjobIDStr], queryjob);
+    //     // if (queryjob.status === CANCELLED) {
+    //     //   container.data('cards')[queryjobIDStr].css('opacity', 0.5);
+    //     // }
+
+    //     // container.data('cards')[queryjobIDStr].css('opacity', 0);
+    //     // container.data('cards')[queryjobIDStr].animate({
+    //     //   opacity: 1
+    //     // }, 300);
+
+    //   }
+    // }, 'JSON').fail(function() {
+    //   alert('Error while posting to /queryjobs/getqueryjobs.');
+    // });
   };
 
 
