@@ -147,7 +147,7 @@ $(document).ready(function() {
     minDate: new Date(
       new Date().getTime() + 1000 * 60 * 10 * 1 * 1), // at least 10min
     maxDate: new Date(new Date().getTime() +
-      1000 * 60 * 60 * 24 * 7), // week later
+      1000 * 60 * 60 * 24 * 365), // 1 yr later
     sideBySide: true
   });
 
@@ -156,6 +156,15 @@ $(document).ready(function() {
     event.preventDefault();
 
     if ($('#submitQuestion input#inputTypedCmd').val() === '') {
+      return;
+    }
+
+    var inputDeadline = $('#inputDeadline').data('DateTimePicker').getDate();
+    var soonestDeadline = new Date(
+      new Date().getTime() + 1000 * 60 * 10 * 1 * 1);
+    if (inputDeadline < soonestDeadline) {
+      alert('Deadline is too close! Please give more than 10min for ' +
+        'DUB-E to answer your question.');
       return;
     }
 
