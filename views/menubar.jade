@@ -12,13 +12,13 @@
       ul.nav.navbar-nav
         if isHome
           li#Home.active
-            a(href="/home") Your Question
+            a(href="/home") Your Questions
           li#Wall
-            a(href="/wall") Everyone's Question
+            a(href="/wall") Everyone's Questions
         unless isHome
           li#0
-            a(href="/home") Your Question
+            a(href="/home") Your Questions
           li#Wall.active
-            a(href="/wall") Everyone's Question
+            a(href="/wall") Everyone's Questions
       p.navbar-text.navbar-right
         | Signed in as #{user.name}

@@ -70,6 +70,33 @@ listener.subscribe(function(message) {
   queryjobCards.refreshCard(message.queryjob_id);
 });
 
+var infscroll = (function() {
+
+  var scrolltrigger = 0.95;
+  var callback = function() {};
+
+  $(window).scroll(function() {
+    var wintop = $(window).scrollTop();
+    var docheight = $(document).height();
+    var winheight = $(window).height();
+
+    if ((wintop / (docheight - winheight)) > scrolltrigger) {
+      callback();
+    }
+  });
+
+  var init = function(option) {
+    scrolltrigger = option.scrolltrigger || 0.95;
+    callback = option.callback || function() {};
+  };
+
+  return {
+    init: init
+  };
+
+}());
+
+
 // =====================================================================
 // DOM Ready
 // =====================================================================
@@ -82,20 +109,17 @@ $(document).ready(function() {
   });
 
   // Initialize contents.
-  queryjobCards.init({
-    callCancelQueryJob: callCancelQueryJob
-  });
+  var container = $('#container');
+  var option = {
+    container: container,
+    cancelCallback: callCancelQueryJob
+  };
+  queryjobCards.init(option);
+  queryjobCards.reloadCards();
 
   // Infinite scroll setups.
-  $(window).scroll(function() {
-    var wintop = $(window).scrollTop();
-    var docheight = $(document).height();
-    var winheight = $(window).height();
-    var scrolltrigger = 0.95;
-
-    if ((wintop / (docheight - winheight)) > scrolltrigger) {
-      queryjobCards.loadMoreCards();
-    }
+  infscroll.init({
+    callback: queryjobCards.loadMoreCards
   });
 
   // Deadline setups.
@@ -152,7 +176,7 @@ $(document).ready(function() {
           if (queryjobs.length !== 1) {
             alert('Error while posting to /queryjobs/getqueryjobs.');
           } else {
-            queryjobCards.addQueryJobToCard(queryjobs[0]);
+            queryjobCards.addNewCard(queryjobs[0]);
           }
         }, 'JSON').fail(function() {
           alert('Error while posting to /queryjobs/getqueryjobs.');
