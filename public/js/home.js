@@ -151,23 +151,7 @@ $(document).ready(function() {
     sideBySide: true
   });
 
-  // Submit question callback setup.
-  var submitQuestion = function(event) {
-    event.preventDefault();
-
-    if ($('#submitQuestion input#inputTypedCmd').val() === '') {
-      return;
-    }
-
-    var inputDeadline = $('#inputDeadline').data('DateTimePicker').getDate();
-    var soonestDeadline = new Date(
-      new Date().getTime() + 1000 * 60 * 10 * 1 * 1);
-    if (inputDeadline < soonestDeadline) {
-      alert('Deadline is too close! Please give more than 10min for ' +
-        'DUB-E to answer your question.');
-      return;
-    }
-
+  var submitQuestionHelper = function() {
     // Parse data from DOM.
     var newQueryJob = {
       timeissued: new Date().toISOString(),
@@ -214,6 +198,51 @@ $(document).ready(function() {
 
     }).always(function() {
       $('#submitQuestion input#inputTypedCmd').val('');
+    });
+  };
+
+  // Submit question callback setup.
+  var submitQuestion = function(event) {
+    event.preventDefault();
+
+    if ($('#submitQuestion input#inputTypedCmd').val() === '') {
+      return;
+    }
+
+    var inputDeadline = $('#inputDeadline').data('DateTimePicker').getDate();
+    var soonestDeadline = new Date(
+      new Date().getTime() + 1000 * 60 * 10 * 1 * 1);
+    if (inputDeadline < soonestDeadline) {
+      alert('Deadline is too close! Please give more than 10min for ' +
+        'DUB-E to answer your question.');
+      return;
+    }
+
+    var postInput = {
+      startDate: new Date().toISOString(),
+      userOnly: true,
+      publicOnly: false
+    };
+    $.post('/queryjobs/getqueryjobs', postInput, function(queryjobs) {
+      var num = 0;
+      for (var i = queryjobs.length - 1; i >= 0; i--) {
+        if (queryjobs[i].status === queryjobCards.RECEIVED ||
+          queryjobs[i].status === queryjobCards.SCHEDULED ||
+          queryjobs[i].status === queryjobCards.RUNNING) {
+          num += 1;
+        }
+      }
+      if (num >= 1) {
+        alert('Oops, you have an unanswered question. You can only add new ' +
+          'question after the current question is answered.');
+        $('#submitQuestion input#inputTypedCmd').val('');
+        return;
+      } else {
+        submitQuestionHelper();
+      }
+    }, 'JSON').fail(function() {
+      console.log('Error while posting to /queryjobs/getqueryjobs.');
+      alert('Oops, something went wrong. Please try refreshing the page.');
     });
   };
 

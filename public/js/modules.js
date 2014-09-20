@@ -438,6 +438,13 @@ var queryjobCards = (function() {
   };
 
   return {
+    RECEIVED: RECEIVED,
+    SCHEDULED: SCHEDULED,
+    RUNNING: RUNNING,
+    SUCCEEDED: SUCCEEDED,
+    CANCELLED: CANCELLED,
+    FAILED: FAILED,
+
     reloadCards: reloadCards,
     loadMoreCards: loadMoreCards,
     addNewCard: addNewCard,
