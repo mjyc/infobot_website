@@ -15,7 +15,8 @@ block content
       form#submitQuestion
         .form-group
           input#inputTypedCmd.form-control(type="text",
-            placeholder="Type question here")
+            placeholder="Type question here"
+            style="box-shadow: none;")
         .form-inline(align="center")
             b Public
             | &nbsp;&nbsp;
@@ -28,7 +29,8 @@ block content
             b Deadline
             | &nbsp;&nbsp;
             #inputDeadline.input-group.input-group-sm.date
-              input.form-control(type="text")
+              input.form-control(type="text",
+                style="box-shadow: none;")
               span.input-group-addon
                 span.glyphicon.glyphicon-calendar
             | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
