@@ -29,11 +29,9 @@ body {
 }
 
 .result-img-sm {
-  /*height: 600px;*/
   width: 100px;
 }
 
 .result-img-lg {
-  /*height: 600px;*/
-  width: 600px;
+  width: 100%;
 }

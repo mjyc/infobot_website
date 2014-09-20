@@ -243,11 +243,25 @@ var queryjobCards = (function() {
       }
 
       var dubePic = elem.children().find('p.dubePic').show();
-      var img = $('<img>').addClass('img-thumbnail');
+      var img = $('<img>').addClass('img-thumbnail result-img-sm');
+      img
+        .attr('data-toggle', 'tooltip')
+        .attr('data-placement', 'top')
+        .attr('title', 'click to change size')
+        .tooltip();
       if (queryjob.status === SUCCEEDED) {
         img
           .attr('alt', queryjob.response_img_path)
-          .attr('src', queryjob.response_img_path);
+          .attr('src', queryjob.response_img_path)
+          .click(function(event) {
+            if (img.is('.result-img-sm')) {
+              img.removeClass('result-img-sm');
+              img.addClass('result-img-lg');
+            } else {
+              img.removeClass('result-img-lg');
+              img.addClass('result-img-sm');
+            }
+          });
       } else {
         dubePic.hide();
       }
