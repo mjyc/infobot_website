@@ -39,7 +39,8 @@ function callScheduleQueryJob(queryjob, callback) {
       callback(result);
     }
   }, function() {
-    alert('Error while calling /schedule_queryjob ROS service.');
+    console('Error while calling /schedule_queryjob ROS service.');
+    alert('Oops, something went wrong. Please try refreshing the page.');
   });
 }
 
@@ -59,7 +60,8 @@ function callCancelQueryJob(queryjobIDStr, callback) {
       callback(result);
     }
   }, function() {
-    alert('Error while calling /cancel_queryjob ROS service.');
+    console('Error while calling /cancel_queryjob ROS service.');
+    alert('Oops, something went wrong. Please try refreshing the page.');
   });
 }
 
@@ -70,7 +72,6 @@ var listener = new ROSLIB.Topic({
 });
 
 listener.subscribe(function(message) {
-  console.log(message);
   queryjobCards.refreshCard(message.queryjob_id);
 });
 
@@ -141,7 +142,7 @@ $(document).ready(function() {
       up: 'fa fa-arrow-up fa-lg',
       down: 'fa fa-arrow-down fa-lg'
     },
-    minuteStepping: 5,
+    minuteStepping: 1,
     // minDate: new Date(),
     minDate: new Date(
       new Date().getTime() + 1000 * 60 * 10 * 1 * 1), // at least 10min
@@ -173,7 +174,9 @@ $(document).ready(function() {
     // Use AJAX to post the object to our adduser service.
     $.post('/queryjobs/addqueryjob', newQueryJob, function(result) {
       if (result.length !== 1) {
-        alert('Error while posting to /queryjobs/addqueryjob.');
+        console.log('Error while posting to /queryjobs/addqueryjob.');
+        alert('Oops, something went wrong. Please try refreshing the page.');
+
       }
       var queryjob = result[0];
       callScheduleQueryJob(queryjob, function() {
@@ -183,16 +186,23 @@ $(document).ready(function() {
         };
         $.post('/queryjobs/getqueryjobs', data, function(queryjobs) {
           if (queryjobs.length !== 1) {
-            alert('Error while posting to /queryjobs/getqueryjobs.');
+            console.log('Error while posting to /queryjobs/getqueryjobs.');
+            alert(
+              'Oops, something went wrong. Please try refreshing the page.');
+
           } else {
             queryjobCards.addNewCard(queryjobs[0]);
           }
         }, 'JSON').fail(function() {
-          alert('Error while posting to /queryjobs/getqueryjobs.');
+          console.log('Error while posting to /queryjobs/getqueryjobs.');
+          alert('Oops, something went wrong. Please try refreshing the page.');
+
         });
       });
     }, 'JSON').fail(function() {
-      alert('Error while posting to /queryjobs/addqueryjob.');
+      console.log('Error while posting to /queryjobs/addqueryjob.');
+      alert('Oops, something went wrong. Please try refreshing the page.');
+
     }).always(function() {
       $('#submitQuestion input#inputTypedCmd').val('');
     });

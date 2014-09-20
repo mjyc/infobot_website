@@ -80,16 +80,16 @@ var queryjobCards = (function() {
       };
       $.post('/queryjobs/getqueryjobs', postInput, function(queryjobs) {
         if (queryjobs.length !== 1) {
-          alert('Error while posting to /queryjobs/getqueryjobs.');
+          console.log('Error while posting to /queryjobs/getqueryjobs.');
+          alert('Oops, something went wrong. Please try refreshing the page.');
         } else {
-
           var queryjob = queryjobs[0];
           elem.data('queryjob', queryjob);
           elem.trigger('updateStatus');
-
         }
       }, 'JSON').fail(function() {
-        alert('Error while posting to /queryjobs/getqueryjobs.');
+        console.log('Error while posting to /queryjobs/getqueryjobs.');
+        alert('Oops, something went wrong. Please try refreshing the page.');
       });
     },
 
@@ -276,8 +276,6 @@ var queryjobCards = (function() {
           btnCancel.attr('disabled', 'disabled');
           if (cancelCallback) {
             cancelCallback(queryjob._id, function(srvResult) {
-              console.log('srvResult');
-              console.log(srvResult);
               elem.trigger('refresh');
             });
           }
@@ -309,14 +307,20 @@ var queryjobCards = (function() {
                 btnHeart.removeClass('active').css('color', 'black');
                 heartNNum.text(result.hearts.length);
               }, 'JSON').fail(function() {
-                alert('Error while posting to /queryjobs/removeheart.');
+                console.log('Error while posting to /queryjobs/removeheart.');
+                alert(
+                  'Oops, something went wrong. Please try refreshing the page.'
+                );
               });
             } else {
               $.post('/queryjobs/addheart', postInput, function(result) {
                 btnHeart.addClass('active').css('color', '#f50');
                 heartNNum.text(result.hearts.length);
               }, 'JSON').fail(function() {
-                alert('Error while posting to /queryjobs/addheart.');
+                console.log('Error while posting to /queryjobs/addheart.');
+                alert(
+                  'Oops, something went wrong. Please try refreshing the page.'
+                );
               });
             }
 
@@ -325,7 +329,8 @@ var queryjobCards = (function() {
           btnHeart.attr('disabled', 'disabled');
         }
       }, 'JSON').fail(function() {
-        alert('Error while posting to /queryjobs/checkheart.');
+        console.log('Error while posting to /queryjobs/checkheart.');
+        alert('Oops, something went wrong. Please try refreshing the page.');
       });
       buttons.children().remove();
       buttons.append(btnCancel);
@@ -416,7 +421,8 @@ var queryjobCards = (function() {
         }
       }, 'JSON').fail(function() {
         // Report /getqueryjob error.
-        alert('Error while posting to /queryjobs/getqueryjobs.');
+        console.log('Error while posting to /queryjobs/getqueryjobs.');
+        alert('Oops, something went wrong. Please try refreshing the page.');
       }).always(function() {
         elem.removeClass('loading');
       });
