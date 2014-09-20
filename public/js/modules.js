@@ -48,9 +48,6 @@ var queryjobCards = (function() {
   var CANCELLED = 4;
   var FAILED = 5;
 
-  // State variables.
-  var publicMode = false;
-
   // Selector variables.
   var container = null; // must be set from the init function.
   var cancelCallback = null;
@@ -118,7 +115,7 @@ var queryjobCards = (function() {
       // Create user status tags.
       var userTags = $('<p>').addClass('userTags col-sm-12')
         .appendTo(bodyRow);
-      if (!publicMode) {
+      if (!container.data('publicMode')) {
         if (JSON.parse(queryjob.is_public || false)) {
           userTags.append(
             tagTemplate.clone().text('public')).append('&nbsp;&nbsp;');
@@ -339,6 +336,9 @@ var queryjobCards = (function() {
         btnCancel.attr('disabled', 'disabled');
         btnHeart.attr('disabled', 'disabled');
       }
+      if (container.data('publicMode')) {
+        btnCancel.hide();
+      }
     }
   };
 
@@ -349,8 +349,8 @@ var queryjobCards = (function() {
     var postInput = {
       startDate: new Date().toISOString(),
       limit: NUM_INITIAL_CARDS,
-      userOnly: !publicMode,
-      publicOnly: publicMode
+      userOnly: !container.data('publicMode'),
+      publicOnly: container.data('publicMode')
     };
     // Remove contents in container.
     container.find('div.thumbnail.card').remove();
@@ -362,8 +362,8 @@ var queryjobCards = (function() {
     var postInput = {
       startDate: container.data('lastTimeissued'),
       limit: NUM_ADDITIONAL_CARDS,
-      userOnly: !publicMode,
-      publicOnly: publicMode
+      userOnly: !container.data('publicMode'),
+      publicOnly: container.data('publicMode')
     };
     // Remove contents in container.
     container.trigger('loadCards', [postInput]);
@@ -389,12 +389,14 @@ var queryjobCards = (function() {
   // Init Function
 
   var init = function(options) {
+    var publicMode = options.publicMode || false;
     container = options.container;
     cancelCallback = options.cancelCallback;
 
     // Container Custom Events
 
     container.data('lastTimeissued', new Date());
+    container.data('publicMode', publicMode);
 
     container.on('loadCards', function(event, postInput) {
       var elem = $(this);

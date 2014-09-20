@@ -27,9 +27,40 @@ var listener = new ROSLIB.Topic({
 });
 
 listener.subscribe(function(message) {
-  console.log(message);
   queryjobCards.refreshCard(message.queryjob_id);
 });
+
+
+// =====================================================================
+// Module
+// =====================================================================
+
+var infscroll = (function() {
+
+  var scrolltrigger = 0.95;
+  var callback = function() {};
+
+  $(window).scroll(function() {
+    var wintop = $(window).scrollTop();
+    var docheight = $(document).height();
+    var winheight = $(window).height();
+
+    if ((wintop / (docheight - winheight)) > scrolltrigger) {
+      callback();
+    }
+  });
+
+  var init = function(option) {
+    scrolltrigger = option.scrolltrigger || 0.95;
+    callback = option.callback || function() {};
+  };
+
+  return {
+    init: init
+  };
+
+}());
+
 
 // =====================================================================
 // DOM Ready
@@ -43,7 +74,16 @@ $(document).ready(function() {
   });
 
   // Initialize contents.
-  queryjobCards.init({
-    publicMode: true
+  var container = $('#container');
+  var option = {
+    publicMode: true,
+    container: container
+  };
+  queryjobCards.init(option);
+  queryjobCards.reloadCards();
+
+  // Infinite scroll setups.
+  infscroll.init({
+    callback: queryjobCards.loadMoreCards
   });
 });
