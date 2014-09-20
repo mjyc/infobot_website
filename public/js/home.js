@@ -2,104 +2,73 @@
 // ROS
 // =====================================================================
 
-// ROS setups.
-var ros = new ROSLIB.Ros({
-  url: urlROS
-});
+// // ROS setups.
+// var ros = new ROSLIB.Ros({
+//   url: urlROS
+// });
 
-ros.on('connection', function() {
-  console.log('Connected to websocket server.');
-});
+// ros.on('connection', function() {
+//   console.log('Connected to websocket server.');
+// });
 
-ros.on('error', function(error) {
-  console.log('Error connecting to websocket server: ', error);
-});
+// ros.on('error', function(error) {
+//   console.log('Error connecting to websocket server: ', error);
+// });
 
-ros.on('close', function() {
-  console.log('Connection to websocket server closed.');
-  location.reload(true);
-});
+// ros.on('close', function() {
+//   console.log('Connection to websocket server closed.');
+//   location.reload(true);
+// });
 
-function callScheduleQueryJob(queryjob, callback) {
-  var scheduleQueryJob = new ROSLIB.Service({
-    ros: ros,
-    name: '/schedule_queryjob',
-    serviceType: 'sara_queryjob_manager/ScheduleQueryJob'
-  });
+// function callScheduleQueryJob(queryjob, callback) {
+//   var scheduleQueryJob = new ROSLIB.Service({
+//     ros: ros,
+//     name: '/schedule_queryjob',
+//     serviceType: 'sara_queryjob_manager/ScheduleQueryJob'
+//   });
 
-  var timeissuedSec = Math.floor(new Date(queryjob.timeissued).getTime() / 1000);
+//   var timeissuedSec = Math.floor(new Date(queryjob.timeissued).getTime() / 1000);
 
-  var request = new ROSLIB.ServiceRequest({
-    queryjob_id: queryjob._id,
-    timeissued: timeissuedSec
-  });
+//   var request = new ROSLIB.ServiceRequest({
+//     queryjob_id: queryjob._id,
+//     timeissued: timeissuedSec
+//   });
 
-  scheduleQueryJob.callService(request, function(result) {
-    if (callback) {
-      callback(result);
-    }
-  }, function() {
-    alert('Error while calling /schedule_queryjob ROS service.');
-  });
-}
+//   scheduleQueryJob.callService(request, function(result) {
+//     callback(result);
+//   }, function() {
+//     alert('Error while calling /schedule_queryjob ROS service.');
+//   });
+// }
 
-function callCancelQueryJob(queryjobIDStr, callback) {
-  var cancelQueryJob = new ROSLIB.Service({
-    ros: ros,
-    name: '/cancel_queryjob',
-    serviceType: 'sara_queryjob_manager/CancelQueryJob'
-  });
+// function callCancelQueryJob(queryjobIDStr, callback) {
+//   var cancelQueryJob = new ROSLIB.Service({
+//     ros: ros,
+//     name: '/cancel_queryjob',
+//     serviceType: 'sara_queryjob_manager/CancelQueryJob'
+//   });
 
-  var request = new ROSLIB.ServiceRequest({
-    queryjob_id: queryjobIDStr
-  });
+//   var request = new ROSLIB.ServiceRequest({
+//     queryjob_id: queryjobIDStr
+//   });
 
-  cancelQueryJob.callService(request, function(result, callback) {
-    if (callback) {
-      callback(result);
-    }
-  }, function() {
-    alert('Error while calling /cancel_queryjob ROS service.');
-  });
-}
+//   cancelQueryJob.callService(request, function(result) {
+//     callback(result);
+//   }, function() {
+//     alert('Error while calling /cancel_queryjob ROS service.');
+//   });
+// }
 
-var listener = new ROSLIB.Topic({
-  ros: ros,
-  name: '/queryjob_update',
-  messageType: 'sara_queryjob_manager/QueryJobUpdate'
-});
+// var listener = new ROSLIB.Topic({
+//   ros: ros,
+//   name: '/queryjob_update',
+//   messageType: 'sara_queryjob_manager/QueryJobUpdate'
+// });
 
-listener.subscribe(function(message) {
-  console.log(message);
-  queryjobCards.refreshCard(message.queryjob_id);
-});
-
-var infscroll = (function() {
-
-  var scrolltrigger = 0.95;
-  var callback = function() {};
-
-  $(window).scroll(function() {
-    var wintop = $(window).scrollTop();
-    var docheight = $(document).height();
-    var winheight = $(window).height();
-
-    if ((wintop / (docheight - winheight)) > scrolltrigger) {
-      callback();
-    }
-  });
-
-  var init = function(option) {
-    scrolltrigger = option.scrolltrigger || 0.95;
-    callback = option.callback || function() {};
-  };
-
-  return {
-    init: init
-  };
-
-}());
-
+// listener.subscribe(function(message) {
+//   console.log(message);
+//   queryjobCards.refreshCard(message.queryjob_id);
+// });
 
 // =====================================================================
 // DOM Ready
@@ -112,18 +81,33 @@ $(document).ready(function() {
     new Switchery(this);
   });
 
-  // Initialize contents.
+  var NUM_INITIAL_CARDS = 10;
+  var publicMode = false;
+
   var container = $('#container');
-  var option = {
-    container: container,
-    cancelCallback: callCancelQueryJob
+  var data = {
+    startDate: new Date().toISOString(),
+    limit: NUM_INITIAL_CARDS,
+    userOnly: !publicMode,
+    publicOnly: publicMode
   };
-  queryjobCards.init(option);
-  queryjobCards.reloadCards();
+  container.trigger('loadCards', [data]);
+
+  // Initialize contents.
+  queryjobCards.init({
+    callCancelQueryJob: callCancelQueryJob
+  });
 
   // Infinite scroll setups.
-  infscroll.init({
-    callback: queryjobCards.loadMoreCards
+  $(window).scroll(function() {
+    var wintop = $(window).scrollTop();
+    var docheight = $(document).height();
+    var winheight = $(window).height();
+    var scrolltrigger = 0.95;
+
+    if ((wintop / (docheight - winheight)) > scrolltrigger) {
+      queryjobCards.loadMoreCards();
+    }
   });
 
   // Deadline setups.
@@ -146,7 +130,7 @@ $(document).ready(function() {
   });
 
   // Submit question callback setup.
-  var submitQuestion = function(event) {
+  var submitQuestion = function() {
     event.preventDefault();
 
     if ($('#submitQuestion input#inputTypedCmd').val() === '') {
@@ -180,7 +164,7 @@ $(document).ready(function() {
           if (queryjobs.length !== 1) {
             alert('Error while posting to /queryjobs/getqueryjobs.');
           } else {
-            queryjobCards.addNewCard(queryjobs[0]);
+            queryjobCards.addQueryJobToCard(queryjobs[0]);
           }
         }, 'JSON').fail(function() {
           alert('Error while posting to /queryjobs/getqueryjobs.');

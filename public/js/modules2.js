@@ -56,19 +56,19 @@ var queryjobCards = (function() {
   var cancelCallback = null;
 
   // DOM templates.
-  // var cardTemplate = $('<div>').addClass('thumbnail').append(
-  //   $('<div>').addClass('caption'));
-  var cardTemplate = $('<div>').addClass('panel panel-default').append(
-    $('<div>').addClass('panel-body'));
+  var cardBodyTemplate = $('<div>').addClass('panel-body body')
+    .css('padding', '15px 15px 0px');
+  var cardFooterTemplate = $('<div>').addClass('panel-footer footer')
+    .css('padding', '15px 15px 0px');
+  var cardTemplate = $('<div>').addClass('panel panel-default')
+    .append(cardBodyTemplate.clone())
+    .append(cardFooterTemplate.clone());
   var nameTemplate = $('<span>').addClass('name-text');
   var timeTemplate = $('<span>').addClass('time-text');
   var tagTemplate = $('<button>').addClass('btn btn-xs')
     .css('opacity', 1).attr('disabled', 'disabled');
-  // var statusTemplate = $('<button>').addClass('btn btn-block')
-  //   .css('opacity', 1).attr('disabled', 'disabled');
   var statusTemplate = $('<div>').addClass('alert')
     .css('text-align', 'center')
-    // .css('margin-top', '20px')
     .css('margin-bottom', '0px');
 
 
@@ -101,7 +101,10 @@ var queryjobCards = (function() {
       // Save queryjob data.
       elem.data('queryjob', queryjob);
       // Create row for a card.
-      var cardRow = elem.children() //caption
+      var bodyRow = elem.children('.body') // body
+        .append($('<div>').addClass('row'))
+        .children(); // row
+      var footerRow = elem.children('.footer') // footer
         .append($('<div>').addClass('row'))
         .children(); // row
 
@@ -110,7 +113,7 @@ var queryjobCards = (function() {
 
       // Create user name and issued time.
       var userInfo = $('<p>').addClass('userInfo col-sm-12')
-        .appendTo(cardRow);
+        .appendTo(bodyRow);
       var userName = nameTemplate.clone().addClass('userName')
         .text(queryjob.user_name).append('&nbsp;&nbsp;')
         .appendTo(userInfo);
@@ -120,7 +123,7 @@ var queryjobCards = (function() {
 
       // Create user status tags.
       var userTags = $('<p>').addClass('userTags col-sm-12')
-        .appendTo(cardRow);
+        .appendTo(bodyRow);
       if (!publicMode) {
         if (JSON.parse(queryjob.is_public || false)) {
           userTags.append(
@@ -146,7 +149,7 @@ var queryjobCards = (function() {
       var userCmd = $('<p>').addClass('userCmd lead col-sm-12')
         .css('font-size', '25px')
         .text(queryjob.typed_cmd)
-        .appendTo(cardRow);
+        .appendTo(bodyRow);
 
 
       // About Dub-E
@@ -154,7 +157,7 @@ var queryjobCards = (function() {
       // Create dube name and last update time.
       var dubeInfo = $('<p>').addClass('dubeInfo col-sm-12')
         .css('text-align', 'right')
-        .appendTo(cardRow);
+        .appendTo(bodyRow);
       var dubeName = nameTemplate.clone().addClass('dubeName')
         .text('DUB-E').append('&nbsp;&nbsp;')
         .appendTo(dubeInfo);
@@ -164,36 +167,40 @@ var queryjobCards = (function() {
 
       var dubeTags = $('<p>').addClass('dubeTags col-sm-12')
         .css('text-align', 'right')
-        .appendTo(cardRow);
+        .appendTo(bodyRow);
 
       // Create response.
       var dubeResp = $('<p>').addClass('dubeResp lead col-sm-12')
         .css('text-align', 'right')
         .css('font-size', '25px')
-        .appendTo(cardRow);
+        .appendTo(bodyRow);
 
       var dubePic = $('<p>').addClass('dubePic col-sm-12')
         .css('text-align', 'right')
-        .appendTo(cardRow);
+        .appendTo(bodyRow);
 
 
       // About Status
 
       // Status tag.
       var statusTag = $('<p>').addClass('statusTag col-sm-12')
-        .css('margin-bottom', '0')
-        .appendTo(cardRow);
+        .appendTo(bodyRow);
 
+
+      // Buttons
 
       var buttons = $('<p>').addClass('buttons col-sm-12')
-        .appendTo(cardRow);
+        .appendTo(bodyRow);
 
-      var fotter = $('<div>').addClass('panel-footer')
-        .appendTo(cardRow.parent().parent());
-      fotter.append($('<div>').addClass('row'));
-      fotter.children().append($('<p>').addClass('dubeInfo col-sm-12')
-        .append($('<strong>').text('Mike Chung: '))
-        .append($('<span>').text('That was cool.')));
+
+      // Comments in Footer
+
+      var comments = $('<div>').addClass('comments col-sm-12')
+        .appendTo(footerRow);
+      // queryjob.
+      // footerRow.append(
+      //   .append($('<strong>').text('Mike Chung: '))
+      //   .append($('<span>').text('That was cool.')));
 
       elem.trigger('updateStatus');
     },
@@ -206,6 +213,7 @@ var queryjobCards = (function() {
       // About Status
 
       // Status tag.
+      var statusTag = elem.children().find('p.statusTag');
       var tag = statusTemplate.clone();
       if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED) {
         tag.addClass('alert-info').text('In Queue');
@@ -218,8 +226,8 @@ var queryjobCards = (function() {
       } else if (queryjob.status === FAILED) {
         tag.addClass('alert-danger').text('Failed :(');
       }
-      elem.children().find('p.statusTag').children().remove();
-      elem.children().find('p.statusTag').append(tag);
+      statusTag.children().remove();
+      statusTag.append(tag);
 
 
       // About Dub-E
@@ -261,33 +269,106 @@ var queryjobCards = (function() {
       dubePic.children().remove();
       dubePic.append(img);
 
-      var buttons = elem.children().find('p.buttons').show();
-      // var btnCancel = $('<button>').addClass('btn btn-default').text('Cancel');
-      var btnHeart = $('<button>').addClass('btn btn-default')
-        .append($('<i>').addClass('fa fa-heart'));
 
-      var formComment = $('<form>')
-        .append($('<div>').addClass('form-group')
-          .append($('<input>').addClass('form-control')
-            .css('box-shadow', 'none')
-            .attr('type', 'text')
-            .attr('placeholder', 'Write a comment...')));
+      // Buttons
 
-      // var btnCancel = $('<button>').addClass('btn btn-default').text('Cancel');
-      // if (queryjob.status === SUCCEEDED) {
-      //     buttons.data('btnCancel', btnCancel);
-      //     btnCancel.click(function() {
-      //       btnCancel.attr('disabled', 'disabled');
-      //       if (cancelCallback) {
-      //         cancelCallback(queryjob._id);
-      //       }
-      //     });
-      // } else {
-      //   buttons.hide();
-      // }
+      var buttons = elem.children().find('p.buttons');
+      var btnCancel = $('<button>').addClass('btn btn-default btn-sm')
+        .css('margin-right', '10px')
+        .text('Cancel');
+      buttons.data('btnCancel', btnCancel);
+      if (queryjob.status === RUNNING) {
+        btnCancel.click(function() {
+          btnCancel.attr('disabled', 'disabled');
+          if (cancelCallback) {
+            cancelCallback(queryjob._id, function(srvResult) {
+              console.log('srvResult');
+              console.log(srvResult);
+              elem.trigger('refresh');
+            });
+          }
+        });
+      } else {
+        btnCancel.attr('disabled', 'disabled');
+      }
+      var heartNNum = $('<span>').text(queryjob.hearts.length);
+      var btnHeart = $('<button>').addClass('btn btn-default btn-sm')
+        .css('outline', 'none')
+        .append($('<i>').addClass('fa fa-heart fa-lg')
+          .append('&nbsp;')
+          .append(heartNNum));
+      buttons.data('btnHeart', btnHeart);
+      var postInput = {
+        queryjobID: queryjob._id,
+      };
+      $.post('/queryjobs/checkheart', postInput, function(result) {
+        var heartOn = JSON.parse(result);
+        if (heartOn) {
+          btnHeart.addClass('active').css('color', '#f50');
+        }
+
+        if (queryjob.status === SUCCEEDED || queryjob.status === FAILED) {
+          btnHeart.click(function() {
+            if (btnHeart.is('.active')) {
+
+              $.post('/queryjobs/removeheart', postInput, function(result) {
+                btnHeart.removeClass('active').css('color', 'black');
+                heartNNum.text(result.hearts.length);
+              }, 'JSON').fail(function() {
+                alert('Error while posting to /queryjobs/removeheart.');
+              });
+            } else {
+              $.post('/queryjobs/addheart', postInput, function(result) {
+                btnHeart.addClass('active').css('color', '#f50');
+                heartNNum.text(result.hearts.length);
+              }, 'JSON').fail(function() {
+                alert('Error while posting to /queryjobs/addheart.');
+              });
+            }
+
+          });
+        } else {
+          btnHeart.attr('disabled', 'disabled');
+        }
+      }, 'JSON').fail(function() {
+        alert('Error while posting to /queryjobs/checkheart.');
+      });
       buttons.children().remove();
-      // buttons.append(btnHeart);
-      buttons.append(formComment);
+      buttons.append(btnCancel);
+      buttons.append(btnHeart);
+
+
+      // Footer Comments
+      var comments = elem.children().find('div.comments');
+      var inputComment = $('<input>').addClass('form-control')
+        .css('box-shadow', 'none')
+        .css('border-color', '#cccccc')
+        .attr('type', 'text')
+        .attr('placeholder', 'Write a comment...');
+      var btnComment = $('<button>').css('display', 'none');
+      var formComment = $('<form>').append(
+        $('<div>').addClass('form-group')
+        .append(inputComment)
+        .append(btnComment));
+      btnComment.on('click', function(event) {
+        event.preventDefault();
+        console.log('comment submitted!');
+        // var postInput = {
+        //   queryjobID: queryjob._id,
+        //   comment: inputComment.val()
+        // };
+        // $.post('/queryjobs/updatequeryjob', postInput, function(queryjobs) {
+        //   if (queryjobs.length !== 1) {
+        //     alert('Error while posting to /queryjobs/updatequeryjobs.');
+        //   } else {
+        //     elem.populate(queryjobs[0]);
+        //   }
+        // }, 'JSON').fail(function() {
+        //   alert('Error while posting to /queryjobs/updatequeryjobs.');
+        // });
+      });
+      comments.children().remove();
+      comments.append(formComment);
 
     }
   };

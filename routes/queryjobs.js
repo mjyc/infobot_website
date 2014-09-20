@@ -29,6 +29,7 @@ router.post('/addqueryjob', function(req, res, next) {
     req.body.notification_email || false);
   newQueryJob.is_public = JSON.parse(req.body.is_public || false);
   newQueryJob.deadline = new Date(req.body.deadline);
+  newQueryJob.hearts = [];
 
   db.collection('queryjobs').insert(newQueryJob, function(err, result) {
     if (err) {
@@ -38,15 +39,14 @@ router.post('/addqueryjob', function(req, res, next) {
   });
 });
 
-router.post('/updatequeryjob', function(req, res, next) {
+router.post('/addheart', function(req, res, next) {
   var db = req.db;
 
   db.collection('queryjobs').findAndModify({
     _id: new ObjectID(req.body.queryjobID)
-  }, {
-  }, {
-    $set: {
-      comment: req.body.comment
+  }, {}, {
+    '$push': {
+      hearts: req.user._id
     }
   }, {
     new: true
@@ -57,26 +57,51 @@ router.post('/updatequeryjob', function(req, res, next) {
     res.send(result);
   });
 
-  // var db = req.db;
-  // var newQueryJob = {};
-  // // Add user info.
-  // newQueryJob.user_id = req.user._id;
-  // newQueryJob.user_name = req.user.name;
-  // // Data from req.
-  // newQueryJob.timeissued = new Date(req.body.timeissued);
-  // newQueryJob.typed_cmd = req.body.typed_cmd;
-  // newQueryJob.notification_sms = JSON.parse(req.body.notification_sms);
-  // newQueryJob.notification_email = JSON.parse(
-  //   req.body.notification_email || false);
-  // newQueryJob.is_public = JSON.parse(req.body.is_public || false);
-  // newQueryJob.deadline = new Date(req.body.deadline);
+});
 
-  // db.collection('queryjobs').insert(newQueryJob, function(err, result) {
-  //   if (err) {
-  //     return next(err);
-  //   }
-  //   res.send(result);
-  // });
+router.post('/removeheart', function(req, res, next) {
+  var db = req.db;
+
+  db.collection('queryjobs').findAndModify({
+    _id: new ObjectID(req.body.queryjobID)
+  }, {}, {
+    $pull: {
+      hearts: req.user._id
+    }
+  }, {
+    new: true
+  }, function(err, result) {
+    if (err) {
+      return next(err);
+    }
+    res.send(result);
+  });
+
+});
+
+router.post('/checkheart', function(req, res, next) {
+  var db = req.db;
+
+  db.collection('queryjobs').findOne({
+    _id: new ObjectID(req.body.queryjobID)
+  }, function(err, result) {
+    if (err) {
+      return next(err);
+    }
+    var sendTrue = false;
+    for (var i = result.hearts.length - 1; i >= 0; i--) {
+      if (result.hearts[i].toString() === req.user._id.toString()) {
+        sendTrue = true;
+        break;
+      }
+    }
+    if (sendTrue) {
+      res.send(true);
+    } else {
+      res.send(false);
+    }
+  });
+
 });
 
 // Get QueryJobs.
