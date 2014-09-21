@@ -17,6 +17,17 @@ body {
   font-size: 15px; padding-top: 10px;
 }
 
+.small + .switchery {
+   height: 20px;
+   width: 34px;
+}
+
+.small + .switchery > small {
+   height: 20px;
+   width: 20px;
+}
+
+
 /* Custom */
 
 .name-text {
