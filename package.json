@@ -31,7 +31,7 @@
     "grunt-env": "^0.4.1",
     "grunt-node-inspector": "^0.1.5",
     "grunt-nodemon": "^0.3.0",
-    "grunt-shell": "^1.1.1",
+    "grunt-shell-spawn": "^0.3.0",
     "lorem-ipsum": "^1.0.1",
     "mocha": "~1.18.2",
     "open": "0.0.5",
