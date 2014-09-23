@@ -20,9 +20,5 @@
             a(href="/home") Your Questions
           li#Wall.active
             a(href="/wall") Everyone's Questions
-      ul.nav.navbar-nav.navbar-right
-        li
-          p.navbar-text.navbar-right
-            | Signed in as #{user.name}
-        li
-          a(href="/unlink/google") Sign Out
+      p.navbar-text.navbar-right
+        | Signed in as #{user.name}
