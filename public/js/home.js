@@ -145,7 +145,7 @@ $(document).ready(function() {
     minuteStepping: 1,
     // minDate: new Date(),
     minDate: new Date(
-      new Date().getTime() + 1000 * 60 * 10 * 1 * 1), // at least 10min
+      new Date().getTime() + 1000 * 60 * 60 * -1 * 1), // 1 hr before
     maxDate: new Date(new Date().getTime() +
       1000 * 60 * 60 * 24 * 365), // 1 yr later
     sideBySide: true
