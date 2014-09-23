@@ -5,6 +5,7 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
+var ObjectID = require('mongodb').ObjectID;
 
 
 // =====================================================================
@@ -124,6 +125,42 @@ router.get('/connect/google/callback',
     successRedirect: '/home',
     failureRedirect: '/'
   }));
+
+// ============================================================================
+// Unlink Accounts
+// ============================================================================
+
+// Local
+
+router.get('/unlink/local', isServerReady, function(req, res) {
+  var user = req.user;
+  user.local.email = undefined;
+  user.local.password = undefined;
+  user.save(function(err) {
+    res.redirect('/');
+  });
+});
+
+// Google
+
+router.get('/unlink/google', isServerReady, function(req, res) {
+  var db = req.db;
+  var user = req.user;
+
+  db.collection('queryjobs').findAndModify({
+    _id: user._id
+  }, {}, {
+    $unset: {
+      'google': ''
+    }
+  }, { new:true }, function(err, result) {
+    console.log('err');
+    console.log(err);
+    console.log('result');
+    console.log(result);
+    res.redirect('/');
+  });
+});
 
 
 module.exports = router;
