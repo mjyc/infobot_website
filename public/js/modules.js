@@ -268,7 +268,8 @@ var queryjobCards = (function() {
         .css('margin-right', '10px')
         .text('Cancel');
       buttons.data('btnCancel', btnCancel);
-      if (queryjob.status === RUNNING) {
+      if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED ||
+          queryjob.status === RUNNING) {
         btnCancel.click(function() {
           btnCancel.attr('disabled', 'disabled');
           if (cancelCallback) {
