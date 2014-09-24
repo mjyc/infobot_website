@@ -18,23 +18,23 @@ block content
             placeholder="Type question here"
             style="box-shadow: none;")
         .form-inline(align="center")
-          b Make Public
-          | &nbsp;&nbsp;
-          input#inputPublic.js-switch.small(type="checkbox")
-          | &nbsp;&nbsp;&nbsp;&nbsp;
-          b Email Notification
-          | &nbsp;&nbsp;
-          input#inputEmail.js-switch.small(type="checkbox")
-          | &nbsp;&nbsp;&nbsp;&nbsp;
-          b Deadline
-          | &nbsp;&nbsp;
-          #inputDeadline.input-group.input-group-sm.date
-            input.form-control(type="text",
-              style="box-shadow: none;")
-            span.input-group-addon
-              span.glyphicon.glyphicon-calendar
-          | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          a#aSubmitQuestion.btn.btn-primary Submit Question
+          .form-group(style="padding-right: 20px;")
+            label Make Public
+            | &nbsp;&nbsp;
+            input#inputPublic.js-switch.small(type="checkbox")
+          .form-group(style="padding-right: 20px;")
+            label Email Notification
+            | &nbsp;&nbsp;
+            input#inputEmail.js-switch.small(type="checkbox")
+          .form-group(style="padding-right: 20px;")
+            label Deadline
+            | &nbsp;&nbsp;
+            #inputDeadline.input-group.input-group-sm.date
+              input.form-control(type="text",
+                style="box-shadow: none;")
+              span.input-group-addon
+                span.glyphicon.glyphicon-calendar
+          a#aSubmitQuestion.btn.btn-primary Submit
           //- For using "Enter" key.
           button#btnSubmitQuestion(style='display: none')
 
