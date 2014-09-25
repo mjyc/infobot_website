@@ -386,13 +386,18 @@ var queryjobCards = (function() {
       });
 
       var commentsInput = elem.children().find('p.commentsInput');
-      var inputComment = $('<input>').addClass('form-control inputsm')
+      var inputComment = $('<input>').addClass('form-control input-sm')
+        .css('width', '350px')
+        .css('margin-right', '5px')
         .css('box-shadow', 'none')
         .css('border-color', '#cccccc')
         .attr('type', 'text')
         .attr('placeholder', 'Write a comment...');
-      var btnComment = $('<button>').css('display', 'none');
+      var btnComment = $('<button>')
+        .addClass('btn btn-default btn-sm')
+        .text('Post');
       var formComment = $('<form>')
+        .addClass('form-inline')
         .append(inputComment)
         .append(btnComment);
       btnComment.on('click', function(event) {
