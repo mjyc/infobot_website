@@ -440,6 +440,10 @@ var queryjobCards = (function() {
         inputComment.attr('disabled', 'disabled');
         btnComment.attr('disabled', 'disabled');
       }
+      if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED ||
+          queryjob.status === RUNNING) {
+        btnHeart.attr('disabled', 'disabled');
+      }
       if (container.data('publicMode')) {
         btnCancel.hide();
       }
