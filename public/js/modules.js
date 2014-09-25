@@ -437,6 +437,8 @@ var queryjobCards = (function() {
         elem.css('opacity', '0.5');
         btnCancel.attr('disabled', 'disabled');
         btnHeart.attr('disabled', 'disabled');
+        inputComment.attr('disabled', 'disabled');
+        btnComment.attr('disabled', 'disabled');
       }
       if (container.data('publicMode')) {
         btnCancel.hide();
