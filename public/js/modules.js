@@ -194,35 +194,6 @@ var queryjobCards = (function() {
       var commentsHist = $('<div>').addClass('commentsHist col-xs-12')
         .css('font-size', '13px')
         .appendTo(footerRow);
-      commentsHist.children().remove();
-      var postInput = {
-        queryjobID: queryjob._id
-      };
-      $.post('/comments/getcomments', postInput, function(comments) {
-
-        $.each(comments, function(index, comment) {
-          var commentLine = $('<p>')
-            .appendTo(commentsHist);
-          var commentUserName = nameTemplate.clone()
-            .text(comment.user_name)
-            .append('&nbsp;&nbsp;')
-            .appendTo(commentLine);
-
-          var commentContent = $('<span>')
-            .text(comment.comment)
-            .appendTo(commentLine);
-
-          commentLine.append('<br>');
-          var commentUserTime = timeTemplate.clone()
-            .text(formatTodayYesterday(new Date(queryjob.timeissued)))
-            .appendTo(commentLine);
-        });
-
-      }, 'JSON').fail(function() {
-        alert(
-          'Oops, something went wrong. Please try refreshing the page.'
-        );
-      });
 
       var commentsInput = $('<p>').addClass('commentsInput col-xs-8')
         .appendTo(footerRow);
@@ -386,6 +357,33 @@ var queryjobCards = (function() {
 
 
       // Comments
+      var commentsHist = elem.children().find('div.commentsHist');
+      commentsHist.children().remove();
+      $.post('/comments/getcomments', postInput, function(comments) {
+
+        $.each(comments, function(index, comment) {
+          var commentLine = $('<p>')
+            .appendTo(commentsHist);
+          var commentUserName = nameTemplate.clone()
+            .text(comment.user_name)
+            .append('&nbsp;&nbsp;')
+            .appendTo(commentLine);
+
+          var commentContent = $('<span>')
+            .text(comment.comment)
+            .appendTo(commentLine);
+
+          commentLine.append('<br>');
+          var commentUserTime = timeTemplate.clone()
+            .text(formatTodayYesterday(new Date(queryjob.timeissued)))
+            .appendTo(commentLine);
+        });
+
+      }, 'JSON').fail(function() {
+        alert(
+          'Oops, something went wrong. Please try refreshing the page.'
+        );
+      });
 
       var commentsInput = elem.children().find('p.commentsInput');
       var inputComment = $('<input>').addClass('form-control inputsm')
@@ -415,28 +413,13 @@ var queryjobCards = (function() {
             alert(
               'Oops, something went wrong. Please try refreshing the page.');
           } else {
-            var commentsHist = elem.children().find('div.commentsHist');
-            var commentLine = $('<p>')
-              .appendTo(commentsHist);
-            var commentUserName = nameTemplate.clone()
-              .text(queryjob.user_name)
-              .append('&nbsp;&nbsp;')
-              .appendTo(commentLine);
-
-            var commentContent = $('<span>')
-              .text(inputComment.val())
-              .appendTo(commentLine);
-
-            commentLine.append('<br>');
-            var commentUserTime = timeTemplate.clone()
-              .text(formatTodayYesterday(new Date(queryjob.timeissued)))
-              .appendTo(commentLine);
-
-            inputComment.val('');
+            elem.trigger('updateStatus');
           }
         }, 'JSON').fail(function() {
           console.log('Error while posting to /comments/addcomment.');
           alert('Oops, something went wrong. Please try refreshing the page.');
+        }).always(function() {
+          inputComment.val('');
         });
 
       });
