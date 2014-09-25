@@ -55,7 +55,7 @@ function callCancelQueryJob(queryjobIDStr, callback) {
     queryjob_id: queryjobIDStr
   });
 
-  cancelQueryJob.callService(request, function(result, callback) {
+  cancelQueryJob.callService(request, function(result) {
     if (callback) {
       callback(result);
     }
