@@ -31,7 +31,7 @@ function isServerReady(req, res, next) {
 // Login.
 router.get('/', function(req, res) {
   if (req.isAuthenticated()) {
-    res.redirect('/home');
+    res.redirect('/wall');
   } else {
     res.render('login.jade', {
       prod: req.PROD
@@ -72,14 +72,14 @@ router.get('/logout', function(req, res) {
 
 // Process the login form.
 router.post('/login', passport.authenticate('local-login', {
-  successRedirect: '/home',
+  successRedirect: '/wall',
   failureRedirect: '/',
   failureFlash: true
 }));
 
 // Process the signup form.
 router.post('/signup', passport.authenticate('local-signup', {
-  successRedirect: '/home',
+  successRedirect: '/wall',
   failureRedirect: '/',
   failureFlash: true
 }));
@@ -94,7 +94,7 @@ router.get('/auth/google', passport.authenticate('google', {
 // The callback after google has authenticated the user.
 router.get('/auth/google/callback',
   passport.authenticate('google', {
-    successRedirect: '/home',
+    successRedirect: '/wall',
     failureRedirect: '/'
   }));
 
@@ -106,7 +106,7 @@ router.get('/auth/google/callback',
 // Local
 
 router.post('/connect/local', passport.authenticate('local-signup', {
-  successRedirect: '/home',
+  successRedirect: '/wall',
   failureRedirect: '/',
   failureFlash: true
 }));
@@ -121,7 +121,7 @@ router.get('/connect/google', passport.authorize('google', {
 // The callback after google has authorized the user.
 router.get('/connect/google/callback',
   passport.authorize('google', {
-    successRedirect: '/home',
+    successRedirect: '/wall',
     failureRedirect: '/'
   }));
 
