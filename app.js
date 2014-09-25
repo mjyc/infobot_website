@@ -17,6 +17,7 @@ var ROSLIB = require('roslib');
 // Locals.
 var routes = require('./routes/index');
 var queryjobs = require('./routes/queryjobs');
+var comments = require('./routes/comments');
 var configDB = require('./config/database.js');
 var sessionDB = require('./config/session.js');
 // TODO: create config file for ROS
@@ -93,6 +94,7 @@ app.use(function(req, res, next) {
 
 app.use('/', routes);
 app.use('/queryjobs', queryjobs);
+app.use('/comments', comments);
 
 // Catch 404 and forward to error handler.
 app.use(function(req, res, next) {

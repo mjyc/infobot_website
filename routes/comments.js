@@ -14,16 +14,18 @@ var ObjectID = require('mongodb').ObjectID;
 
 // POST
 
-// Add QueryJob.
+// Add comment.
 router.post('/addcomment', function(req, res, next) {
   var db = req.db;
   var newComment = {};
   // Add user info.
   newComment.user_id = req.user._id;
   newComment.user_name = req.user.name;
+  // Add QueryJon info.
+  newComment.queryjob_id = new ObjectID(req.body.queryjobID);
   // Data from req.
-  newComment.timeissued = new Date(req.body.timeissued);
-  newComment.text = req.body.text;
+  newComment.timecommented = new Date(req.body.timecommented);
+  newComment.comment = req.body.comment;
 
   db.collection('comments').insert(newComment, function(err, result) {
     if (err) {
@@ -33,48 +35,26 @@ router.post('/addcomment', function(req, res, next) {
   });
 });
 
-// // Get QueryJobs.
-// // Returns QueryJobs in decreasing timeissued sorted manner. Can provide
-// // parameters to control types of QueryJobs being returned.
-// router.post('/getqueryjobs', function(req, res, next) {
-//   var db = req.db;
+// Get comments.
+// Returns comments in decreasing timecommented sorted manner.
+router.post('/getcomments', function(req, res, next) {
+  var db = req.db;
 
-//   // Parse inputs.
-//   var queryjobID = req.body.queryjobID; // get one QueryJob with id
-//   var limit = parseInt(req.body.limit || '0'); // get limit #
-//   var startDate = req.body.startDate; // get QueryJobs from startDate
-//   var userOnly = JSON.parse(req.body.userOnly || false); // get user's
-//   //   QueryJobs
-//   var publicOnly = JSON.parse(req.body.publicOnly || false); // get
-//   //   public QueryJobs
+  var queryjobID = req.body.queryjobID;
+  var criteria = {};
+  if (queryjobID) {
+    criteria.queryjob_id = new ObjectID(queryjobID);
+  }
 
-//   // Set query.
-//   var criteria = {};
-//   if (queryjobID) {
-//     criteria._id = new ObjectID(queryjobID);
-//   }
-//   if (startDate) {
-//     criteria.timeissued = {
-//       '$lt': new Date(startDate)
-//     };
-//   }
-//   if (userOnly) {
-//     criteria.user_id = req.user._id;
-//   }
-//   if (publicOnly) {
-//     criteria.is_public = true;
-//   }
-
-//   db.collection('queryjobs').find(criteria).sort({
-//     'timeissued': -1
-//   })
-//     .limit(limit).toArray(function(err, results) {
-//       if (err) {
-//         return next(err);
-//       }
-//       res.send(results);
-//     });
-// });
+  db.collection('comments').find(criteria).sort({
+    'timecommented': 1
+  }).toArray(function(err, results) {
+    if (err) {
+      return next(err);
+    }
+    res.send(results);
+  });
+});
 
 
 module.exports = router;
