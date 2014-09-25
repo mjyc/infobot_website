@@ -142,7 +142,7 @@ $(document).ready(function() {
       up: 'fa fa-arrow-up fa-lg',
       down: 'fa fa-arrow-down fa-lg'
     },
-    minuteStepping: 1,
+    minuteStepping: 15,
     // minDate: new Date(),
     minDate: new Date(
       new Date().getTime() + 1000 * 60 * 60 * -1 * 1), // 1 hr before
