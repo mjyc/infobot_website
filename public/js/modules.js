@@ -309,7 +309,7 @@ var queryjobCards = (function() {
       var heartNNum = $('<span>').text(queryjob.hearts.length);
       var btnHeart = $('<button>').addClass('btn btn-default btn-sm')
         .css('outline', 'none')
-        .append($('<span>').text('Thank You')
+        .append($('<span>').text('Thank You DUB-E')
           .append('&nbsp;')
           .append($('<i>').addClass('fa fa-heart').append('&nbsp;'))
           .append(heartNNum));
