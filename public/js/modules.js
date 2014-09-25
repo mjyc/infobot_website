@@ -375,7 +375,7 @@ var queryjobCards = (function() {
 
           commentLine.append('<br>');
           var commentUserTime = timeTemplate.clone()
-            .text(formatTodayYesterday(new Date(queryjob.timeissued)))
+            .text(formatTodayYesterday(new Date(comment.timecommented)))
             .appendTo(commentLine);
         });
 
