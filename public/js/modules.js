@@ -418,7 +418,7 @@ var queryjobCards = (function() {
             alert(
               'Oops, something went wrong. Please try refreshing the page.');
           } else {
-            elem.trigger('updateStatus');
+            elem.trigger('refresh');
           }
         }, 'JSON').fail(function() {
           console.log('Error while posting to /comments/addcomment.');
