@@ -161,12 +161,6 @@ var queryjobCards = (function() {
       var dubeInfo = $('<p>').addClass('dubeInfo col-xs-12')
         .css('text-align', 'right')
         .appendTo(bodyRow);
-      var dubeName = nameTemplate.clone().addClass('dubeName')
-        .text('DUB-E').append('&nbsp;&nbsp;')
-        .appendTo(dubeInfo);
-      var dubeTime = timeTemplate.clone().addClass('dubeTime')
-        .text(formatTodayYesterday(new Date(queryjob.timeissued)))
-        .appendTo(dubeName);
 
       var dubeTags = $('<p>').addClass('dubeTags col-xs-12')
         .css('text-align', 'right')
@@ -234,6 +228,35 @@ var queryjobCards = (function() {
 
 
       // About Dub-E
+
+      // Create dube name and last update time.
+      var dubeInfo = elem.children().find('p.dubeInfo').show();
+      dubeInfo.children().remove();
+      var dubeName = nameTemplate.clone().addClass('dubeName')
+        .text('DUB-E').append('&nbsp;&nbsp;')
+        .appendTo(dubeInfo);
+      var dubeTime = timeTemplate.clone();
+      if (queryjob.status === RECEIVED || queryjob.status === SCHEDULED) {
+        dubeTime
+          .text(formatTodayYesterday(new Date(queryjob.timeissued)))
+          .appendTo(dubeName);
+      } else if (queryjob.status === RUNNING) {
+        dubeTime
+          .text(formatTodayYesterday(new Date(queryjob.timestarted)))
+          .appendTo(dubeName);
+      } else if (queryjob.status === SUCCEEDED) {
+        dubeTime
+          .text(formatTodayYesterday(new Date(queryjob.timecompleted)))
+          .appendTo(dubeName);
+      } else if (queryjob.status === CANCELLED) {
+        dubeTime
+          .text(formatTodayYesterday(new Date(queryjob.timecompleted)))
+          .appendTo(dubeName);
+      } else if (queryjob.status === FAILED) {
+        dubeTime
+          .text(formatTodayYesterday(new Date(queryjob.timecompleted)))
+          .appendTo(dubeName);
+      }
 
       // Response tags.
       var dubeTags = elem.children().find('p.dubeTags').show();
