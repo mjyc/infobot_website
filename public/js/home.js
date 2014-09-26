@@ -145,13 +145,13 @@ $(document).ready(function() {
     minuteStepping: 15,
     // minDate: new Date(),
     minDate: new Date(
-      new Date().getTime() + 1000 * 60 * 60 * -1 * 1), // 1 hr before
+      new Date().getTime() + 1000 * 60 * 60 * -2 * 1), // 2 hr before
     maxDate: new Date(new Date().getTime() +
       1000 * 60 * 60 * 24 * 365), // 1 yr later
     sideBySide: true
   });
 
-  var submitQuestionHelper = function() {
+  var submitQuestionHelper = function(deadline) {
     // Parse data from DOM.
     var newQueryJob = {
       timeissued: new Date().toISOString(),
@@ -160,8 +160,7 @@ $(document).ready(function() {
       notification_email: $('#submitQuestion input#inputEmail')
         .prop('checked'),
       'is_public': $('#submitQuestion input#inputPublic').prop('checked'),
-      deadline: new Date(new Date().getTime() + 1000 * 60 * 60 * 1 * 1)
-        .toISOString()
+      deadline: deadline
     };
 
     // Use AJAX to post the object to our adduser service.
@@ -209,7 +208,8 @@ $(document).ready(function() {
       return;
     }
 
-    var inputDeadline = $('#inputDeadline').data('DateTimePicker').getDate();
+    var inputDeadline = $('#inputDeadline').data('DateTimePicker')
+      .getDate().toDate();
     var soonestDeadline = new Date(
       new Date().getTime() + 1000 * 60 * 10 * 1 * 1);
     if (inputDeadline < soonestDeadline) {
@@ -238,7 +238,7 @@ $(document).ready(function() {
         $('#submitQuestion input#inputTypedCmd').val('');
         return;
       } else {
-        submitQuestionHelper();
+        submitQuestionHelper(inputDeadline);
       }
     }, 'JSON').fail(function() {
       console.log('Error while posting to /queryjobs/getqueryjobs.');
