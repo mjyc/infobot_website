@@ -21,6 +21,7 @@ router.post('/addqueryjob', function(req, res, next) {
   // Add user info.
   newQueryJob.user_id = req.user._id;
   newQueryJob.user_name = req.user.name;
+  newQueryJob.user_email = req.user.google.email;
   // Data from req.
   newQueryJob.timeissued = new Date(req.body.timeissued);
   newQueryJob.typed_cmd = req.body.typed_cmd;
