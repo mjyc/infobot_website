@@ -67,3 +67,7 @@ On second terminal, run
 cd ~/path/to/sara_uw_website
 node bin/www
 ```
+
+## Database Models
+
+see the [database model doc on google drive](https://docs.google.com/document/d/15Mvr-qWT-urHocsiDXLwXAtiwZ0kJiqtb0C6rsN1Soo/edit?usp=sharing) for details.
