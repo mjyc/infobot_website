@@ -30,6 +30,8 @@ npm install -g node-inspector  # for debugging
 
 #### On Mac OS X 10.9
 
+First make sure ROS is prepared for running the website server. See [this wiki](https://github.com/pronobis/sara/wiki/Draft-of-Installation-Instructions-for-Mac-OS-X-10.9) for setting ROS on Mac OS X.
+
 ```
 # install canvas
 cd ~/path/to/sara_uw_website
