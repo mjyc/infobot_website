@@ -103,7 +103,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-env');
   grunt.loadNpmTasks('grunt-node-inspector');
   grunt.loadNpmTasks('grunt-nodemon');
-  grunt.loadNpmTasks('grunt-open');
   grunt.loadNpmTasks('grunt-shell-spawn');
 
   grunt.registerTask('default', [
