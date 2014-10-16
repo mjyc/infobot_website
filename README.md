@@ -2,6 +2,10 @@
 
 ## Installing Dependencies
 
+#### MongoDB
+
+See [MongoDB Website](http://docs.mongodb.org/manual/installation/) for details.
+
 #### On Ubuntu 14.04
 
 Do not copy and paste below code, but actual
