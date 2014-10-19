@@ -19,9 +19,9 @@ cd node
 git checkout tags/v0.10.32
 ./configure --prefix=~/local
 make; make install
+# make sure to add ~/local/bin to $PATH
 
 # install canvas
-cd ~/path/to/sara_uw_website
 sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
 sudo apt-get install libgif-dev
 
