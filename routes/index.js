@@ -5,6 +5,7 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
+var ObjectID = require('mongodb').ObjectID;
 
 
 // =====================================================================
@@ -63,6 +64,43 @@ router.get('/logout', function(req, res) {
   res.redirect('/');
 });
 
+// email client
+router.post('/emails', function(req, res) {
+  var db = req.db;
+  var id = req.body.queryjob_id;
+  db.collection('queryjobs').findOne({_id: new ObjectID(id)}, function(err, document) {
+    if (document.timecompleted !== null && document.notification_email) {
+      var nodemailer = require('nodemailer');
+
+      // create reusable transporter object using SMTP transport
+      var transporter = nodemailer.createTransport({
+          service: 'Gmail',
+          auth: {
+              user: 'dub-e@dub-e.org',
+              pass: 'Mzk0%Fn^@s1GvflQy%8*'
+          }
+      });
+
+      // setup e-mail data with unicode symbols
+      var mailOptions = {
+          from: 'dub-e <dub-e@dub-e.org>', // sender address
+          to: 'davidt93@cs.washington.edu', // list of receivers
+          subject: 'DUB-e Response', // Subject line
+          text: 'Hello world ✔', // plaintext body
+          html: '<b>' + document.response_text +'</b>' // html body
+      };
+
+      // send mail with defined transport object
+      transporter.sendMail(mailOptions, function(error, info){
+          if(error){
+              console.log(error);
+          }else{
+              console.log('Message sent: ' + info.response);
+          }
+      });
+    }
+  });
+});
 
 // =====================================================================
 // Authenticate (First Login)
