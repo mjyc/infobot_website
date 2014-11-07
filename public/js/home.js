@@ -73,6 +73,9 @@ var listener = new ROSLIB.Topic({
 
 listener.subscribe(function(message) {
   queryjobCards.refreshCard(message.queryjob_id);
+  $.post('/emails', message, function(result) {
+  });
+
 });
 
 
