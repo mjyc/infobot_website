@@ -32,6 +32,10 @@ npm install
 npm install bson
 npm install -g grunt-cli  # grunt is like makefile for node
 npm install -g node-inspector  # for debugging
+
+# install web components
+npm install -g bower
+bower install
 ```
 
 #### On Mac OS X 10.9
@@ -49,6 +53,10 @@ npm install  # install node dependencies
 npm install bson
 npm install -g grunt-cli  # grunt is like makefile for node
 npm install -g node-inspector  # for debugging
+
+# install web components
+npm install -g bower
+bower install
 ```
 
 ## Running Website Server
