@@ -20,6 +20,7 @@ git checkout tags/v0.10.32
 ./configure --prefix=~/local
 make; make install
 # make sure to add ~/local/bin to $PATH
+# e.g., echo 'export PATH=~/local/bin:$PATH' >> ~/.bashrc
 
 # install canvas
 sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
