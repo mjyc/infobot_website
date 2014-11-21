@@ -62,6 +62,8 @@ bower install
 
 ## Running Website Server
 
+Frist, contact the admin to get the `config` folder and place it in `~/path/to/sara_uw_website`.
+
 #### Using [Grunt](http://gruntjs.com/)
 
 ```
