@@ -13,7 +13,7 @@ var bodyParser = require('body-parser');
 var mongo = require('mongoskin');
 var passport = require('passport');
 var flash = require('connect-flash');
-var session = require('express-session');
+var expressSession = require('express-session');
 
 // Locals.
 var database = require('./config/database.js');
@@ -59,7 +59,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
-app.use(session({
+app.use(expressSession({
   secret: session.secret
 }));
 app.use(passport.initialize());
@@ -111,5 +111,8 @@ app.use(function(err, req, res, next) {
 });
 
 
+// =====================================================================
+// Module
+// =====================================================================
 
 module.exports = app;
