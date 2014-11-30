@@ -8,10 +8,10 @@
     // roslibjs
     "EventEmitter2": true,
     "ROSLIB": true,
-    // jquery
+    // general
     "$": true,
     "jQuery": true,
-    // general
+    "angular": true,
     "__dirname": true,
     "after": true,
     "before": true,
