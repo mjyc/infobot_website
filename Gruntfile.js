@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(grunt) {
 
   grunt.initConfig({
@@ -24,6 +26,7 @@ module.exports = function(grunt) {
       },
       files: [
         '**/*.js',
+        '!bower_components/**/*.js',
         '!node_modules/**/*.js',
         '!public/js/vendor/**/*.js'
       ]
