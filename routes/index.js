@@ -32,14 +32,14 @@ function isServerReady(req, res, next) {
 // Login.
 router.get('/', function(req, res) {
   if (req.isAuthenticated()) {
-    res.redirect('/wall');
+    res.redirect('/angular.html');
   } else {
-    res.render('login.jade', {
-      prod: req.PROD
-    });
+    res.redirect('/angular.html#/signup');
   }
 });
 
+// TODO: remove below block after porting work is done.
+// ----------------------------------------------------------------
 // Home.
 router.get('/home', isServerReady, function(req, res) {
   res.render('home.jade', {
@@ -57,6 +57,7 @@ router.get('/wall', isServerReady, function(req, res) {
     prod: req.PROD
   });
 });
+// ----------------------------------------------------------------
 
 // Logout.
 router.get('/logout', function(req, res) {
