@@ -1,3 +1,5 @@
+'use strict';
+
 // =====================================================================
 // Requires
 // =====================================================================
@@ -15,9 +17,7 @@ var ObjectID = require('mongodb').ObjectID;
 // Route middleware to ensure (1) the server is connected to ROS and
 // (2) user is logged in.
 function isServerReady(req, res, next) {
-  if (!req.ros.connection) {
-    return next(new Error('Cannot connect to ROS.'));
-  } else if (req.isAuthenticated()) {
+  if (req.isAuthenticated()) {
     return next();
   }
 
@@ -28,15 +28,6 @@ function isServerReady(req, res, next) {
 // =====================================================================
 // Routes
 // =====================================================================
-
-// Login.
-router.get('/', function(req, res) {
-  if (req.isAuthenticated()) {
-    res.redirect('/angular.html');
-  } else {
-    res.redirect('/angular.html#/signup');
-  }
-});
 
 // TODO: remove below block after porting work is done.
 // ----------------------------------------------------------------
@@ -164,5 +155,14 @@ router.get('/connect/google/callback',
     failureRedirect: '/'
   }));
 
+
+// Login.
+router.get('/', function(req, res) {
+  if (req.isAuthenticated()) {
+    res.redirect('/angular.html');
+  } else {
+    res.redirect('/angular.html#/signup');
+  }
+});
 
 module.exports = router;
