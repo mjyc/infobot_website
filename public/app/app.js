@@ -1,3 +1,5 @@
+'use strict';
+
 // declare module
 var dubeapp = angular.module('dubeApp', ['ngRoute']);
 
