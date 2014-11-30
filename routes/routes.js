@@ -19,9 +19,9 @@ var ObjectID = require('mongodb').ObjectID;
 function isServerReady(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
+  } else {
+    res.redirect('/');
   }
-
-  res.redirect('/');
 }
 
 
@@ -29,7 +29,7 @@ function isServerReady(req, res, next) {
 // Routes
 // =====================================================================
 
-// TODO: remove below block after porting work is done.
+// TODO(mjyc): remove below block after porting work is done.
 // ----------------------------------------------------------------
 // Home.
 router.get('/home', isServerReady, function(req, res) {
@@ -56,6 +56,8 @@ router.get('/logout', function(req, res) {
   res.redirect('/');
 });
 
+// TODO(mjyc): test this
+// ----------------------------------------------------------------
 // email client
 router.post('/emails', function(req, res) {
   var db = req.db;
@@ -93,6 +95,17 @@ router.post('/emails', function(req, res) {
     }
   });
 });
+// ----------------------------------------------------------------
+
+// Login.
+router.get('/', function(req, res) {
+  if (req.isAuthenticated()) {
+    res.redirect('/angular.html');
+  } else {
+    res.redirect('/angular.html#/wall');
+  }
+});
+
 
 // =====================================================================
 // Authenticate (First Login)
@@ -156,13 +169,8 @@ router.get('/connect/google/callback',
   }));
 
 
-// Login.
-router.get('/', function(req, res) {
-  if (req.isAuthenticated()) {
-    res.redirect('/angular.html');
-  } else {
-    res.redirect('/angular.html#/signup');
-  }
-});
+// =====================================================================
+// Module
+// =====================================================================
 
 module.exports = router;
