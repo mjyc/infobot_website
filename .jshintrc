@@ -1,29 +1,29 @@
 {
-  // Adopted from: https://github.com/RobotWebTools/starter-template/blob/stable/utils/.jshintrc
   "globals": {
-    // jquery
-    "$": true,
-    "jQuery": true,
-    // misc
-    "__dirname": true,
-    "process": true,
-    "require": true,
+    // sara_uw_website
     "Switchery": true,
     "queryjobCards":true,
     "home":true,
     "urlROS":true,
-    // test
+    // roslibjs
+    "EventEmitter2": true,
+    "ROSLIB": true,
+    // jquery
+    "$": true,
+    "jQuery": true,
+    // general
+    "__dirname": true,
     "after": true,
     "before": true,
     "beforeEach": true,
     "describe": true,
     "it": true,
-    // roslibjs
-    "module": true,
-    "EventEmitter2": true,
-    "ROSLIB": true
+    "process": true,
+    "require": true,
+    "module": true
   },
-  // roslibjs
+  "globalstrict": true,
+  "strict": false,
   "curly": true,
   "eqeqeq": true,
   "immed": true,
@@ -36,8 +36,6 @@
   "eqnull": false,
   "browser": true,
   "devel": true,
-  // "es5": true,  // causes print outs
-  "strict": false,
   "trailing": true,
   "quotmark": "single",
   "proto": true,
