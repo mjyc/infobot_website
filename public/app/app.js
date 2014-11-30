@@ -10,11 +10,11 @@ dubeapp.config(function($routeProvider) {
       templateUrl: '/app/views/home.html',
       controller: 'HomeController',
     })
-    .when('/landing', {
-      templateUrl: '/app/views/landing.html',
+    .when('/signup', {
+      templateUrl: '/app/views/signup.html',
     })
     .otherwise({
       templateUrl: '/app/views/wall.html',
       controller: 'WallController',
-    })
+    });
 });
