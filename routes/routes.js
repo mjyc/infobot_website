@@ -11,101 +11,22 @@ var ObjectID = require('mongodb').ObjectID;
 
 
 // =====================================================================
-// Functions
-// =====================================================================
-
-// Route middleware to ensure (1) the server is connected to ROS and
-// (2) user is logged in.
-function isServerReady(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  } else {
-    res.redirect('/');
-  }
-}
-
-
-// =====================================================================
 // Routes
 // =====================================================================
 
-// TODO(mjyc): remove below block after porting work is done.
-// ----------------------------------------------------------------
-// Home.
-router.get('/home', isServerReady, function(req, res) {
-  res.render('home.jade', {
-    user: req.user,
-    isHome: true,
-    prod: req.PROD
-  });
-});
-
-// Home.
-router.get('/wall', isServerReady, function(req, res) {
-  res.render('wall.jade', {
-    user: req.user,
-    isHome: false,
-    prod: req.PROD
-  });
-});
-// ----------------------------------------------------------------
-
-// Logout.
-router.get('/logout', function(req, res) {
-  req.logout();
-  res.redirect('/');
-});
-
-// TODO(mjyc): test this
-// ----------------------------------------------------------------
-// email client
-router.post('/emails', function(req, res) {
-  var db = req.db;
-  var id = req.body.queryjob_id;
-  db.collection('queryjobs').findOne({_id: new ObjectID(id)}, function(err, document) {
-    if (document.timecompleted !== null && document.notification_email) {
-      var nodemailer = require('nodemailer');
-
-      // create reusable transporter object using SMTP transport
-      var transporter = nodemailer.createTransport({
-          service: 'Gmail',
-          auth: {
-              user: 'dub-e@dub-e.org',
-              pass: 'Mzk0%Fn^@s1GvflQy%8*'
-          }
-      });
-
-      // setup e-mail data with unicode symbols
-      var mailOptions = {
-          from: 'dub-e <dub-e@dub-e.org>', // sender address
-          to: 'davidt93@cs.washington.edu', // list of receivers
-          subject: 'DUB-e Response', // Subject line
-          text: 'Hello world ✔', // plaintext body
-          html: '<b>' + document.response_text +'</b>' // html body
-      };
-
-      // send mail with defined transport object
-      transporter.sendMail(mailOptions, function(error, info){
-          if(error){
-              console.log(error);
-          }else{
-              console.log('Message sent: ' + info.response);
-          }
-      });
-    }
-  });
-});
-// ----------------------------------------------------------------
-
-// Login.
 router.get('/', function(req, res) {
+  // res.render('index');
   if (req.isAuthenticated()) {
-    res.redirect('/angular.html');
+    res.render('index');
   } else {
-    res.redirect('/angular.html#/wall');
+    res.render('signup.jade');
   }
 });
 
+router.get('/partials/:name', function(req, res) {
+  var name = req.params.name;
+  res.render('partials/' + name);
+});
 
 // =====================================================================
 // Authenticate (First Login)
@@ -115,14 +36,14 @@ router.get('/', function(req, res) {
 
 // Process the login form.
 router.post('/login', passport.authenticate('local-login', {
-  successRedirect: '/wall',
+  successRedirect: '/',
   failureRedirect: '/',
   failureFlash: true
 }));
 
 // Process the signup form.
 router.post('/signup', passport.authenticate('local-signup', {
-  successRedirect: '/wall',
+  successRedirect: '/',
   failureRedirect: '/',
   failureFlash: true
 }));
@@ -137,7 +58,7 @@ router.get('/auth/google', passport.authenticate('google', {
 // The callback after google has authenticated the user.
 router.get('/auth/google/callback',
   passport.authenticate('google', {
-    successRedirect: '/wall',
+    successRedirect: '/',
     failureRedirect: '/'
   }));
 
@@ -149,7 +70,7 @@ router.get('/auth/google/callback',
 // Local
 
 router.post('/connect/local', passport.authenticate('local-signup', {
-  successRedirect: '/wall',
+  successRedirect: '/',
   failureRedirect: '/',
   failureFlash: true
 }));
@@ -164,7 +85,7 @@ router.get('/connect/google', passport.authorize('google', {
 // The callback after google has authorized the user.
 router.get('/connect/google/callback',
   passport.authorize('google', {
-    successRedirect: '/wall',
+    successRedirect: '/',
     failureRedirect: '/'
   }));
 

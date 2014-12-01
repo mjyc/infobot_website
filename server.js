@@ -44,12 +44,9 @@ require('./config/passport')(passport, db, process.env.NODE_ENV);
 
 var app = express();
 
-// TODO: remove below block after porting to angular work is done.
-// ----------------------------------------------------------------
 // View engine setup.
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-// ----------------------------------------------------------------
 
 app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
 app.use(logger('dev'));
@@ -67,17 +64,22 @@ app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in
 //   session
 
-// Make our ros, db and MODE accessible to our router.
+// Make our db and MODE accessible to our router.
 app.use(function(req, res, next) {
   req.db = db;
   req.PROD = (process.env.NODE_ENV === 'production');
   next();
 });
 
-// Custom routing.
-app.use('/comments', comments);
-app.use('/queryjobs', queryjobs);
 app.use('/', routes);
+// app.use('/comments', comments);
+// app.use('/queryjobs', queryjobs);
+app.get('/hello', function(req, res) {
+  res.send('hello world!');
+});
+app.get('*', function(req, res) {
+  res.redirect('/');
+});
 
 // Catch 404 and forward to error handler.
 app.use(function(req, res, next) {

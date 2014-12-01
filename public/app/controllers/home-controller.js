@@ -1,4 +1,4 @@
 'use strict';
 
-angular.module('dubeApp').controller('HomeController', ['$scope', function($scope) {
+angular.module('askdubeApp').controller('HomeController', ['$scope', function($scope) {
 }]);
