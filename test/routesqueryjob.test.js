@@ -11,19 +11,19 @@ var loremIpsum = require('lorem-ipsum'); // function
 var ObjectID = require('mongodb').ObjectID; // class
 
 // Locals.
-var configAuth = require('../config/auth.js');
-var configDB = require('../config/database.js');
+var auth = require('../config/auth.js');
+var database = require('../config/database.js');
 
 // DB setups.
 // Make sure the test database is clean.
-var sara_db = mongo.db(configDB.url, {
+var sara_db = mongo.db(database.url, {
   native_parser: true
 });
 sara_db.collectionNames(function(err, items) {
   expect(items).to.eql([]); // MUST NOT BE USED!
 });
 // Connect to test db.
-var db = mongo.db(configDB.urlTest, {
+var db = mongo.db(database.urlTest, {
   native_parser: true
 });
 
@@ -53,7 +53,7 @@ function signupUser(agent) {
   return function(done) {
     agent
       .post('http://localhost:8080/signup')
-      .send(configAuth.accountTest)
+      .send(auth.accountTest)
       .end(function(err, res) {
         expect(err).to.eql(null);
         expect(res.status).to.eql(200);
@@ -66,7 +66,7 @@ function loginUser(agent) {
   return function(done) {
     agent
       .post('http://localhost:8080/login')
-      .send(configAuth.accountTest)
+      .send(auth.accountTest)
       .end(function(err, res) {
         expect(err).to.eql(null);
         expect(res.status).to.eql(200);
