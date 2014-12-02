@@ -18,7 +18,7 @@ router.get('/', function(req, res) {
   if (req.isAuthenticated()) {
     res.render('index');
   } else {
-    res.render('signup');
+    res.render('signup', { warning: false });
   }
 });
 
@@ -26,6 +26,13 @@ router.get('/partials/:name', function(req, res) {
   var name = req.params.name;
   res.render('partials/' + name);
 });
+
+// Logout.
+router.get('/logout', function(req, res) {
+  req.logout();
+  res.redirect('/');
+});
+
 
 // =====================================================================
 // Authenticate (First Login)
@@ -51,7 +58,8 @@ router.post('/signup', passport.authenticate('local-signup', {
 
 // Send to google to do the authentication.
 router.get('/auth/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
+  scope: ['profile', 'email'],
+  hd: 'cs.washington.edu'
 }));
 
 // The callback after google has authenticated the user.
@@ -78,7 +86,8 @@ router.post('/connect/local', passport.authenticate('local-signup', {
 
 // Send to google to do the authentication.
 router.get('/connect/google', passport.authorize('google', {
-  scope: ['profile', 'email']
+  scope: ['profile', 'email'],
+  hd: 'cs.washington.edu'
 }));
 
 // The callback after google has authorized the user.

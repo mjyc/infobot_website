@@ -13,10 +13,6 @@ body {
   margin-bottom: 25px;
 }
 
-.jumbotron .sublead {
-  font-size: 15px; padding-top: 10px;
-}
-
 .small + .switchery {
    height: 20px;
    width: 34px;
