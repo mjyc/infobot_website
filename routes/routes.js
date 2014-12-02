@@ -15,11 +15,10 @@ var ObjectID = require('mongodb').ObjectID;
 // =====================================================================
 
 router.get('/', function(req, res) {
-  // res.render('index');
   if (req.isAuthenticated()) {
     res.render('index');
   } else {
-    res.render('signup.jade');
+    res.render('signup');
   }
 });
 

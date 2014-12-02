@@ -71,12 +71,19 @@ app.use(function(req, res, next) {
   next();
 });
 
+function IsAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    res.redirect('/');
+  }
+}
+app.all('/queryjobs/*', IsAuthenticated);
+app.all('/comments/*', IsAuthenticated);
+
 app.use('/', routes);
-// app.use('/comments', comments);
-// app.use('/queryjobs', queryjobs);
-app.get('/hello', function(req, res) {
-  res.send('hello world!');
-});
+app.use('/queryjobs', queryjobs);
+app.use('/comments', comments);
 app.get('*', function(req, res) {
   res.redirect('/');
 });
