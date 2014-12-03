@@ -35,6 +35,44 @@ router.post('/', function(req, res, next) {
 });
 
 // Retrieve.
+
+// retrieve list
+router.get('/list', function(req, res, next) {
+  var db = req.db;
+
+  // limit: maximum number of items desired
+  // after: retrieve querjobs with their timeissued field larger than "after"
+  // userOnly: retrieve querjobs which are belong to the current user
+  // publicOnly: retrieve querjobs which has "true" value for the public field
+  var limit = JSON.parse(req.body.limit || '0');
+  var after = req.body.after;
+  var userOnly = JSON.parse(req.body.userid || false);
+  var publicOnly = JSON.parse(req.body.public || false);
+
+  var criteria = {};
+  if (after) {
+    criteria.timeissued = {
+      '$lt': after
+    };
+  }
+  if (userOnly) {
+    criteria.user_id = req.user._id;
+  }
+  if (publicOnly) {
+    criteria.is_public = true;
+  }
+
+  db.collection('queryjobs').find(criteria).sort({
+    'timeissued': -1
+  }).limit(limit).toArray(function(err, results) {
+    if (err) {
+      return next(err);
+    }
+    res.send(results);
+  });
+});
+
+// retrieve single object
 router.get('/:id', function(req, res, next) {
   var db = req.db;
   var queryjobID = new ObjectID(req.params.id);
@@ -44,42 +82,6 @@ router.get('/:id', function(req, res, next) {
     }
     res.send(result);
   });
-});
-
-router.get('/list', function(req, res, next) {
-  var db = req.db;
-
-  // limit: maximum number of items desired
-  // after: retrieve querjobs with their timeissued field larger than "after"
-  // useronly: retrieve querjobs which are belong to the current user
-  // publiconly: retrieve querjobs which has "true" value for the public field
-  var limit = JSON.parse(req.body.limit || '0');
-  var after = req.body.after;
-  var useronly = JSON.parse(req.body.userid || false);
-  var publiconly = JSON.parse(req.body.public || false);
-
-  var criteria = {};
-  if (after) {
-    criteria.timeissued = {
-      '$lt': after
-    };
-  }
-  if (useronly) {
-    criteria.user_id = req.user._id;
-  }
-  if (publiconly) {
-    criteria.is_public = true;
-  }
-
-  db.collection('queryjobs').find(criteria).sort({
-    'timeissued': -1
-  })
-    .limit(limit).toArray(function(err, results) {
-      if (err) {
-        return next(err);
-      }
-      res.send(results);
-    });
 });
 
 // router.post('/addheart', function(req, res, next) {

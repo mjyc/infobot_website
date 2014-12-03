@@ -164,6 +164,34 @@ describe('queryjobs routing test', function() {
       });
   });
 
+  it('retrieve queryjob list', function(done) {
+    var N = 10;
+    var endCb = function(err, res) {
+      expect(err).to.eql(null);
+    };
+    for (var i = N - 1; i >= 0; i--) {
+      agent
+        .post('http://localhost:8080/queryjobs')
+        .send({
+          timeissued: new Date().getTime(),
+          typed_cmd: loremIpsum(),
+          notification_sms: randomBoolean(),
+          notification_email: randomBoolean(),
+          is_public: randomBoolean(),
+          deadline: new Date().getTime() + 1000 * 60 * 60 * 1 * 1
+        })
+        .end(endCb);
+    }
+
+    agent
+      .get('http://localhost:8080/queryjobs/list')
+      .end(function(err, res) {
+        expect(err).to.eql(null);
+        expect(res.body.length).to.eql(N + 1);
+        return done();
+      });
+  });
+
   after(removeCollections(agent));
 
 });
