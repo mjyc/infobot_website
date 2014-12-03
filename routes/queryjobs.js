@@ -13,28 +13,20 @@ var ObjectID = require('mongodb').ObjectID;
 // Routes
 // =====================================================================
 
-
-// POST
-
-// Add QueryJob.
-router.post('/addqueryjob', function(req, res, next) {
+// Create.
+router.post('/', function(req, res, next) {
   var db = req.db;
-  var newQueryJob = {};
-  // Add user info.
-  newQueryJob.user_id = req.user._id;
-  newQueryJob.user_name = req.user.name;
-  newQueryJob.user_email = req.user.google.email;
-  // Data from req.
-  newQueryJob.timeissued = new Date(req.body.timeissued);
-  newQueryJob.typed_cmd = req.body.typed_cmd;
-  newQueryJob.notification_sms = JSON.parse(req.body.notification_sms);
-  newQueryJob.notification_email = JSON.parse(
-    req.body.notification_email || false);
-  newQueryJob.is_public = JSON.parse(req.body.is_public || false);
-  newQueryJob.deadline = new Date(req.body.deadline);
-  newQueryJob.hearts = [];
+  var queryjob = {};
 
-  db.collection('queryjobs').insert(newQueryJob, function(err, result) {
+  queryjob.timeissued = JSON.parse(req.body.timeissued);
+  queryjob.typed_cmd = req.body.typed_cmd;
+  queryjob.notification_sms = JSON.parse(req.body.notification_sms || false);
+  queryjob.notification_email = JSON.parse(req.body.notification_email || false);
+  queryjob.is_public = JSON.parse(req.body.is_public || false);
+  queryjob.deadline = JSON.parse(req.body.deadline);
+  queryjob.user_id = req.user._id;
+
+  db.collection('queryjobs').insert(queryjob, function(err, result) {
     if (err) {
       return next(err);
     }
@@ -42,100 +34,40 @@ router.post('/addqueryjob', function(req, res, next) {
   });
 });
 
-router.post('/addheart', function(req, res, next) {
+// Retrieve.
+router.get('/:id', function(req, res, next) {
   var db = req.db;
-
-  db.collection('queryjobs').findAndModify({
-    _id: new ObjectID(req.body.queryjobID)
-  }, {}, {
-    '$push': {
-      hearts: req.user._id
-    }
-  }, {
-    new: true
-  }, function(err, result) {
+  var queryjobID = new ObjectID(req.params.id);
+  db.collection('queryjobs').findById(queryjobID, function(err, result) {
     if (err) {
       return next(err);
     }
     res.send(result);
   });
-
 });
 
-router.post('/removeheart', function(req, res, next) {
+router.get('/list', function(req, res, next) {
   var db = req.db;
 
-  db.collection('queryjobs').findAndModify({
-    _id: new ObjectID(req.body.queryjobID)
-  }, {}, {
-    $pull: {
-      hearts: req.user._id
-    }
-  }, {
-    new: true
-  }, function(err, result) {
-    if (err) {
-      return next(err);
-    }
-    res.send(result);
-  });
+  // limit: maximum number of items desired
+  // after: retrieve querjobs with their timeissued field larger than "after"
+  // useronly: retrieve querjobs which are belong to the current user
+  // publiconly: retrieve querjobs which has "true" value for the public field
+  var limit = JSON.parse(req.body.limit || '0');
+  var after = req.body.after;
+  var useronly = JSON.parse(req.body.userid || false);
+  var publiconly = JSON.parse(req.body.public || false);
 
-});
-
-router.post('/checkheart', function(req, res, next) {
-  var db = req.db;
-
-  db.collection('queryjobs').findOne({
-    _id: new ObjectID(req.body.queryjobID)
-  }, function(err, result) {
-    if (err) {
-      return next(err);
-    }
-    var sendTrue = false;
-    for (var i = result.hearts.length - 1; i >= 0; i--) {
-      if (result.hearts[i].toString() === req.user._id.toString()) {
-        sendTrue = true;
-        break;
-      }
-    }
-    if (sendTrue) {
-      res.send(true);
-    } else {
-      res.send(false);
-    }
-  });
-
-});
-
-// Get QueryJobs.
-// Returns QueryJobs in decreasing timeissued sorted manner. Can provide
-// parameters to control types of QueryJobs being returned.
-router.post('/getqueryjobs', function(req, res, next) {
-  var db = req.db;
-
-  // Parse inputs.
-  var queryjobID = req.body.queryjobID; // get one QueryJob with id
-  var limit = parseInt(req.body.limit || '0'); // get limit #
-  var startDate = req.body.startDate; // get QueryJobs from startDate
-  var userOnly = JSON.parse(req.body.userOnly || false); // get user's
-  //   QueryJobs
-  var publicOnly = JSON.parse(req.body.publicOnly || false); // get
-  //   public QueryJobs
-
-  // Set query.
   var criteria = {};
-  if (queryjobID) {
-    criteria._id = new ObjectID(queryjobID);
-  }
-  if (startDate) {
+  if (after) {
     criteria.timeissued = {
-      '$lt': new Date(startDate)
+      '$lt': after
     };
   }
-  if (userOnly) {
+  if (useronly) {
     criteria.user_id = req.user._id;
   }
-  if (publicOnly) {
+  if (publiconly) {
     criteria.is_public = true;
   }
 
@@ -149,6 +81,71 @@ router.post('/getqueryjobs', function(req, res, next) {
       res.send(results);
     });
 });
+
+// router.post('/addheart', function(req, res, next) {
+//   var db = req.db;
+
+//   db.collection('queryjobs').findAndModify({
+//     _id: new ObjectID(req.body.queryjobID)
+//   }, {}, {
+//     '$push': {
+//       hearts: req.user._id
+//     }
+//   }, {
+//     new: true
+//   }, function(err, result) {
+//     if (err) {
+//       return next(err);
+//     }
+//     res.send(result);
+//   });
+
+// });
+
+// router.post('/removeheart', function(req, res, next) {
+//   var db = req.db;
+
+//   db.collection('queryjobs').findAndModify({
+//     _id: new ObjectID(req.body.queryjobID)
+//   }, {}, {
+//     $pull: {
+//       hearts: req.user._id
+//     }
+//   }, {
+//     new: true
+//   }, function(err, result) {
+//     if (err) {
+//       return next(err);
+//     }
+//     res.send(result);
+//   });
+
+// });
+
+// router.post('/checkheart', function(req, res, next) {
+//   var db = req.db;
+
+//   db.collection('queryjobs').findOne({
+//     _id: new ObjectID(req.body.queryjobID)
+//   }, function(err, result) {
+//     if (err) {
+//       return next(err);
+//     }
+//     var sendTrue = false;
+//     for (var i = result.hearts.length - 1; i >= 0; i--) {
+//       if (result.hearts[i].toString() === req.user._id.toString()) {
+//         sendTrue = true;
+//         break;
+//       }
+//     }
+//     if (sendTrue) {
+//       res.send(true);
+//     } else {
+//       res.send(false);
+//     }
+//   });
+
+// });
 
 
 // =====================================================================
