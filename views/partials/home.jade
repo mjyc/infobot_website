@@ -1,7 +1,44 @@
-p home!
+p HOME!
 
-ul
-  li
-    a(href='home') home
-  li
-    a(href='wall') wall
+ui.phones
+li(ng-repeat="phone in queryjobs").thumbnail
+  a(href="#/phones/{{phone.id}}").thumb
+    img(ng-src="{{phone.imageUrl}}")
+  a(href="#/phones/{{phone.id}}") {{queryjob.typed_cmd}}
+
+//- <ul class="phones">
+//-   <li ng-repeat="phone in phones | filter:query | orderBy:orderProp" class="thumbnail">
+//-     <a href="#/phones/{{phone.id}}" class="thumb"><img ng-src="{{phone.imageUrl}}"></a>
+//-     <a href="#/phones/{{phone.id}}">{{phone.name}}</a>
+//-     <p>{{phone.snippet}}</p>
+//-   </li>
+//- </ul>
+
+//- NOTE: Use this template only when a user is authenticated.
+
+//- .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
+//-   .container
+//-     .navbar-header
+//-       button.navbar-toggle(type="button", data-toggle="collapse",
+//-         data-target=".navbar-collapse")
+//-         span.sr-only Toggle navigation
+//-         span.icon-bar
+//-         span.icon-bar
+//-         span.icon-bar
+//-     .navbar-collapse.collapse
+//-       ul.nav.navbar-nav
+//-         li
+//-           a(href="/home") Your Questions
+//-         li
+//-           a(href="/wall") Everyone's Questions
+//-       p.navbar-text.navbar-right
+//-         | Signed in as Someone!
+//-         //- #{user.name}
+
+//- p home!
+
+//- ul
+//-   li
+//-     a(href='home') home
+//-   li
+//-     a(href='wall') wall
