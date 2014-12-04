@@ -13,13 +13,14 @@ askdubeApp.config(['$routeProvider', '$locationProvider',
         templateUrl: '/partials/home',
         controller: 'HomeController',
       })
-      .when('/wall', {
-        templateUrl: '/partials/wall',
+      .when('/profile', {
+        templateUrl: '/partials/profile',
         controller: 'WallController',
       })
+      .when('/logout', {
+        templateUrl: '/logout',
+      })
       .otherwise({
-        // templateUrl: '/partials/wall.jade',
-        // controller: 'WallController',
         redirectTo: '/home'
       });
   }]);

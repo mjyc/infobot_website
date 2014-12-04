@@ -18,9 +18,9 @@ var expressSession = require('express-session');
 // Locals.
 var database = require('./config/database.js');
 var session = require('./config/session.js');
-var queryjobs = require('./routes/queryjobs');
-var comments = require('./routes/comments');
-var routes = require('./routes/routes');
+var routesBasic = require('./routes/basic');
+var routesQueryjobs = require('./routes/queryjobs');
+var routesComments = require('./routes/comments');
 
 
 // =====================================================================
@@ -71,6 +71,7 @@ app.use(function(req, res, next) {
   next();
 });
 
+// For Protecting APIs.
 function IsAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
@@ -81,12 +82,14 @@ function IsAuthenticated(req, res, next) {
 app.all('/queryjobs/*', IsAuthenticated);
 app.all('/comments/*', IsAuthenticated);
 
-app.use('/', routes);
-app.use('/queryjobs', queryjobs);
-app.use('/comments', comments);
-app.get('*', function(req, res) {
-  res.redirect('/');
-});
+app.use('/', routesBasic);
+app.use('/queryjobs', routesQueryjobs);
+app.use('/comments', routesComments);
+
+// // For angular.
+// app.get('*', function(req, res) {
+//   res.redirect('/');
+// });
 
 // Catch 404 and forward to error handler.
 app.use(function(req, res, next) {
