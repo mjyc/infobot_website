@@ -19,6 +19,7 @@ var expressSession = require('express-session');
 var database = require('./config/database.js');
 var session = require('./config/session.js');
 var routesBasic = require('./routes/basic');
+var routesUsers = require('./routes/users');
 var routesQueryjobs = require('./routes/queryjobs');
 var routesComments = require('./routes/comments');
 
@@ -79,10 +80,12 @@ function IsAuthenticated(req, res, next) {
     res.redirect('/');
   }
 }
+app.all('/users/*', IsAuthenticated);
 app.all('/queryjobs/*', IsAuthenticated);
 app.all('/comments/*', IsAuthenticated);
 
 app.use('/', routesBasic);
+app.use('/users', routesUsers);
 app.use('/queryjobs', routesQueryjobs);
 app.use('/comments', routesComments);
 
