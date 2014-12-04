@@ -89,10 +89,10 @@ app.use('/users', routesUsers);
 app.use('/queryjobs', routesQueryjobs);
 app.use('/comments', routesComments);
 
-// // For angular.
-// app.get('*', function(req, res) {
-//   res.redirect('/');
-// });
+// For angular.
+app.get('*', function(req, res) {
+  res.redirect('/');
+});
 
 // Catch 404 and forward to error handler.
 app.use(function(req, res, next) {
