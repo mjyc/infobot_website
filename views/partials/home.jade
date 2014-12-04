@@ -1,10 +1,158 @@
-p HOME!
+//- Menubar
+.navbar.navbar-inverse.navbar-fixed-top(role="navigation")
+  .container
+    .navbar-header
+      a.navbar-brand(href="/home") Ask DUB-E
+      button.navbar-toggle(type="button", data-toggle="collapse",
+        data-target=".navbar-collapse")
+        span.sr-only Toggle navigation
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+    .navbar-collapse.collapse
+      ul.nav.navbar-nav.navbar-right
+        li.dropdown
+          a(data-toggle="dropdown", role="button", aria-expanded="false").dropdown-toggle
+            | Signed in as Mike &nbsp;&nbsp;
+            i.fa.fa-caret-down
+          ul(role="menu").dropdown-menu
+            li
+              a(href="/profile") Profile
+            li
+              a(href="/signout") Sign out
 
-ui.phones
-li(ng-repeat="phone in queryjobs").thumbnail
-  a(href="#/phones/{{phone.id}}").thumb
-    img(ng-src="{{phone.imageUrl}}")
-  a(href="#/phones/{{phone.id}}") {{queryjob.typed_cmd}}
+      //- p.navbar-right.dropdown
+
+
+      //- <li class="dropdown">
+      //-   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+      //-   <ul class="dropdown-menu" role="menu">
+      //-     <li><a href="#">Action</a></li>
+      //-     <li><a href="#">Another action</a></li>
+      //-     <li><a href="#">Something else here</a></li>
+      //-     <li class="divider"></li>
+      //-     <li class="dropdown-header">Nav header</li>
+      //-     <li><a href="#">Separated link</a></li>
+      //-     <li><a href="#">One more separated link</a></li>
+      //-   </ul>
+      //- </li>
+
+      //- ul.nav.navbar-nav
+      //-   li.dropdown
+
+        //- li
+        //-   a(href="/home") Your Questions
+        //- li
+        //-   a(href="/wall") Everyone's Questions
+
+      //- ul.navbar-right
+      //-   li.dropdown
+      //-     a(aria-expanded="false").dropdown-toggle Mike
+      //-       i.fa.fa-caret-down
+
+        //- | Signed in as XXX
+        //- #{user.name}
+//- <ul class="nav navbar-nav navbar-right">
+//-         <li class="dropdown">
+//-           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"> John Doe <span class="caret"></span></a>
+//-           <ul class="dropdown-menu" role="menu">
+//-             <li><a href="#">Profile</a></li>
+//-             <li><a href="#">Settings</a></li>
+//-             <li class="divider"></li>
+//-             <li><a href="#">Sign Out</a></li>
+//-           </ul>
+//-         </li>
+//-       </ul>
+
+//- Question Input Interface
+
+.jumbotron.jumbotron-home
+  .container
+    form#submitQuestion
+      .form-group
+        .input-group.input-group-lg
+        input#inputTypedCmd.form-control(type="text",
+          placeholder="Type question here"
+          style="box-shadow: none;")
+      .form-inline(align="center")
+        .form-group(style="padding-right: 20px;")
+          label Make Public
+          | &nbsp;&nbsp;
+          input#inputPublic.js-switch.small(type="checkbox", checked)
+        .form-group(style="padding-right: 20px;")
+          label Email Notification
+          | &nbsp;&nbsp;
+          input#inputEmail.js-switch.small(type="checkbox")
+        .form-group(style="padding-right: 20px;")
+          label Deadline
+          | &nbsp;&nbsp;
+          #inputDeadline.input-group.input-group-sm.date
+            input.form-control(type="text",
+              style="box-shadow: none;")
+            span.input-group-addon
+              span.glyphicon.glyphicon-calendar
+        a#aSubmitQuestion.btn.btn-primary Submit
+        //- For using "Enter" key.
+        button#btnSubmitQuestion(style='display: none')
+
+
+//- QueryJob List
+
+.container#container
+  div(ng-repeat="queryjob in queryjobs").panel.panel-default
+    .panel-body.body
+      .row
+        //- user stuff
+        div(style='text-align: left')
+          p.col-xs-9
+            span.name-text {{queryjob.user_id}} &nbsp;&nbsp;
+            spen.time-text {{queryjob.timeissued | date:'medium'}}
+          //- cancel button
+          p(style='text-align: right').upperLeftButtons.col-xs-3
+            button(style='opacity: 1', disabled='disabled').btn Cancel
+          //- rest of the user stuff
+          p.col-xs-12
+            button(style='opacity: 1', disabled='disabled').btn.btn-xs public
+            | &nbsp;&nbsp;
+            button(style='opacity: 1', disabled='disabled').btn.btn-xs deadline
+          p(style='font-size; 25px').userCmd.lead.col-xs-12
+            | {{queryjob.typed_cmd}}
+        //- robot stuff
+        div(style='text-align: right')
+          p(style='text-align: right').col-xs-12
+            span.name-text DUB-E &nbsp;&nbsp;
+            spen.time-text {{queryjob.timeissued | date:'medium'}}
+          //-
+          p.col-xs-12
+            button(style='opacity: 1', disabled='disabled').btn.btn-xs public
+            | &nbsp;&nbsp;
+            button(style='opacity: 1', disabled='disabled').btn.btn-xs deadline
+          p(style='font-size; 25px').lead.col-xs-12
+            | Yes.
+          p.col-xs-12
+        div.col-xs-12
+          p
+            div(style='text-align: center; margin-bottom: 0px').alert.alert-warning Running
+
+    .panel-footer.footer
+      .row
+
+  //- // DOM templates.
+  //- var cardBodyTemplate = $('<div>').addClass('panel-body body')
+  //-   .css('padding', '15px 15px 0px');
+  //- var cardFooterTemplate = $('<div>').addClass('panel-footer footer')
+  //-   .css('padding', '15px 15px 0px');
+  //- var cardTemplate = $('<div>').addClass('panel panel-default')
+  //-   .append(cardBodyTemplate.clone())
+  //-   .append(cardFooterTemplate.clone());
+  //- var nameTemplate = $('<span>').addClass('name-text');
+  //- var timeTemplate = $('<span>').addClass('time-text');
+  //- var tagTemplate = $('<button>').addClass('btn btn-xs')
+  //-   .css('opacity', 1).attr('disabled', 'disabled');
+  //- var statusTemplate = $('<div>').addClass('alert')
+  //-   .css('text-align', 'center')
+  //-   .css('margin-bottom', '0px');
+
 
 //- <ul class="phones">
 //-   <li ng-repeat="phone in phones | filter:query | orderBy:orderProp" class="thumbnail">
@@ -14,26 +162,7 @@ li(ng-repeat="phone in queryjobs").thumbnail
 //-   </li>
 //- </ul>
 
-//- NOTE: Use this template only when a user is authenticated.
 
-//- .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
-//-   .container
-//-     .navbar-header
-//-       button.navbar-toggle(type="button", data-toggle="collapse",
-//-         data-target=".navbar-collapse")
-//-         span.sr-only Toggle navigation
-//-         span.icon-bar
-//-         span.icon-bar
-//-         span.icon-bar
-//-     .navbar-collapse.collapse
-//-       ul.nav.navbar-nav
-//-         li
-//-           a(href="/home") Your Questions
-//-         li
-//-           a(href="/wall") Everyone's Questions
-//-       p.navbar-text.navbar-right
-//-         | Signed in as Someone!
-//-         //- #{user.name}
 
 //- p home!
 
