@@ -114,4 +114,7 @@ module.exports = function(grunt) {
   grunt.registerTask('test_setup', [
     'env:test', 'shell:ros4test', 'shell:sleep', 'concurrent:dev'
   ]);
+  grunt.registerTask('noros', [
+    'concurrent:dev'
+  ]);
 };
