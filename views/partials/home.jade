@@ -4,8 +4,7 @@
   .container
     .navbar-header
       a.navbar-brand(href="/home") Ask DUB-E
-      button.navbar-toggle(type="button", data-toggle="collapse",
-        data-target=".navbar-collapse")
+      button.navbar-toggle(type="button", data-toggle="collapse", data-target=".navbar-collapse")
         span.sr-only Toggle navigation
         span.icon-bar
         span.icon-bar
@@ -14,25 +13,39 @@
       ul.nav.navbar-nav.navbar-right
         li.dropdown
           a(data-toggle="dropdown", role="button", aria-expanded="false").dropdown-toggle
-            | Signed in as {{user.name}} &nbsp;&nbsp;
+            | {{user.email}} &nbsp;&nbsp;
             i.fa.fa-caret-down
           ul(role="menu").dropdown-menu
             li
-              a(href="/profile") Profile
+              a(href="/profile")
+                i.fa.fa-gear &nbsp; Profile
+            li(role="presentation").divider
             li
-              a(href="/logout", target="_self") Sign out
+              a(href="/logout", target="_self")
+                i.fa.fa-sign-out &nbsp; Sign out
 
 
 //- Question Input Interface
 
+//- .jumbotron.jumbotron-home
+
+//- .container
+//-   .row
+//-     .col-xs-12
+//-       form(role="form").form-inline
+//-         .form-group
+//-           .input-group
+//-             input.form-control(type="text", placeholder="Type question here", style="box-shadow: none;")
+
 .jumbotron.jumbotron-home
   .container
-    form#submitQuestion
+    //- .input-group.input-group-lg
+    //- input.form-control(type="text", placeholder="Type question here", style="box-shadow: none;")
+    form
       .form-group
-        .input-group.input-group-lg
-        input#inputTypedCmd.form-control(type="text",
-          placeholder="Type question here"
-          style="box-shadow: none;")
+        //- .control
+          //- .input-group.input-group-lg
+        input.form-control(type="text", placeholder="Type question here", style="box-shadow: none;")
       .form-inline(align="center")
         .form-group(style="padding-right: 20px;")
           label Make Public
@@ -57,7 +70,8 @@
 
 //- QueryJob List
 
-.container#container
+.container
+
   div(ng-repeat="queryjob in queryjobs").panel.panel-default
     .panel-body.body
       .row
