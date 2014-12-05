@@ -3,8 +3,11 @@
 .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
   .container
     .navbar-header
-      a.navbar-brand(href="/home") Ask DUB-E
-      button.navbar-toggle(type="button", data-toggle="collapse", data-target=".navbar-collapse")
+      a.navbar-brand.askdube-text(href="/home")
+        i.fa.fa-question-circle
+        span Ask DUB-E
+      button.navbar-toggle(type="button", data-toggle="collapse",
+        data-target=".navbar-collapse")
         span.sr-only Toggle navigation
         span.icon-bar
         span.icon-bar
@@ -12,59 +15,72 @@
     .navbar-collapse.collapse
       ul.nav.navbar-nav.navbar-right
         li.dropdown
-          a(data-toggle="dropdown", role="button", aria-expanded="false").dropdown-toggle
-            | {{user.email}} &nbsp;&nbsp;
+          a.dropdown-toggle(data-toggle="dropdown", role="button",
+            aria-expanded="false")
+            | {{user.email}} &nbsp;
             i.fa.fa-caret-down
-          ul(role="menu").dropdown-menu
+          ul.dropdown-menu(role="menu")
             li
               a(href="/profile")
-                i.fa.fa-gear &nbsp; Profile
+                i.fa.fa-user(style="margin-right: 5px")
+                span Profile
             li(role="presentation").divider
             li
               a(href="/logout", target="_self")
-                i.fa.fa-sign-out &nbsp; Sign out
+                i.fa.fa-sign-out(style="margin-right: 5px")
+                span Sign out
 
 
 //- Question Input Interface
 
-//- .jumbotron.jumbotron-home
-
-//- .container
-//-   .row
-//-     .col-xs-12
-//-       form(role="form").form-inline
-//-         .form-group
-//-           .input-group
-//-             input.form-control(type="text", placeholder="Type question here", style="box-shadow: none;")
-
 .jumbotron.jumbotron-home
   .container
-    //- .input-group.input-group-lg
-    //- input.form-control(type="text", placeholder="Type question here", style="box-shadow: none;")
     form
-      .form-group
-        //- .control
-          //- .input-group.input-group-lg
-        input.form-control(type="text", placeholder="Type question here", style="box-shadow: none;")
-      .form-inline(align="center")
-        .form-group(style="padding-right: 20px;")
-          label Make Public
-          | &nbsp;&nbsp;
-          input#inputPublic.js-switch.small(type="checkbox", checked)
-        .form-group(style="padding-right: 20px;")
-          label Email Notification
-          | &nbsp;&nbsp;
-          input#inputEmail.js-switch.small(type="checkbox")
-        .form-group(style="padding-right: 20px;")
-          label Deadline
-          | &nbsp;&nbsp;
-          #inputDeadline.input-group.input-group-sm.date
-            input.form-control(type="text",
+      .form-horizontal
+        .form-group.form-group-lg
+          .input-group
+            input.form-control(type="text", placeholder="Type question here",
               style="box-shadow: none;")
-            span.input-group-addon
-              span.glyphicon.glyphicon-calendar
-        a#aSubmitQuestion.btn.btn-primary Submit
-        //- For using "Enter" key.
+            .input-group-btn
+              button.btn.btn-primary.btn-lg Submit
+      .qoption-group
+        .btn-group.qoption-spacing(dropdown)
+          button.btn.btn-default.btn-sm.dropdown-toggle(type="button", dropdown-toggle)
+            i.fa.fa-users.qoption-icon-rspacing
+            span.qoption-option-text CSE
+            i.fa.fa-caret-down.qoption-icon-lspacing
+          ui(role="menu").dropdown-menu
+            li.dropdown-header(role="presentation") Who should see this?
+            li
+              a(href="#")
+                i.fa.fa-users.qoption-icon-rspacing
+                span CSE
+                br
+                span(style="font-size: 12px; color: rgb(119,119,119); margin-right: 10px")
+                  | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Anyone with CSE account.
+            li
+              a(href="#")
+                i.fa.fa-lock.qoption-icon-rspacing
+                span Only Me
+        .btn-group.qoption-spacing(dropdown)
+          button.btn.btn-default.btn-sm.dropdown-toggle(type="button", dropdown-toggle)
+            i.fa.fa-envelope.qoption-icon-rspacing
+            span.qoption-text Email
+            i.fa.fa-caret-down.qoption-icon-lspacing
+          ui(role="menu").dropdown-menu
+            li.dropdown-header(role="presentation") How do I want to be notified?
+            li
+              a(href="#")
+                i.fa.fa-envelope.qoption-icon-rspacing
+                span Email
+            li
+              a(href="#")
+                i.fa.fa-comment.qoption-icon-rspacing
+                span SMS
+        .btn-group.qoption-spacing
+          i.fa.fa-calendar.qoption-icon-rspacing
+          span.qoption-text.qoption-icon-rspacing Deadline
+          input.qoption-deadline(type="time", ng-model="value", placeholder="HH:mm:ss")
         button#btnSubmitQuestion(style='display: none')
 
 
@@ -109,38 +125,3 @@
 
     .panel-footer.footer
       .row
-
-  //- // DOM templates.
-  //- var cardBodyTemplate = $('<div>').addClass('panel-body body')
-  //-   .css('padding', '15px 15px 0px');
-  //- var cardFooterTemplate = $('<div>').addClass('panel-footer footer')
-  //-   .css('padding', '15px 15px 0px');
-  //- var cardTemplate = $('<div>').addClass('panel panel-default')
-  //-   .append(cardBodyTemplate.clone())
-  //-   .append(cardFooterTemplate.clone());
-  //- var nameTemplate = $('<span>').addClass('name-text');
-  //- var timeTemplate = $('<span>').addClass('time-text');
-  //- var tagTemplate = $('<button>').addClass('btn btn-xs')
-  //-   .css('opacity', 1).attr('disabled', 'disabled');
-  //- var statusTemplate = $('<div>').addClass('alert')
-  //-   .css('text-align', 'center')
-  //-   .css('margin-bottom', '0px');
-
-
-//- <ul class="phones">
-//-   <li ng-repeat="phone in phones | filter:query | orderBy:orderProp" class="thumbnail">
-//-     <a href="#/phones/{{phone.id}}" class="thumb"><img ng-src="{{phone.imageUrl}}"></a>
-//-     <a href="#/phones/{{phone.id}}">{{phone.name}}</a>
-//-     <p>{{phone.snippet}}</p>
-//-   </li>
-//- </ul>
-
-
-
-//- p home!
-
-//- ul
-//-   li
-//-     a(href='home') home
-//-   li
-//-     a(href='wall') wall

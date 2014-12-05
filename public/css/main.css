@@ -1,11 +1,28 @@
 /* Existing */
 
-body {
-  padding-bottom: 20px;
-}
-
 .container {
   max-width: 730px;
+}
+
+.jumbotron .container {
+  max-width: 730px;
+}
+
+.form-horizontal .form-group {
+  margin-right: 0px;
+  margin-left: 0px;
+  margin-bottom: 5px;
+}
+
+
+/* Custom */
+
+.askdube-text {
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  height: 24px;
+  letter-spacing: 0px;
+  line-height: 24px;
 }
 
 .jumbotron-home {
@@ -13,18 +30,59 @@ body {
   margin-bottom: 25px;
 }
 
-.small + .switchery {
-   height: 20px;
-   width: 34px;
+.qoption-group {
+  text-align: center;
 }
 
-.small + .switchery > small {
-   height: 20px;
-   width: 20px;
+.qoption-text {
+  color: rgb(89, 89, 89);
+  font-size: 12px;
+  font-weight: bold;
 }
 
+.qoption-spacing {
+  margin-right: 10px;
+}
 
-/* Custom */
+.qoption-icon-rspacing {
+  margin-right: 2px;
+}
+
+.qoption-icon-lspacing {
+  margin-left: 5px;
+}
+
+.qoption-deadline {
+  outline: none;
+  display: inline-block;
+  /*vertical-align:top;*/
+  width: 100px;
+  height: 30px;
+  background-color: rgb(255, 255, 255);
+  background-image: none;
+  border-bottom-color: rgb(204, 204, 204);
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-image-outset: 0px;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-left-color: rgb(204, 204, 204);
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: rgb(204, 204, 204);
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-top-color: rgb(204, 204, 204);
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  /*box-sizing: border-box;*/
+}
 
 .name-text {
   font-weight: bold;
