@@ -26,7 +26,7 @@
                 span Profile
             li(role="presentation").divider
             li
-              a(href="/logout", target="_self")
+              a(href="/signout", target="_self")
                 i.fa.fa-sign-out(style="margin-right: 5px")
                 span Sign out
 
@@ -35,53 +35,57 @@
 
 .jumbotron.jumbotron-home
   .container
-    form
+    form(ng-submit="submitQuestion()")
       .form-horizontal
-        .form-group.form-group-lg
+        .form-group.form-group-lg(ng-class="{ 'has-error' : errorQuestion }")
           .input-group
             input.form-control(type="text", placeholder="Type question here",
-              style="box-shadow: none;")
+              style="box-shadow: none;", ng-model="questionForm.question")
             .input-group-btn
               button.btn.btn-primary.btn-lg Submit
+          span.help-block(ng-show="errorQuestion") {{ errorQuestion }}
       .qoption-group
         .btn-group.qoption-spacing(dropdown)
-          button.btn.btn-default.btn-sm.dropdown-toggle(type="button", dropdown-toggle)
+          button.btn.btn-default.btn-sm.dropdown-toggle(type="button",
+            dropdown-toggle)
             i.fa.fa-users.qoption-icon-rspacing
-            span.qoption-option-text CSE
+            span.qoption-text {{questionForm.audience}}
             i.fa.fa-caret-down.qoption-icon-lspacing
           ui(role="menu").dropdown-menu
             li.dropdown-header(role="presentation") Who should see this?
             li
-              a(href="#")
+              a(ng-click="questionForm.audience='CSE'")
                 i.fa.fa-users.qoption-icon-rspacing
                 span CSE
                 br
-                span(style="font-size: 12px; color: rgb(119,119,119); margin-right: 10px")
+                span(
+                  style="font-size: 12px; color: rgb(119,119,119); margin-right: 10px")
                   | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Anyone with CSE account.
             li
-              a(href="#")
+              a(ng-click="questionForm.audience='Only Me'")
                 i.fa.fa-lock.qoption-icon-rspacing
                 span Only Me
         .btn-group.qoption-spacing(dropdown)
-          button.btn.btn-default.btn-sm.dropdown-toggle(type="button", dropdown-toggle)
+          button.btn.btn-default.btn-sm.dropdown-toggle(type="button",
+            dropdown-toggle)
             i.fa.fa-envelope.qoption-icon-rspacing
-            span.qoption-text Email
+            span.qoption-text {{questionForm.notification}}
             i.fa.fa-caret-down.qoption-icon-lspacing
           ui(role="menu").dropdown-menu
-            li.dropdown-header(role="presentation") How do I want to be notified?
+            li.dropdown-header(role="presentation") How do you want to be notified?
             li
-              a(href="#")
+              a(ng-click="questionForm.notification='Email'")
                 i.fa.fa-envelope.qoption-icon-rspacing
                 span Email
             li
-              a(href="#")
+              a(ng-click="questionForm.notification='SMS'")
                 i.fa.fa-comment.qoption-icon-rspacing
                 span SMS
         .btn-group.qoption-spacing
           i.fa.fa-calendar.qoption-icon-rspacing
           span.qoption-text.qoption-icon-rspacing Deadline
-          input.qoption-deadline(type="time", ng-model="value", placeholder="HH:mm:ss")
-        button#btnSubmitQuestion(style='display: none')
+          input.qoption-deadline(type="time", ng-model="questionForm.deadline",
+            placeholder="HH:mm")
 
 
 //- QueryJob List
@@ -94,7 +98,7 @@
         //- user stuff
         div(style='text-align: left')
           p.col-xs-9
-            span.name-text {{queryjob.user_id}} &nbsp;&nbsp;
+            span.name-text {{queryjob.user.name}} &nbsp;&nbsp;
             spen.time-text {{queryjob.timeissued | date:'medium'}}
           //- cancel button
           p(style='text-align: right').upperLeftButtons.col-xs-3
