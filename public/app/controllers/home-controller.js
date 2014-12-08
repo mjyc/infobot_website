@@ -48,8 +48,3 @@ homeControllers.controller('HomeController', ['$scope', '$http',
       $scope.queryjobs = data;
     });
   }]);
-
-// Replacing a(href="/signout", target="_self") in home.jade
-homeControllers.controller('external', ['$window', function ($window) {
-  $window.location.href = '/logout';
-}]);
