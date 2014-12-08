@@ -18,6 +18,7 @@ askdubeApp.config(['$routeProvider', '$locationProvider',
         controller: 'WallController',
       })
       .when('/signout', {
+        // templateUrl: '/logout',
         templateUrl: '/logout',
         controller: 'external'
       })
