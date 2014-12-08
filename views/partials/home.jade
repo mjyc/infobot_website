@@ -41,7 +41,7 @@
         .form-group.form-group-lg(ng-class="{ 'has-error' : errorQuestion }")
           .input-group
             input.form-control(type="text", placeholder="Type question here",
-              style="box-shadow: none;", ng-model="questionForm.question")
+              style="box-shadow: none;", ng-model="questionForm.typed_cmd")
             .input-group-btn
               button.btn.btn-primary.btn-lg Submit
           span.help-block(ng-show="errorQuestion") {{ errorQuestion }}
@@ -49,44 +49,45 @@
         .btn-group.qoption-spacing(dropdown)
           button.btn.btn-default.btn-sm.dropdown-toggle(type="button",
             dropdown-toggle)
-            i.fa.fa-users.qoption-icon-rspacing
-            span.qoption-text {{questionForm.audience}}
+            i.qoption-icon-rspacing(ng-class="audienceOpts.icon")
+            span.qoption-text {{audienceOpts.name}}
             i.fa.fa-caret-down.qoption-icon-lspacing
           ui(role="menu").dropdown-menu
             li.dropdown-header(role="presentation") Who should see this?
             li
-              a(ng-click="questionForm.audience='CSE'")
+              a(ng-click="audienceOpts.icon='fa fa-users'; audienceOpts.name='CSE'; questionForm.is_public=true;")
                 i.fa.fa-users.qoption-icon-rspacing
                 span CSE
                 br
-                span(
-                  style="font-size: 12px; color: rgb(119,119,119); margin-right: 10px")
+                span(style="font-size: 12px; color: rgb(119,119,119); margin-right: 10px")
                   | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Anyone with CSE account.
             li
-              a(ng-click="questionForm.audience='Only Me'")
+              a(ng-click="audienceOpts.icon='fa fa-lock'; audienceOpts.name='Only Me'; questionForm.is_public=false;")
                 i.fa.fa-lock.qoption-icon-rspacing
                 span Only Me
         .btn-group.qoption-spacing(dropdown)
           button.btn.btn-default.btn-sm.dropdown-toggle(type="button",
             dropdown-toggle)
-            i.fa.fa-envelope.qoption-icon-rspacing
-            span.qoption-text {{questionForm.notification}}
+            i.qoption-icon-rspacing(ng-class="notificationOpts.icon")
+            span.qoption-text {{notificationOpts.name}}
             i.fa.fa-caret-down.qoption-icon-lspacing
           ui(role="menu").dropdown-menu
-            li.dropdown-header(role="presentation") How do you want to be notified?
+            li.dropdown-header(role="presentation")
+              | How do you want to be notified?
             li
-              a(ng-click="questionForm.notification='Email'")
+              a(ng-click="notificationOpts.icon='fa fa-envelope'; notificationOpts.name='Email'; questionForm.notification_email=true;")
                 i.fa.fa-envelope.qoption-icon-rspacing
                 span Email
             li
-              a(ng-click="questionForm.notification='SMS'")
-                i.fa.fa-comment.qoption-icon-rspacing
-                span SMS
+              a(ng-click="notificationOpts.icon='fa fa-newspaper-o'; notificationOpts.name='Feed Only'; questionForm.notification_email=false;")
+                i.fa.fa-newspaper-o.qoption-icon-rspacing
+                span Feed Only
         .btn-group.qoption-spacing
           i.fa.fa-calendar.qoption-icon-rspacing
           span.qoption-text.qoption-icon-rspacing Deadline
+            small &nbsp;(Today)&nbsp;
           input.qoption-deadline(type="time", ng-model="questionForm.deadline",
-            placeholder="HH:mm")
+            placeholder="HH:mm:ss", min="08:00:00", max="17:00:00")
 
 
 //- QueryJob List

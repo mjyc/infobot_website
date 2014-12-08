@@ -18,12 +18,12 @@ router.post('/', function(req, res, next) {
   var db = req.db;
   var queryjob = {};
 
-  queryjob.timeissued = JSON.parse(req.body.timeissued);
+  queryjob.timeissued = new Date(req.body.timeissued);
   queryjob.typed_cmd = req.body.typed_cmd;
   queryjob.notification_sms = JSON.parse(req.body.notification_sms || false);
   queryjob.notification_email = JSON.parse(req.body.notification_email || false);
   queryjob.is_public = JSON.parse(req.body.is_public || false);
-  queryjob.deadline = JSON.parse(req.body.deadline);
+  queryjob.deadline = new Date(req.body.deadline);
   // queryjob.user_id = req.user._id;
   queryjob.user = {
     id: req.user._id,

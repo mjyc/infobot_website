@@ -8,41 +8,39 @@ homeControllers.controller('HomeController', ['$scope', '$http',
       $scope.user = data;
     });
 
-    $scope.userMenuItems = [
-      {
-        'name': 'Profile',
-        'icon': 'fa fa-user',
-        'link': '/profile'
-      }
-    ];
-    $scope.link = 'http://angularjs.org/';
-
-    Date.prototype.addHours= function(h){
-      this.setHours(this.getHours()+h);
-      return this;
+    var curDate = new Date();
+    var deadlineDate = new Date(curDate.getFullYear(), curDate.getMonth(),
+        curDate.getDate(), curDate.getHours() + 1, curDate.getMinutes(), 0);
+    $scope.audienceOpts = {
+      icon: 'fa fa-users',
+      name: 'CSE',
     };
-
+    $scope.notificationOpts = {
+      icon: 'fa fa-envelope',
+      name: 'Email',
+    };
     $scope.questionForm = {
-      question: '',
-      audience: 'CSE',
-      notification: 'Email',
-      // deadline: new Date(1970, 0, 1, 14, 57, 0),
-      deadline: new Date(Math.floor(new Date() / 10000) * 10000),
+      timeissued: curDate,
+      typed_cmd: '',
+      notification_sms: false,
+      notification_email: false,
+      is_public: true,
+      deadline: deadlineDate,
     };
+
     $scope.submitQuestion = function() {
-      console.log('submit got called!');
-      console.log($scope.questionForm);
-      if (jQuery.isEmptyObject($scope.questionForm) || $scope.questionForm.question === '') {
+      if ($scope.questionForm.question === '') {
         return;
       }
-      // $http.post('/queryjobs', {}).success(function(data) {
-      //   console.log('success!');
-      // })
-      // .success(function(data) {
-      //   if (!data.sucess)
-      // });
+      $http.post('/queryjobs', $scope.questionForm)
+        .success(function(data) {
+          // TODO: update the feed
+          console.log('success!');
+        })
+        .error(function(data) {
+          alert('Oops, something went wrong. Please try refreshing the page.');
+        });
     };
-
 
     $http.get('queryjobs/list').success(function(data) {
       $scope.queryjobs = data;

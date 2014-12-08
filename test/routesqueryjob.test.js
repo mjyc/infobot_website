@@ -116,13 +116,12 @@ describe('queryjobs routing test', function() {
   beforeEach(loginUser(agent));
 
   var id;
-  var timeissued = new Date().getTime();
+  var timeissued = new Date();
   var typed_cmd = loremIpsum();
   var notification_sms = randomBoolean();
   var notification_email = randomBoolean();
   var is_public = randomBoolean();
-  var deadline = new Date().getTime() + 1000 * 60 * 60 * 1 * 1; // 1 hr from
-  //   now
+  var deadline = new Date(new Date().getTime() + 1000 * 60 * 60 * 1 * 1);
 
   it('post queryjob', function(done) {
     agent
@@ -138,12 +137,12 @@ describe('queryjobs routing test', function() {
       .end(function(err, res) {
         expect(err).to.eql(null);
         expect(res.body.length).to.eql(1);
-        expect(res.body[0].timeissued).to.eql(timeissued);
+        expect(res.body[0].timeissued).to.eql(timeissued.toISOString());
         expect(res.body[0].typed_cmd).to.eql(typed_cmd);
         expect(res.body[0].notification_sms).to.eql(notification_sms);
         expect(res.body[0].notification_email).to.eql(notification_email);
         expect(res.body[0].is_public).to.eql(is_public);
-        expect(res.body[0].deadline).to.eql(deadline);
+        expect(res.body[0].deadline).to.eql(deadline.toISOString());
         id = res.body[0]._id;
         return done();
       });
@@ -154,12 +153,12 @@ describe('queryjobs routing test', function() {
       .get('http://localhost:8080/queryjobs/' + id)
       .end(function(err, res) {
         expect(err).to.eql(null);
-        expect(res.body.timeissued).to.eql(timeissued);
+        expect(res.body.timeissued).to.eql(timeissued.toISOString());
         expect(res.body.typed_cmd).to.eql(typed_cmd);
         expect(res.body.notification_sms).to.eql(notification_sms);
         expect(res.body.notification_email).to.eql(notification_email);
         expect(res.body.is_public).to.eql(is_public);
-        expect(res.body.deadline).to.eql(deadline);
+        expect(res.body.deadline).to.eql(deadline.toISOString());
         return done();
       });
   });
@@ -173,12 +172,12 @@ describe('queryjobs routing test', function() {
       agent
         .post('http://localhost:8080/queryjobs')
         .send({
-          timeissued: new Date().getTime(),
+          timeissued: new Date(),
           typed_cmd: loremIpsum(),
           notification_sms: randomBoolean(),
           notification_email: randomBoolean(),
           is_public: randomBoolean(),
-          deadline: new Date().getTime() + 1000 * 60 * 60 * 1 * 1
+          deadline: new Date(new Date().getTime() + 1000 * 60 * 60 * 1 * 1)
         })
         .end(endCb);
     }
