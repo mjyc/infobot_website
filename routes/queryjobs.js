@@ -24,7 +24,12 @@ router.post('/', function(req, res, next) {
   queryjob.notification_email = JSON.parse(req.body.notification_email || false);
   queryjob.is_public = JSON.parse(req.body.is_public || false);
   queryjob.deadline = JSON.parse(req.body.deadline);
-  queryjob.user_id = req.user._id;
+  // queryjob.user_id = req.user._id;
+  queryjob.user = {
+    id: req.user._id,
+    name: req.user.name,
+    email: req.user.google.email,
+  };
 
   db.collection('queryjobs').insert(queryjob, function(err, result) {
     if (err) {
