@@ -83,7 +83,7 @@
                 i.fa.fa-newspaper-o.qoption-icon-rspacing
                 span Feed Only
         .btn-group.qoption-spacing
-          i.fa.fa-calendar.qoption-icon-rspacing
+          i.fa.fa-exclamation-triangle.qoption-icon-rspacing
           span.qoption-text.qoption-icon-rspacing Deadline
             small &nbsp;(Today)&nbsp;
           input.qoption-deadline(type="time", ng-model="questionForm.deadline",
@@ -94,39 +94,45 @@
 
 .container
 
-  div(ng-repeat="queryjob in queryjobs").panel.panel-default
-    .panel-body.body
+  .panel.panel-default(ng-repeat="queryjob in queryjobs")
+    .panel-body.body(style="padding-top: 0px;")
       .row
         //- user stuff
         div(style='text-align: left')
-          p.col-xs-9
-            span.name-text {{queryjob.user.name}} &nbsp;&nbsp;
-            spen.time-text {{queryjob.timeissued | date:'medium'}}
           //- cancel button
-          p(style='text-align: right').upperLeftButtons.col-xs-3
-            button(style='opacity: 1', disabled='disabled').btn Cancel
-          //- rest of the user stuff
+          button.btn.btn-default.btn-sm.pull-right.cancel-text(ng-if="queryjob.status > 3")
+            | Cancel
+          div(style="padding-top: 15px;", ng-if="!(queryjob.status > 3)")
           p.col-xs-12
-            button(style='opacity: 1', disabled='disabled').btn.btn-xs public
-            | &nbsp;&nbsp;
-            button(style='opacity: 1', disabled='disabled').btn.btn-xs deadline
+            span.name-text {{queryjob.user.name}} &nbsp;&nbsp;
+            span.time-text {{queryjob.timeissued | date:'medium'}}
+          p.col-xs-12
+            i.fa.fa-users(ng-if="(queryjob.is_public)")
+            i.fa.fa-lock(ng-if="!(queryjob.is_public)")
+            span &nbsp;&nbsp;·&nbsp;&nbsp;
+            i.fa.fa-envelope(ng-if="queryjob.notification_email")
+            i.fa.fa-newspaper-o(ng-if="!(queryjob.notification_email)")
+            span &nbsp;&nbsp;·&nbsp;&nbsp;
+            i.fa.fa-exclamation-triangle &nbsp;
+            span {{queryjob.deadline | date:'medium'}}
           p(style='font-size; 25px').userCmd.lead.col-xs-12
             | {{queryjob.typed_cmd}}
         //- robot stuff
         div(style='text-align: right')
           p(style='text-align: right').col-xs-12
             span.name-text DUB-E &nbsp;&nbsp;
+            //- TODO: make below depends on "status"
             spen.time-text {{queryjob.timeissued | date:'medium'}}
-          //-
-          p.col-xs-12
-            button(style='opacity: 1', disabled='disabled').btn.btn-xs public
-            | &nbsp;&nbsp;
-            button(style='opacity: 1', disabled='disabled').btn.btn-xs deadline
+          //- TODO: make below depends on the "response"
+          //- p.col-xs-12
+          //-   i.fa.fa-bar-chart-o &nbsp;
+          //-   span 90%
           p(style='font-size; 25px').lead.col-xs-12
             | Yes.
-          p.col-xs-12
+          //- TODO: add image
         div.col-xs-12
           p
+            //- TODO: make below depends on "status"
             div(style='text-align: center; margin-bottom: 0px').alert.alert-warning Running
 
     .panel-footer.footer

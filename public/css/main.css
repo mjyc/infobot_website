@@ -83,6 +83,13 @@
   box-sizing: border-box;
 }
 
+.cancel-text {
+  color: rgb(89, 89, 89);
+  font-weight: bold;
+  border-top-width: 0px;
+  border-right-width: 0px;
+}
+
 .name-text {
   font-weight: bold;
 }
