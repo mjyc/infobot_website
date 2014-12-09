@@ -20,16 +20,20 @@
             | {{user.email}} &nbsp;
             i.fa.fa-caret-down
           ul.dropdown-menu(role="menu")
-            li
-              a(href="/profile")
-                i.fa.fa-user(style="margin-right: 5px")
-                span Profile
-            li(role="presentation").divider
-            li
-              //- NOTE: `target="_self"` is there to make logout work
-              a(href="/logout", target="_self")
-                i.fa.fa-sign-out(style="margin-right: 5px")
-                span Sign out
+            li(ng-repeat="item in userMenuItems")
+              a(ng-href="{{item.url}}")
+                i.margin-right-5px(ng-class="item.icon")
+                span {{item.name}}
+            //- li
+            //-   a(href="/profile")
+            //-     i.fa.fa-user(style="margin-right: 5px")
+            //-     span Profile
+            //- li(role="presentation").divider
+            //- li
+            //-   //- NOTE: `target="_self"` is there to make logout work
+            //-   a(href="/logout", target="_self")
+            //-     i.fa.fa-sign-out(style="margin-right: 5px")
+            //-     span Sign out
 
 
 //- Question Input Interface

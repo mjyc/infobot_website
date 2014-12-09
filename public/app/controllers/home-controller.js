@@ -2,11 +2,28 @@
 
 var homeControllers = angular.module('askdubeApp');
 
+homeControllers.controller('logout', ['$window', function ($window) {
+  $window.location.href = '/logout';
+}]);
+
 homeControllers.controller('HomeController', ['$scope', '$http',
   function($scope, $http) {
     $http.get('users/current').success(function(data) {
       $scope.user = data;
     });
+
+    $scope.userMenuItems = [
+      {
+        url: '/profile',
+        icon: 'fa fa-user',
+        name: 'Profile',
+      },
+      {
+        url: '/signout',
+        icon: 'fa fa-sign-out',
+        name: 'Sign Out',
+      },
+    ];
 
     var curDate = new Date();
     var deadlineDate = new Date(curDate.getFullYear(), curDate.getMonth(),
