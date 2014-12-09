@@ -55,16 +55,9 @@
           ui(role="menu").dropdown-menu
             li.dropdown-header(role="presentation") Who should see this?
             li
-              a(ng-click="audienceOpts.icon='fa fa-users'; audienceOpts.name='CSE'; questionForm.is_public=true;")
-                i.fa.fa-users.qoption-icon-rspacing
-                span CSE
-                br
-                span(style="font-size: 12px; color: rgb(119,119,119); margin-right: 10px")
-                  | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Anyone with CSE account.
+              a(href="javascript:void(0)", ng-click="audienceOpts.icon='fa fa-users'; audienceOpts.name='CSE'; questionForm.is_public=true;")
             li
-              a(ng-click="audienceOpts.icon='fa fa-lock'; audienceOpts.name='Only Me'; questionForm.is_public=false;")
-                i.fa.fa-lock.qoption-icon-rspacing
-                span Only Me
+              a(href="javascript:void(0)", ng-click="audienceOpts.icon='fa fa-lock'; audienceOpts.name='Only Me'; questionForm.is_public=false;")
         .btn-group.qoption-spacing(dropdown)
           button.btn.btn-default.btn-sm.dropdown-toggle(type="button",
             dropdown-toggle)

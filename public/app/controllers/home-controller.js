@@ -28,10 +28,37 @@ homeControllers.controller('HomeController', ['$scope', '$http',
       deadline: deadlineDate,
     };
 
+    // $scope.setCSE = function() {
+    //   $scope.audienceOpts.icon='fa fa-users';
+    //   $scope.audienceOpts.name='CSE';
+    //   $scope.questionForm.is_public=true;
+    // };
+    // $scope.setOnlyMe = function() {
+    //   $scope.audienceOpts.icon='fa fa-lock';
+    //   $scope.audienceOpts.name='Only Me';
+    //   $scope.questionForm.is_public=false;
+    // };
+    // $scope.setCSE = function() {
+    //   $scope.audienceOpts.icon='fa fa-users';
+    //   $scope.audienceOpts.name='CSE';
+    //   $scope.questionForm.is_public=true;
+    // };
+    // $scope.setCSE = function() {
+    //   $scope.audienceOpts.icon='fa fa-users';
+    //   $scope.audienceOpts.name='CSE';
+    //   $scope.questionForm.is_public=true;
+    // };
+
     $scope.submitQuestion = function() {
-      if ($scope.questionForm.question === '') {
+      // TODO: also check current "status" of the user's last queryjob
+      // TODO: a user can send one queryjob at a time
+      // TODO: maybe this can be done from the other side
+      if ($scope.questionForm.typed_cmd === '') {
         return;
       }
+      // $scope.questionForm.deadline.setFullYear(curDate.getFullYear());
+      // $scope.questionForm.deadline.setMonth(curDate.getMonth());
+      // $scope.questionForm.deadline.setDate(curDate.getDate());
       $http.post('/queryjobs', $scope.questionForm)
         .success(function(data) {
           // TODO: update the feed
