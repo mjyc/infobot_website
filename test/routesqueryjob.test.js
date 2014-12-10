@@ -183,7 +183,7 @@ describe('queryjobs routing test', function() {
     }
 
     agent
-      .get('http://localhost:8080/queryjobs/list/all/0')
+      .get('http://localhost:8080/queryjobs/list/all/0/0')
       .end(function(err, res) {
         expect(err).to.eql(null);
         expect(res.body.length).to.eql(N + 1);

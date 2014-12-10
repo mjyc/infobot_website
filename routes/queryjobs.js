@@ -49,6 +49,7 @@ router.get('/list/:select/:limit/:after?', function(req, res, next) {
   // limit: maximum number of items desired
   // after: retrieve querjobs with their timeissued field larger than "after"
   //        utc time string in miliseconds
+  //        0 < means from after === now
   var publicOnly = true;
   var userOnly = false;
   switch (req.params.select) {
@@ -62,29 +63,33 @@ router.get('/list/:select/:limit/:after?', function(req, res, next) {
       break;
     case 'userall':
       publicOnly = false;
-      userOnly = false;
+      userOnly = true;
       break;
     case 'usercse':
-      publicOnly = false;
-      userOnly = false;
+      publicOnly = true;
+      userOnly = true;
       break;
     default:
       publicOnly = true;
       userOnly = false;
   }
-  var limit = 0;
-  if (req.params.limit > 0) {
-    limit = req.params.limit;
+  var limit = JSON.parse(req.params.limit);
+  if (limit <= 0) {
+    limit = 0;
+  }
+  var after = JSON.parse(req.params.after);
+  if (after <= 0) {
+    after = new Date().getTime();
   }
 
   var criteria = {};
-  // if (after) {
-  //   criteria.timeissued = {
-  //     '$lt': new Date(after)
-  //   };
-  // }
+  if (after > 0) {
+    criteria.timeissued = {
+      '$lt': new Date(after)
+    };
+  }
   if (userOnly) {
-    criteria.user_id = req.user._id;
+    criteria['user.id'] = req.user._id;
   }
   if (publicOnly) {
     criteria.is_public = true;

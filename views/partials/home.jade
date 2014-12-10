@@ -68,16 +68,16 @@
           b
             | Deadline
             small &nbsp; (Today) &nbsp;
+          //- TODO: use below code during production time
+          //- input.qoption-deadline(type="time", ng-model="questionDeadline",
+          //-   placeholder="HH:mm:ss", min="08:00:00", max="17:00:00" required)
           input.qoption-deadline(type="time", ng-model="questionDeadline",
-            placeholder="HH:mm:ss", min="08:00:00", max="17:00:00")
-          span.help-block(ng-show="errorQuestionDeadline")
-            | {{errorQuestionDeadline}}
+            placeholder="HH:mm:ss" required)
 
 
 //- QueryJob List
 
-.container
-
+.container(infinite-scroll='loadMore()', infinite-scroll-disabled='loadBusy')
   .panel.panel-default(ng-repeat="queryjob in queryjobs")
     .panel-body.body(style="padding-top: 0px;")
       .row
@@ -118,6 +118,5 @@
           p
             //- TODO: make below depends on "status"
             div(style='text-align: center; margin-bottom: 0px').alert.alert-warning Running
-
     .panel-footer.footer
       .row

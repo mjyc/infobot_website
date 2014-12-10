@@ -1,7 +1,7 @@
 'use strict';
 
 // declare module
-var askdubeApp = angular.module('askdubeApp', ['ngRoute', 'ui.bootstrap']);
+var askdubeApp = angular.module('askdubeApp', ['ngRoute', 'ui.bootstrap', 'infinite-scroll']);
 
 // ng-route setting
 askdubeApp.config(['$routeProvider', '$locationProvider',

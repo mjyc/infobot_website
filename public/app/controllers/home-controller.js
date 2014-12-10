@@ -17,9 +17,13 @@ homeControllers.controller('HomeController', ['$scope', '$http',
     $scope.CANCELLED = 4;
     $scope.FAILED = 5;
 
-    // Get user data.
+    // Get data from the server.
     $http.get('users/current').success(function(data) {
       $scope.user = data;
+    });
+
+    $http.get('queryjobs/list/userall/5/0').success(function(data) {
+      $scope.queryjobs = data;
     });
 
     // User Menu
@@ -113,11 +117,11 @@ homeControllers.controller('HomeController', ['$scope', '$http',
       var c = $scope.questionForm.timeissued.getTime();
       if (d - 1000 * 60 * 10 * 1 * 1 < c) {
         alert('Deadline is too close! Please give more than 10min for DUB-E ' +
-              'to answer your question.');
+          'to answer your question.');
       }
 
       // check if the user has an unanswered queryjob
-      $http.get('/queryjobs/list/userall/0')
+      $http.get('/queryjobs/list/userall/0/0')
         .success(function(data) {
           var numUnansweredJobs = 0;
           for (var i = data.length - 1; i >= 0; i--) {
@@ -128,26 +132,43 @@ homeControllers.controller('HomeController', ['$scope', '$http',
             }
           }
           if (numUnansweredJobs >= 1) {
-            alert('Oops, you have an unanswered question. You can only add new ' +
-              'question after the current question is answered.');
+            alert('Oops, you have an unanswered question. You can only ' +
+              'add new question after the current question is answered.');
             $scope.questionForm.typed_cmd = '';
             return;
           }
         });
 
-      // $http.post('/queryjobs', $scope.questionForm)
-      //   .success(function(data) {
-      //     var newQueryJob = jQuery.extend(true, {}, $scope.questionForm);
-      //     $scope.queryjobs.unshift(newQueryJob);
-      //     $scope.questionForm.typed_cmd = '';
-      //   })
-      //   .error(function(data) {
-      //     alert('Oops, something went wrong. Please try refreshing the page.');
-      //   });
+      $http.post('/queryjobs', $scope.questionForm)
+        .success(function(data) {
+          var newQueryJob = jQuery.extend(true, {}, $scope.questionForm);
+          $scope.queryjobs.unshift(newQueryJob);
+          $scope.questionForm.typed_cmd = '';
+        })
+        .error(function(data) {
+          alert('Oops, something went wrong. Please try refreshing the page.');
+        });
     };
 
-    $http.get('queryjobs/list/userall/0').success(function(data) {
-      $scope.queryjobs = data;
-    });
+    // Infinite scroll setup.
+    $scope.loadBusy = false;
+    $scope.loadMore = function() {
+      var qjs = $scope.queryjobs;
+      if (qjs && qjs.length > 1) {
+        $scope.loadAfter = new Date(qjs[qjs.length-1].timeissued).getTime();
+        $scope.loadBusy = true;
+        $http.get('/queryjobs/list/userall/5/' + $scope.loadAfter)
+          .success(function(data) {
+            for (var i = 0; i < data.length; i++) {
+              $scope.queryjobs.push(data[i]);
+            }
+            $scope.loadBusy = false;
+          })
+          .error(function(data) {
+            alert('Oops, something went wrong. Please try refreshing the ' +
+              'page.');
+          });
+      }
+    };
   }
 ]);
