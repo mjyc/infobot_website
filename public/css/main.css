@@ -8,23 +8,44 @@
   max-width: 730px;
 }
 
-.form-horizontal .form-group {
-  margin-right: 0px;
-  margin-left: 0px;
-  margin-bottom: 5px;
+.input-group .form-control  {
+  box-shadow: none;
 }
 
 
-/* Custom */
+/* Alias */
+
+.margin-right-2px {
+  margin-right: 2px;
+}
 
 .margin-right-5px {
   margin-right: 5px;
 }
 
+.margin-right-10px {
+  margin-right: 10px;
+}
+
+.margin-left-5px {
+  margin-left: 5px;
+}
+.margin-left-10px {
+  margin-left: 10px;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+
+/* Custom */
+
+/* NOTE: height gets overwritten */
 .askdube-text {
   font-family: Arial, sans-serif;
   font-size: 24px;
-  height: 24px;
+  /*height: 24px; */
   letter-spacing: 0px;
   line-height: 24px;
 }
@@ -34,26 +55,10 @@
   margin-bottom: 25px;
 }
 
-.qoption-group {
-  text-align: center;
-}
-
-.qoption-text {
-  color: rgb(89, 89, 89);
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.qoption-spacing {
-  margin-right: 10px;
-}
-
-.qoption-icon-rspacing {
-  margin-right: 2px;
-}
-
-.qoption-icon-lspacing {
-  margin-left: 5px;
+.form-horizontal .form-group, .question-box {
+  margin-right: 0px;
+  margin-left: 0px;
+  margin-bottom: 5px;
 }
 
 .qoption-deadline {

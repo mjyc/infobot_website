@@ -2,91 +2,152 @@
 
 var homeControllers = angular.module('askdubeApp');
 
-homeControllers.controller('logout', ['$window', function ($window) {
+homeControllers.controller('logout', ['$window', function($window) {
   $window.location.href = '/logout';
 }]);
 
 homeControllers.controller('HomeController', ['$scope', '$http',
   function($scope, $http) {
+
+    // Global variables.
+    $scope.RECEIVED = 0;
+    $scope.SCHEDULED = 1;
+    $scope.RUNNING = 2;
+    $scope.SUCCEEDED = 3;
+    $scope.CANCELLED = 4;
+    $scope.FAILED = 5;
+
+    // Get user data.
     $http.get('users/current').success(function(data) {
       $scope.user = data;
     });
 
-    $scope.userMenuItems = [
-      {
-        url: '/profile',
-        icon: 'fa fa-user',
-        name: 'Profile',
-      },
-      {
-        url: '/signout',
-        icon: 'fa fa-sign-out',
-        name: 'Sign Out',
-      },
-    ];
+    // User Menu
 
-    var curDate = new Date();
-    var deadlineDate = new Date(curDate.getFullYear(), curDate.getMonth(),
-        curDate.getDate(), curDate.getHours() + 1, curDate.getMinutes(), 0);
-    $scope.audienceOpts = {
-      icon: 'fa fa-users',
-      name: 'CSE',
-    };
-    $scope.notificationOpts = {
-      icon: 'fa fa-envelope',
-      name: 'Email',
-    };
+    $scope.userMenuItems = [{
+      url: '/profile',
+      icon: 'fa fa-user',
+      name: 'Profile',
+    }, {
+      url: '/signout',
+      icon: 'fa fa-sign-out',
+      name: 'Sign Out',
+    }, ];
+
+
+    // Question Options.
     $scope.questionForm = {
-      timeissued: curDate,
+      timeissued: null,
       typed_cmd: '',
       notification_sms: false,
       notification_email: false,
       is_public: true,
-      deadline: deadlineDate,
+      deadline: null,
+    };
+    // Button options.
+    $scope.questionOptions = {
+      audience: [{
+        icon: 'fa fa-users',
+        name: 'CSE',
+        desc: 'Anyone with CSE account.',
+        field: 'is_public',
+        val: true,
+      }, {
+        icon: 'fa fa-lock',
+        name: 'Only Me',
+        desc: '',
+        field: 'is_public',
+        val: false,
+      }],
+      notification: [{
+        icon: 'fa fa-envelope',
+        name: 'Email',
+        desc: '',
+        field: 'notification_email',
+        val: true,
+      }, {
+        icon: 'fa fa-newspaper-o',
+        name: 'Feed Only',
+        desc: '',
+        field: 'notification_email',
+        val: false,
+      }],
     };
 
-    // $scope.setCSE = function() {
-    //   $scope.audienceOpts.icon='fa fa-users';
-    //   $scope.audienceOpts.name='CSE';
-    //   $scope.questionForm.is_public=true;
-    // };
-    // $scope.setOnlyMe = function() {
-    //   $scope.audienceOpts.icon='fa fa-lock';
-    //   $scope.audienceOpts.name='Only Me';
-    //   $scope.questionForm.is_public=false;
-    // };
-    // $scope.setCSE = function() {
-    //   $scope.audienceOpts.icon='fa fa-users';
-    //   $scope.audienceOpts.name='CSE';
-    //   $scope.questionForm.is_public=true;
-    // };
-    // $scope.setCSE = function() {
-    //   $scope.audienceOpts.icon='fa fa-users';
-    //   $scope.audienceOpts.name='CSE';
-    //   $scope.questionForm.is_public=true;
-    // };
+    $scope.questionOptionsDesc = {
+      audience: 'Who should see this?',
+      notification: 'How do you want to be notified?',
+    };
 
+    $scope.selectedQuestionOptions = {
+      audience: $scope.questionOptions.audience[0],
+      notification: $scope.questionOptions.notification[0],
+    };
+
+    $scope.setQuestionOption = function(field, options) {
+      $scope.selectedQuestionOptions[field] = options;
+      $scope.questionForm[options.field] = options.val;
+    };
+
+    // Deadline option.
+    $scope.questionDeadline = new Date(1970, 0, 1, new Date().getHours() + 1,
+      new Date().getMinutes(), 0);
+
+    // Submit function.
+    // TODO: also check current "status" of the user's last queryjob
     $scope.submitQuestion = function() {
-      // TODO: also check current "status" of the user's last queryjob
-      // TODO: a user can send one queryjob at a time
-      // TODO: maybe this can be done from the other side
+      // input check
       if ($scope.questionForm.typed_cmd === '') {
         return;
       }
-      // $scope.questionForm.deadline.setFullYear(curDate.getFullYear());
-      // $scope.questionForm.deadline.setMonth(curDate.getMonth());
-      // $scope.questionForm.deadline.setDate(curDate.getDate());
-      $http.post('/queryjobs', $scope.questionForm)
+      // setting timestamps
+      $scope.questionForm.timeissued = new Date();
+      $scope.questionForm.deadline = new Date();
+      $scope.questionForm.deadline.setSeconds(0, 0);
+      $scope.questionForm.deadline.setHours(
+        $scope.questionDeadline.getHours());
+      $scope.questionForm.deadline.setMinutes(
+        $scope.questionDeadline.getMinutes());
+      // checking timestamps
+      var d = $scope.questionForm.deadline.getTime();
+      var c = $scope.questionForm.timeissued.getTime();
+      if (d - 1000 * 60 * 10 * 1 * 1 < c) {
+        alert('Deadline is too close! Please give more than 10min for DUB-E ' +
+              'to answer your question.');
+      }
+
+      // check if the user has an unanswered queryjob
+      $http.get('/queryjobs/list/userall/0')
         .success(function(data) {
-          // TODO: update the feed
-          console.log('success!');
-        })
-        .error(function(data) {
-          alert('Oops, something went wrong. Please try refreshing the page.');
+          var numUnansweredJobs = 0;
+          for (var i = data.length - 1; i >= 0; i--) {
+            if (data[i].status === $scope.RECEIVED ||
+              data[i].status === $scope.SCHEDULED ||
+              data[i].status === $scope.RUNNING) {
+              numUnansweredJobs += 1;
+            }
+          }
+          if (numUnansweredJobs >= 1) {
+            alert('Oops, you have an unanswered question. You can only add new ' +
+              'question after the current question is answered.');
+            $scope.questionForm.typed_cmd = '';
+            return;
+          }
         });
+
+      // $http.post('/queryjobs', $scope.questionForm)
+      //   .success(function(data) {
+      //     var newQueryJob = jQuery.extend(true, {}, $scope.questionForm);
+      //     $scope.queryjobs.unshift(newQueryJob);
+      //     $scope.questionForm.typed_cmd = '';
+      //   })
+      //   .error(function(data) {
+      //     alert('Oops, something went wrong. Please try refreshing the page.');
+      //   });
     };
 
-    $http.get('queryjobs/list').success(function(data) {
+    $http.get('queryjobs/list/userall/0').success(function(data) {
       $scope.queryjobs = data;
     });
-  }]);
+  }
+]);

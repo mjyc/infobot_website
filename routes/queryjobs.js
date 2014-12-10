@@ -78,11 +78,11 @@ router.get('/list/:select/:limit/:after?', function(req, res, next) {
   }
 
   var criteria = {};
-  if (after) {
-    criteria.timeissued = {
-      '$lt': new Date(after)
-    };
-  }
+  // if (after) {
+  //   criteria.timeissued = {
+  //     '$lt': new Date(after)
+  //   };
+  // }
   if (userOnly) {
     criteria.user_id = req.user._id;
   }
