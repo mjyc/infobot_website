@@ -24,7 +24,6 @@ router.post('/', function(req, res, next) {
   queryjob.notification_email = JSON.parse(req.body.notification_email || false);
   queryjob.is_public = JSON.parse(req.body.is_public || false);
   queryjob.deadline = new Date(req.body.deadline);
-  // queryjob.user_id = req.user._id;
   queryjob.user = {
     id: req.user._id,
     name: req.user.name,
@@ -42,22 +41,46 @@ router.post('/', function(req, res, next) {
 // Retrieve.
 
 // retrieve list
-router.get('/list', function(req, res, next) {
+router.get('/list/:select/:limit/:after?', function(req, res, next) {
   var db = req.db;
 
+  // publicOnly: retrieve querjobs which has "true" value for the public field
+  // userOnly: retrieve querjobs which are belong to the current user
   // limit: maximum number of items desired
   // after: retrieve querjobs with their timeissued field larger than "after"
-  // userOnly: retrieve querjobs which are belong to the current user
-  // publicOnly: retrieve querjobs which has "true" value for the public field
-  var limit = JSON.parse(req.body.limit || '0');
-  var after = req.body.after;
-  var userOnly = JSON.parse(req.body.userid || false);
-  var publicOnly = JSON.parse(req.body.public || false);
+  //        utc time string in miliseconds
+  var publicOnly = true;
+  var userOnly = false;
+  switch (req.params.select) {
+    case 'all':
+      publicOnly = false;
+      userOnly = false;
+      break;
+    case 'cse':
+      publicOnly = true;
+      userOnly = false;
+      break;
+    case 'userall':
+      publicOnly = false;
+      userOnly = false;
+      break;
+    case 'usercse':
+      publicOnly = false;
+      userOnly = false;
+      break;
+    default:
+      publicOnly = true;
+      userOnly = false;
+  }
+  var limit = 0;
+  if (req.params.limit > 0) {
+    limit = req.params.limit;
+  }
 
   var criteria = {};
   if (after) {
     criteria.timeissued = {
-      '$lt': after
+      '$lt': new Date(after)
     };
   }
   if (userOnly) {
