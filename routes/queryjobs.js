@@ -38,7 +38,7 @@ router.post('/', function(req, res, next) {
   });
 });
 
-// Retrieve.
+// Retrieve
 
 // retrieve list
 router.get('/list/:select/:limit/:after?', function(req, res, next) {
@@ -117,70 +117,73 @@ router.get('/:id', function(req, res, next) {
   });
 });
 
-// router.post('/addheart', function(req, res, next) {
-//   var db = req.db;
 
-//   db.collection('queryjobs').findAndModify({
-//     _id: new ObjectID(req.body.queryjobID)
-//   }, {}, {
-//     '$push': {
-//       hearts: req.user._id
-//     }
-//   }, {
-//     new: true
-//   }, function(err, result) {
-//     if (err) {
-//       return next(err);
-//     }
-//     res.send(result);
-//   });
+// Hearts
 
-// });
+router.post('/addheart', function(req, res, next) {
+  var db = req.db;
 
-// router.post('/removeheart', function(req, res, next) {
-//   var db = req.db;
+  db.collection('queryjobs').findAndModify({
+    _id: new ObjectID(req.body.queryjobID)
+  }, {}, {
+    '$push': {
+      hearts: req.user._id
+    }
+  }, {
+    new: true
+  }, function(err, result) {
+    if (err) {
+      return next(err);
+    }
+    res.send(result);
+  });
 
-//   db.collection('queryjobs').findAndModify({
-//     _id: new ObjectID(req.body.queryjobID)
-//   }, {}, {
-//     $pull: {
-//       hearts: req.user._id
-//     }
-//   }, {
-//     new: true
-//   }, function(err, result) {
-//     if (err) {
-//       return next(err);
-//     }
-//     res.send(result);
-//   });
+});
 
-// });
+router.post('/removeheart', function(req, res, next) {
+  var db = req.db;
 
-// router.post('/checkheart', function(req, res, next) {
-//   var db = req.db;
+  db.collection('queryjobs').findAndModify({
+    _id: new ObjectID(req.body.queryjobID)
+  }, {}, {
+    $pull: {
+      hearts: req.user._id
+    }
+  }, {
+    new: true
+  }, function(err, result) {
+    if (err) {
+      return next(err);
+    }
+    res.send(result);
+  });
 
-//   db.collection('queryjobs').findOne({
-//     _id: new ObjectID(req.body.queryjobID)
-//   }, function(err, result) {
-//     if (err) {
-//       return next(err);
-//     }
-//     var sendTrue = false;
-//     for (var i = result.hearts.length - 1; i >= 0; i--) {
-//       if (result.hearts[i].toString() === req.user._id.toString()) {
-//         sendTrue = true;
-//         break;
-//       }
-//     }
-//     if (sendTrue) {
-//       res.send(true);
-//     } else {
-//       res.send(false);
-//     }
-//   });
+});
 
-// });
+router.post('/checkheart', function(req, res, next) {
+  var db = req.db;
+
+  db.collection('queryjobs').findOne({
+    _id: new ObjectID(req.body.queryjobID)
+  }, function(err, result) {
+    if (err) {
+      return next(err);
+    }
+    var sendTrue = false;
+    for (var i = result.hearts.length - 1; i >= 0; i--) {
+      if (result.hearts[i].toString() === req.user._id.toString()) {
+        sendTrue = true;
+        break;
+      }
+    }
+    if (sendTrue) {
+      res.send(true);
+    } else {
+      res.send(false);
+    }
+  });
+
+});
 
 
 // =====================================================================
