@@ -16,8 +16,7 @@ var flash = require('connect-flash');
 var expressSession = require('express-session');
 
 // Locals.
-var database = require('./config/database.js');
-var session = require('./config/session.js');
+var config = require('config');
 var routesBasic = require('./routes/basic');
 var routesUsers = require('./routes/users');
 var routesQueryjobs = require('./routes/queryjobs');
@@ -28,15 +27,23 @@ var routesComments = require('./routes/comments');
 // Configuration
 // =====================================================================
 
+// Config file.
+if (process.env.NODE_ENV === 'production') {
+  config = config.get('production');
+} else if (JSON.parse(process.env.TEST || false)) {
+  config = config.get('test');
+} else {
+  config = config.get('development');
+}
+
 // DB.
-var dbUrl = (JSON.parse(process.env.TEST || false) ?
-  database.urlTest : database.url);
+var dbUrl = config.dbConfig.url;
 var db = mongo.db(dbUrl, {
   native_parser: true
 }); // connect to db
 
 // Passport.
-require('./config/passport')(passport, db, process.env.NODE_ENV);
+require('./config/passport')(passport, db);
 
 
 // =====================================================================
@@ -58,7 +65,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
 app.use(expressSession({
-  secret: session.secret
+  secret: config.sessionSecret
 }));
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
