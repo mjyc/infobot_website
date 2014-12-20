@@ -15,9 +15,9 @@ var session = require('express-session');
 var ROSLIB = require('roslib');
 
 // Locals.
-var routes = require('./routes/index');
 var queryjobs = require('./routes/queryjobs');
 var comments = require('./routes/comments');
+var routes = require('./routes/routes');
 var configDB = require('./config/database.js');
 var sessionDB = require('./config/session.js');
 // TODO: create config file for ROS
@@ -65,9 +65,12 @@ require('./config/passport')(passport, db, process.env.NODE_ENV);
 
 var app = express();
 
+// TODO: remove below block after porting work is done.
+// ----------------------------------------------------------------
 // View engine setup.
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+// ----------------------------------------------------------------
 
 app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
 app.use(logger('dev'));
@@ -93,9 +96,9 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.use('/', routes);
-app.use('/queryjobs', queryjobs);
 app.use('/comments', comments);
+app.use('/queryjobs', queryjobs);
+app.use('/', routes);
 
 // Catch 404 and forward to error handler.
 app.use(function(req, res, next) {
