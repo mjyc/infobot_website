@@ -1,18 +1,27 @@
+'use strict';
+
 // declare module
-var dubeapp = angular.module('dubeApp', ['ngRoute']);
+var askdubeApp = angular.module('askdubeApp', ['ngRoute', 'ui.bootstrap', 'infinite-scroll']);
 
 // ng-route setting
-dubeapp.config(function($routeProvider) {
-  $routeProvider
-    .when('/home', {
-      templateUrl: '/app/views/home.html',
-      controller: 'HomeController',
-    })
-    .when('/landing', {
-      templateUrl: '/app/views/landing.html',
-    })
-    .otherwise({
-      templateUrl: '/app/views/wall.html',
-      controller: 'WallController',
-    })
-});
+askdubeApp.config(['$routeProvider', '$locationProvider',
+  function($routeProvider, $locationProvider) {
+    $locationProvider.html5Mode(true);
+
+    $routeProvider
+      .when('/home', {
+        templateUrl: '/partials/home',
+        controller: 'HomeController',
+      })
+      .when('/profile', {
+        templateUrl: '/partials/profile',
+        controller: 'WallController',
+      })
+      .when('/signout', {
+        templateUrl: '/logout',
+        controller: 'logout',
+      })
+      .otherwise({
+        redirectTo: '/home'
+      });
+  }]);

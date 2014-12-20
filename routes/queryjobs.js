@@ -1,3 +1,5 @@
+'use strict';
+
 // =====================================================================
 // Requires
 // =====================================================================
@@ -11,34 +13,112 @@ var ObjectID = require('mongodb').ObjectID;
 // Routes
 // =====================================================================
 
-
-// POST
-
-// Add QueryJob.
-router.post('/addqueryjob', function(req, res, next) {
+// Create.
+router.post('/', function(req, res, next) {
   var db = req.db;
-  var newQueryJob = {};
-  // Add user info.
-  newQueryJob.user_id = req.user._id;
-  newQueryJob.user_name = req.user.name;
-  newQueryJob.user_email = req.user.google.email;
-  // Data from req.
-  newQueryJob.timeissued = new Date(req.body.timeissued);
-  newQueryJob.typed_cmd = req.body.typed_cmd;
-  newQueryJob.notification_sms = JSON.parse(req.body.notification_sms);
-  newQueryJob.notification_email = JSON.parse(
-    req.body.notification_email || false);
-  newQueryJob.is_public = JSON.parse(req.body.is_public || false);
-  newQueryJob.deadline = new Date(req.body.deadline);
-  newQueryJob.hearts = [];
+  var queryjob = {};
 
-  db.collection('queryjobs').insert(newQueryJob, function(err, result) {
+  queryjob.timeissued = new Date(req.body.timeissued);
+  queryjob.typed_cmd = req.body.typed_cmd;
+  queryjob.notification_sms = JSON.parse(req.body.notification_sms || false);
+  queryjob.notification_email = JSON.parse(req.body.notification_email || false);
+  queryjob.is_public = JSON.parse(req.body.is_public || false);
+  queryjob.deadline = new Date(req.body.deadline);
+  queryjob.user = {
+    id: req.user._id,
+    name: req.user.name,
+    email: req.user.google.email,
+  };
+
+  db.collection('queryjobs').insert(queryjob, function(err, result) {
     if (err) {
       return next(err);
     }
     res.send(result);
   });
 });
+
+// Retrieve
+
+// retrieve list
+router.get('/list/:select/:limit/:after?', function(req, res, next) {
+  var db = req.db;
+
+  // publicOnly: retrieve querjobs which has "true" value for the public field
+  // userOnly: retrieve querjobs which are belong to the current user
+  // limit: maximum number of items desired
+  // after: retrieve querjobs with their timeissued field larger than "after"
+  //        utc time string in miliseconds
+  //        0 < means from after === now
+  var publicOnly = true;
+  var userOnly = false;
+  switch (req.params.select) {
+    case 'all':
+      publicOnly = false;
+      userOnly = false;
+      break;
+    case 'cse':
+      publicOnly = true;
+      userOnly = false;
+      break;
+    case 'userall':
+      publicOnly = false;
+      userOnly = true;
+      break;
+    case 'usercse':
+      publicOnly = true;
+      userOnly = true;
+      break;
+    default:
+      publicOnly = true;
+      userOnly = false;
+  }
+  var limit = JSON.parse(req.params.limit);
+  if (limit <= 0) {
+    limit = 0;
+  }
+  var after = JSON.parse(req.params.after);
+  if (after <= 0) {
+    after = new Date().getTime();
+  }
+
+  var criteria = {};
+  if (after > 0) {
+    criteria.timeissued = {
+      '$lt': new Date(after)
+    };
+  }
+  if (userOnly) {
+    criteria['user.id'] = req.user._id;
+  }
+  if (publicOnly) {
+    criteria.is_public = true;
+  }
+
+  db.collection('queryjobs').find(criteria).sort({
+    'timeissued': -1
+  }).limit(limit).toArray(function(err, results) {
+    if (err) {
+      return next(err);
+    }
+    res.send(results);
+  });
+});
+
+// retrieve single object
+router.get('/:id', function(req, res, next) {
+  var db = req.db;
+  var queryjobID = new ObjectID(req.params.id);
+  db.collection('queryjobs').findById(queryjobID, function(err, result) {
+    if (err) {
+      return next(err);
+    }
+    res.send(result);
+  });
+});
+
+
+// Hearts
 
 router.post('/addheart', function(req, res, next) {
   var db = req.db;
@@ -105,48 +185,9 @@ router.post('/checkheart', function(req, res, next) {
 
 });
 
-// Get QueryJobs.
-// Returns QueryJobs in decreasing timeissued sorted manner. Can provide
-// parameters to control types of QueryJobs being returned.
-router.post('/getqueryjobs', function(req, res, next) {
-  var db = req.db;
 
-  // Parse inputs.
-  var queryjobID = req.body.queryjobID; // get one QueryJob with id
-  var limit = parseInt(req.body.limit || '0'); // get limit #
-  var startDate = req.body.startDate; // get QueryJobs from startDate
-  var userOnly = JSON.parse(req.body.userOnly || false); // get user's
-  //   QueryJobs
-  var publicOnly = JSON.parse(req.body.publicOnly || false); // get
-  //   public QueryJobs
-
-  // Set query.
-  var criteria = {};
-  if (queryjobID) {
-    criteria._id = new ObjectID(queryjobID);
-  }
-  if (startDate) {
-    criteria.timeissued = {
-      '$lt': new Date(startDate)
-    };
-  }
-  if (userOnly) {
-    criteria.user_id = req.user._id;
-  }
-  if (publicOnly) {
-    criteria.is_public = true;
-  }
-
-  db.collection('queryjobs').find(criteria).sort({
-    'timeissued': -1
-  })
-    .limit(limit).toArray(function(err, results) {
-      if (err) {
-        return next(err);
-      }
-      res.send(results);
-    });
-});
-
+// =====================================================================
+// Module
+// =====================================================================
 
 module.exports = router;

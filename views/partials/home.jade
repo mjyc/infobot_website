@@ -1,0 +1,123 @@
+//- Menubar
+
+.navbar.navbar-inverse.navbar-fixed-top(role="navigation")
+  .container
+    .navbar-header
+      a.navbar-brand.askdube-text(href="/home")
+        i.fa.fa-question-circle
+        span Ask DUB-E
+      button.navbar-toggle(type="button", data-toggle="collapse",
+        data-target=".navbar-collapse")
+        span.sr-only Toggle navigation
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+    .navbar-collapse.collapse
+      ul.nav.navbar-nav.navbar-right
+        li.dropdown
+          a.dropdown-toggle(data-toggle="dropdown", role="button",
+            aria-expanded="false")
+            | {{user.email}} &nbsp;
+            i.fa.fa-caret-down
+          ul.dropdown-menu(role="menu")
+            li(ng-repeat="item in userMenuItems")
+              a(ng-href="{{item.url}}")
+                i.margin-right-5px(ng-class="item.icon")
+                span {{item.name}}
+
+
+//- Question Input Interface
+
+.jumbotron.jumbotron-home
+  .container
+    form(ng-submit="submitQuestion()")
+      .form-horizontal
+        .form-group.form-group-lg.question-box(
+          ng-class="{'has-error': errorQuestion }")
+          .input-group
+            input.form-control(type="text", placeholder="Type question here",
+              ng-model="questionForm.typed_cmd")
+            .input-group-btn
+              button.btn.btn-primary.btn-lg Submit
+          span.help-block(ng-show="errorQuestionTypedCmd")
+            | {{errorQuestionTypedCmd}}
+      .text-align-center
+        //- button options
+        .btn-group.margin-right-10px(dropdown,
+          ng-repeat="(optionName, option) in questionOptions")
+          button.btn.btn-default.btn-sm.dropdown-toggle(type="button",
+            dropdown-toggle)
+            i.margin-right-5px(
+              ng-class="selectedQuestionOptions[optionName].icon")
+            b {{selectedQuestionOptions[optionName].name}}
+            i.fa.fa-caret-down.margin-left-5px
+          ui(role="menu").dropdown-menu
+            li.dropdown-header(role="presentation")
+              | {{questionOptionsDesc[optionName]}}
+            li(ng-repeat="item in option")
+              a(ng-click="setQuestionOption(optionName, item)")
+                i.margin-right-2px(ng-class="item.icon")
+                span {{item.name}}
+                br(ng-if="item.desc !== ''")
+                small(style="color: gray; margin-left: 18px",
+                  ng-if="item.desc !== ''")
+                  | Anyone with CSE account.
+        //- deadline option
+        .btn-group
+          i.fa.fa-exclamation-triangle.margin-right-2px
+          b
+            | Deadline
+            small &nbsp; (Today) &nbsp;
+          //- TODO: use below code during production time
+          //- input.qoption-deadline(type="time", ng-model="questionDeadline",
+          //-   placeholder="HH:mm:ss", min="08:00:00", max="17:00:00" required)
+          input.qoption-deadline(type="time", ng-model="questionDeadline",
+            placeholder="HH:mm:ss" required)
+
+
+//- QueryJob List
+
+.container(infinite-scroll='loadMore()', infinite-scroll-disabled='loadBusy')
+  .panel.panel-default(ng-repeat="queryjob in queryjobs")
+    .panel-body.body(style="padding-top: 0px;")
+      .row
+        //- user stuff
+        div(style='text-align: left')
+          //- cancel button
+          button.btn.btn-default.btn-sm.pull-right.cancel-text(ng-if="queryjob.status > 3")
+            | Cancel
+          div(style="padding-top: 15px;", ng-if="!(queryjob.status > 3)")
+          p.col-xs-12
+            span.name-text {{queryjob.user.name}} &nbsp;&nbsp;
+            span.time-text {{queryjob.timeissued | date:'medium'}}
+          p.col-xs-12
+            i.fa.fa-users(ng-if="(queryjob.is_public)")
+            i.fa.fa-lock(ng-if="!(queryjob.is_public)")
+            span &nbsp;&nbsp;·&nbsp;&nbsp;
+            i.fa.fa-envelope(ng-if="queryjob.notification_email")
+            i.fa.fa-newspaper-o(ng-if="!(queryjob.notification_email)")
+            span &nbsp;&nbsp;·&nbsp;&nbsp;
+            i.fa.fa-exclamation-triangle &nbsp;
+            span {{queryjob.deadline | date:'medium'}}
+          p(style='font-size; 25px').userCmd.lead.col-xs-12
+            | {{queryjob.typed_cmd}}
+        //- robot stuff
+        div(style='text-align: right')
+          p(style='text-align: right').col-xs-12
+            span.name-text DUB-E &nbsp;&nbsp;
+            //- TODO: make below depends on "status"
+            spen.time-text {{queryjob.timeissued | date:'medium'}}
+          //- TODO: make below depends on the "response"
+          //- p.col-xs-12
+          //-   i.fa.fa-bar-chart-o &nbsp;
+          //-   span 90%
+          p(style='font-size; 25px').lead.col-xs-12
+            | Yes.
+          //- TODO: add image
+        div.col-xs-12
+          p
+            //- TODO: make below depends on "status"
+            div(style='text-align: center; margin-bottom: 0px').alert.alert-warning Running
+    //- TODO: implement header and fotter
+    //- .panel-footer.footer
+    //-   .row

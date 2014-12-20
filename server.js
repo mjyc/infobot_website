@@ -1,3 +1,5 @@
+'use strict';
+
 // =====================================================================
 // Requires
 // =====================================================================
@@ -11,66 +13,41 @@ var bodyParser = require('body-parser');
 var mongo = require('mongoskin');
 var passport = require('passport');
 var flash = require('connect-flash');
-var session = require('express-session');
-var ROSLIB = require('roslib');
+var expressSession = require('express-session');
 
 // Locals.
-var queryjobs = require('./routes/queryjobs');
-var comments = require('./routes/comments');
-var routes = require('./routes/routes');
-var configDB = require('./config/database.js');
-var sessionDB = require('./config/session.js');
-// TODO: create config file for ROS
-var urlROS = (process.env.NODE_ENV === 'production' ?
-  'ws://dub-e.org:9090' : 'ws://localhost:9090'
-);
+var database = require('./config/database.js');
+var session = require('./config/session.js');
+var routesBasic = require('./routes/basic');
+var routesUsers = require('./routes/users');
+var routesQueryjobs = require('./routes/queryjobs');
+var routesComments = require('./routes/comments');
 
 
 // =====================================================================
-// Setups
+// Configuration
 // =====================================================================
 
-// ROS setup.
-var ros = new ROSLIB.Ros({
-  url: 'ws://localhost:9090'
-});
-ros.connection = false;
-ros.on('connection', function() {
-  ros.connection = true;
-  console.log('Connected to websocket server.');
-});
-ros.on('error', function(error) {
-  ros.connection = false;
-  console.log('Error connecting to websocket server: ', error);
-});
-ros.on('close', function() {
-  ros.connection = false;
-  console.log('Connection to websocket server closed.');
-});
-
-// DB setup.
+// DB.
 var dbUrl = (JSON.parse(process.env.TEST || false) ?
-  configDB.urlTest : configDB.url);
+  database.urlTest : database.url);
 var db = mongo.db(dbUrl, {
   native_parser: true
 }); // connect to db
 
-// Passport setup.
+// Passport.
 require('./config/passport')(passport, db, process.env.NODE_ENV);
 
 
 // =====================================================================
-// Express
+// Express Configuration
 // =====================================================================
 
 var app = express();
 
-// TODO: remove below block after porting work is done.
-// ----------------------------------------------------------------
 // View engine setup.
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-// ----------------------------------------------------------------
 
 app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
 app.use(logger('dev'));
@@ -80,25 +57,42 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
-app.use(session({
-  secret: sessionDB.secret
+app.use(expressSession({
+  secret: session.secret
 }));
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in
 //   session
 
-// Make our ros, db and MODE accessible to our router.
+// Make our db and MODE accessible to our router.
 app.use(function(req, res, next) {
-  req.ros = ros;
   req.db = db;
   req.PROD = (process.env.NODE_ENV === 'production');
   next();
 });
 
-app.use('/comments', comments);
-app.use('/queryjobs', queryjobs);
-app.use('/', routes);
+// For Protecting APIs.
+function IsAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    res.redirect('/');
+  }
+}
+app.all('/users/*', IsAuthenticated);
+app.all('/queryjobs/*', IsAuthenticated);
+app.all('/comments/*', IsAuthenticated);
+
+app.use('/', routesBasic);
+app.use('/users', routesUsers);
+app.use('/queryjobs', routesQueryjobs);
+app.use('/comments', routesComments);
+
+// For angular.
+app.get('*', function(req, res) {
+  res.redirect('/');
+});
 
 // Catch 404 and forward to error handler.
 app.use(function(req, res, next) {
@@ -132,5 +126,8 @@ app.use(function(err, req, res, next) {
 });
 
 
+// =====================================================================
+// Module
+// =====================================================================
 
 module.exports = app;
