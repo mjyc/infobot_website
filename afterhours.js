@@ -1,4 +1,5 @@
-#!/usr/bin/env node
+// adopted from:
+// https://github.com/spadin/simple-express-static-server/blob/master/server.js
 
 var express = require('express');
 var debug = require('debug')('sara_uw_website');
