@@ -1,0 +1,12 @@
+.container(style="margin-top: 20px;")
+  form(ng-submit="submitQuestion()")
+    .form-horizontal
+      .form-group.form-group-lg.question-box(
+        ng-class="{'has-error': errorQuestion }")
+        .input-group
+          input.form-control(type="text", placeholder="Type question here",
+            ng-model="questionForm.typed_cmd")
+          .input-group-btn
+            button.btn.btn-primary.btn-lg Submit
+        span.help-block(ng-show="errorQuestionTypedCmd")
+          | {{errorQuestionTypedCmd}}

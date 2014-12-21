@@ -33,6 +33,10 @@ homeControllers.controller('HomeController', ['$scope', '$http',
       icon: 'fa fa-user',
       name: 'Profile',
     }, {
+      url: '/liveparser',
+      icon: 'fa fa-keyboard-o',
+      name: 'LiveParser',
+    }, {
       url: '/signout',
       icon: 'fa fa-sign-out',
       name: 'Sign Out',
