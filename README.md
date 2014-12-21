@@ -11,7 +11,7 @@ See [MongoDB Website](http://docs.mongodb.org/manual/installation/) for details.
 Do not copy and paste below code, but actual
 
 ```
-# install node--note that we are installing it from source to use a particular version of node
+# install node--note that you can use any version > v0.10.32
 if [ ! -d ~/code ]; then mkdir -p ~/local/src; fi;
 cd ~/local/src
 git clone https://github.com/joyent/node.git
