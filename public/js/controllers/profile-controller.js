@@ -1,4 +1,6 @@
 'use strict';
 
-angular.module('askdubeApp').controller('ProfileController', ['$scope', function($scope) {
+var profileController = angular.module('askdubeApp');
+
+profileController.controller('ProfileController', ['$scope', function($scope) {
 }]);

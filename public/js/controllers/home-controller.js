@@ -2,10 +2,6 @@
 
 var homeControllers = angular.module('askdubeApp');
 
-homeControllers.controller('logout', ['$window', function($window) {
-  $window.location.href = '/logout';
-}]);
-
 homeControllers.controller('HomeController', ['$scope', '$http',
   function($scope, $http) {
 

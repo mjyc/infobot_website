@@ -1,9 +1,14 @@
 'use strict';
 
-// declare module
+// Declare module.
 var askdubeApp = angular.module('askdubeApp', ['ngRoute', 'ui.bootstrap', 'infinite-scroll']);
 
-// ng-route setting
+// Simple controller.
+askdubeApp.controller('logout', ['$window', function($window) {
+  $window.location.href = '/logout';
+}]);
+
+// ng-route setting.
 askdubeApp.config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
@@ -26,6 +31,6 @@ askdubeApp.config(['$routeProvider', '$locationProvider',
         controller: 'logout',
       })
       .otherwise({
-        redirectTo: '/home'
+        redirectTo: '/liveparser'
       });
   }]);
