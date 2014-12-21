@@ -76,7 +76,7 @@ app.use(flash()); // use connect-flash for flash messages stored in
 // Make our db and MODE accessible to our router.
 app.use(function(req, res, next) {
   req.db = db;
-  req.PROD = (process.env.NODE_ENV === 'production');
+  req.DEV = (app.get('env') === 'development');
   next();
 });
 

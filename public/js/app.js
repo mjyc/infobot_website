@@ -31,6 +31,6 @@ askdubeApp.config(['$routeProvider', '$locationProvider',
         controller: 'logout',
       })
       .otherwise({
-        redirectTo: '/liveparser'
+        redirectTo: '/home'
       });
   }]);

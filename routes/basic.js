@@ -16,7 +16,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 router.get('/', function(req, res) {
   if (req.isAuthenticated()) {
-    res.render('index');
+    res.render('index', { DEV: req.DEV });
   } else {
     res.render('signup');
   }
