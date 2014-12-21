@@ -18,7 +18,7 @@ add_service_files(DIRECTORY srv
   ParseQuestion.srv
 )
 
-generate_messages(DEPENDENCIES message_runtime std_msgs)
+generate_messages(DEPENDENCIES std_msgs)
 
 ###################################
 ## catkin specific configuration ##
