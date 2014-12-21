@@ -52,21 +52,31 @@ require('./config/passport')(passport, db);
 
 var app = express();
 
+// Setup
+var MongoStore = require('connect-mongo')(expressSession);
+var sessionStore = new MongoStore({
+  url: dbUrl
+});
+
 // View engine setup.
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
 app.use(logger('dev'));
+app.use(cookieParser(config.sessionSecret));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-app.use(cookieParser());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(expressSession({
+  store: sessionStore,
+  secret: config.sessionSecret,
+  name: config.cookieKey,
+  resave: true,
+  saveUninitialized: true
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
-app.use(expressSession({
-  secret: config.sessionSecret
-}));
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in
