@@ -15,7 +15,7 @@ askdubeApp.config(['$routeProvider', '$locationProvider',
       })
       .when('/profile', {
         templateUrl: '/partials/profile',
-        controller: 'WallController',
+        controller: 'ProfileController',
       })
       .when('/signout', {
         templateUrl: '/logout',
