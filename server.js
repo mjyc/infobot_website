@@ -55,7 +55,6 @@ app.set('view engine', 'jade');
 
 app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
 app.use(logger('dev'));
-console.log(config.get('sessionSecret'));
 app.use(cookieParser(config.get('sessionSecret')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));

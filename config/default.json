@@ -13,7 +13,7 @@
     "dbConfig": {
       "url": "mongodb://localhost:27017/test_sara_uw_website"
     },
-    "testAccount": {
+    "account": {
       "email": "test@gmail.com",
       "password": "testpassword"
     }
