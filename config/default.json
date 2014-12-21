@@ -1,0 +1,21 @@
+{
+  "cookieKey": "session",
+  "dbConfig": {
+    "url": "mongodb://localhost:27017/sara_uw_website"
+  },
+  "googleAuth": {
+    "clientID": "911364529225-8nlktgklmjmqcm850la2955mi2f8ek0s.apps.googleusercontent.com",
+    "clientSecret": "90O69HAaB15asS4vjwXM30Yn",
+    "callbackURL": "http://127.0.0.1:8080/auth/google/callback"
+  },
+  "sessionSecret": "secret key",
+  "test": {
+    "dbConfig": {
+      "url": "mongodb://localhost:27017/test_sara_uw_website"
+    },
+    "testAccount": {
+      "email": "test@gmail.com",
+      "password": "testpassword"
+    }
+  }
+}

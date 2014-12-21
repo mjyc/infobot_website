@@ -27,17 +27,8 @@ var routesComments = require('./routes/comments');
 // Configuration
 // =====================================================================
 
-// Config file.
-if (process.env.NODE_ENV === 'production') {
-  config = config.get('production');
-} else if (JSON.parse(process.env.TEST || false)) {
-  config = config.get('test');
-} else {
-  config = config.get('development');
-}
-
 // DB.
-var dbUrl = config.dbConfig.url;
+var dbUrl = config.get('dbConfig').url;
 var db = mongo.db(dbUrl, {
   native_parser: true
 }); // connect to db
@@ -64,13 +55,14 @@ app.set('view engine', 'jade');
 
 app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
 app.use(logger('dev'));
-app.use(cookieParser(config.sessionSecret));
+console.log(config.get('sessionSecret'));
+app.use(cookieParser(config.get('sessionSecret')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(expressSession({
   store: sessionStore,
-  secret: config.sessionSecret,
-  name: config.cookieKey,
+  secret: config.get('sessionSecret'),
+  name: config.get('cookieKey'),
   resave: true,
   saveUninitialized: true
 }));
