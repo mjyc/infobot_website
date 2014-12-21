@@ -4,7 +4,7 @@ from sara_uw_website.srv import *
 import rospy
 
 def handle_parse_question(req):
-    parsed_cmd = typed_cmd + " parsed!"
+    parsed_cmd = req.typed_cmd + " parsed!"
     return ParseQuestionResponse(parsed_cmd)
 
 def parse_question_server():
@@ -14,4 +14,4 @@ def parse_question_server():
     rospy.spin()
 
 if __name__ == "__main__":
-    add_two_ints_server()
+    parse_question_server()
