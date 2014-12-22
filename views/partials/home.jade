@@ -128,7 +128,7 @@
               span {{comment.comment}}
         p
           //- input comment
-          form(ng-submit="submitComment(queryjob)").col-xs-8
+          form(ng-submit="submitComment(queryjob._id)").col-xs-8
             .input-group.input-group-sm
               input.form-control(type="text", placeholder="Write a comment...",
                 ng-model="commentForm.comment")

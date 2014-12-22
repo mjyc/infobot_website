@@ -53,7 +53,6 @@ router.get('/list/:qid', function(req, res, next) {
       if (err) {
         return next(err);
       }
-      console.log(results);
       res.send(results);
     });
 });

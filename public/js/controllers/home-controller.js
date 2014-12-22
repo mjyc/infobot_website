@@ -235,9 +235,6 @@ homeControllers.controller('HomeController', ['$scope', '$http',
     // Hearts
 
     $scope.toggleHeart = function(queryjob) {
-      // var queryjob = $scope.queryjobs.filter(function(queryjob) {
-      //   return queryjob._id === qid;
-      // })[0];
       if (queryjob.userHeart) {
         $http.delete('/hearts/' + queryjob.userHeart._id)
           .success(function(data) {
