@@ -86,7 +86,7 @@
           div(style="padding-top: 15px;", ng-if="!(queryjob.status > 3)")
           p.col-xs-12
             span.name-text {{queryjob.user.name}} &nbsp;&nbsp;
-            span.time-text {{queryjob.timeissued | date:'medium'}}
+            span.time-text {{queryjob.timeissued | today}}
           p.col-xs-12
             i.fa.fa-users(ng-if="(queryjob.is_public)")
             i.fa.fa-lock(ng-if="!(queryjob.is_public)")
@@ -95,7 +95,7 @@
             i.fa.fa-newspaper-o(ng-if="!(queryjob.notification_email)")
             span &nbsp;&nbsp;·&nbsp;&nbsp;
             i.fa.fa-exclamation-triangle &nbsp;
-            span {{queryjob.deadline | date:'medium'}}
+            span {{queryjob.deadline | today}}
           p(style="font-size; 25px").userCmd.lead.col-xs-12
             | {{queryjob.typed_cmd}}
         //- robot stuff
@@ -103,7 +103,7 @@
           p(style="text-align: right").col-xs-12
             span.name-text DUB-E &nbsp;&nbsp;
             //- TODO: make below depends on "status"
-            spen.time-text {{queryjob.timeissued | date:'medium'}}
+            spen.time-text {{queryjob.timeissued | today}}
           //- TODO(mjyc): make below depends on the "response"
           //- p.col-xs-12
           //-   i.fa.fa-bar-chart-o &nbsp;
@@ -123,9 +123,10 @@
           p(ng-repeat="comment in queryjob.comments")
             small
               b {{comment.user.name}} &nbsp;
-              span(style="color: gray;")
-                | {{comment.timecommented | date:'medium'}} &nbsp;
               span {{comment.comment}}
+              br
+              span(style="color: gray;")
+                | {{comment.timecommented | today}}
         p
           //- input comment
           form(ng-submit="submitComment(queryjob._id)").col-xs-8

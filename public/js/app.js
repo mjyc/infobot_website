@@ -1,7 +1,12 @@
 'use strict';
 
 // Declare module.
-var askdubeApp = angular.module('askdubeApp', ['ngRoute', 'ui.bootstrap', 'infinite-scroll']);
+var askdubeApp = angular.module('askdubeApp', [
+  'ngRoute',
+  'ui.bootstrap',
+  'infinite-scroll',
+  'askdubeFilters',
+]);
 
 // Simple controller.
 askdubeApp.controller('logout', ['$window', function($window) {
