@@ -26,8 +26,8 @@ module.exports = function(grunt) {
       },
       files: [
         '**/*.js',
-        '!bower_components/**/*.js',
         '!node_modules/**/*.js',
+        '!public/bower_components/**/*.js',
         '!public/js/vendor/**/*.js'
       ]
     },
