@@ -32,15 +32,12 @@
   .container
     form(ng-submit="submitQuestion()")
       .form-horizontal
-        .form-group.form-group-lg.question-box(
-          ng-class="{'has-error': errorQuestion }")
+        .form-group.form-group-lg.question-box
           .input-group
             input.form-control(type="text", placeholder="Type question here",
               ng-model="questionForm.typed_cmd")
             .input-group-btn
               button.btn.btn-primary.btn-lg Submit
-          span.help-block(ng-show="errorQuestionTypedCmd")
-            | {{errorQuestionTypedCmd}}
       .text-align-center
         //- button options
         .btn-group.margin-right-10px(dropdown,
@@ -117,22 +114,32 @@
         div.col-xs-12
           p
             //- TODO(mjyc): make below depends on "status"
-            div(style="text-align: center; margin-bottom: 0px").alert.alert-warning Running
+            .alert.alert-warning(style="text-align: center; margin-bottom: 0px")
+              | Running
     .panel-footer.footer
       .row
-        .col-xs-9
+        //- comments history
+        .col-xs-12
           p(ng-repeat="comment in queryjob.comments")
             small
               b {{comment.user.name}} &nbsp;
-              span(style="color: gray;") {{comment.timecommented | date:'medium'}} &nbsp;
+              span(style="color: gray;")
+                | {{comment.timecommented | date:'medium'}} &nbsp;
               span {{comment.comment}}
         p
-          form(ng-submit="submitComment(queryjob._id)").col-xs-9
+          //- input comment
+          form(ng-submit="submitComment(queryjob)").col-xs-8
             .input-group.input-group-sm
               input.form-control(type="text", placeholder="Write a comment...",
                 ng-model="commentForm.comment")
               .input-group-btn
                 button.btn.btn-default.btn-sm Post
-          .col-xs-3(style="text-align: right")
-            button.btn.btn-default.btn-sm Thank You DUB-E &nbsp;
+          //- heart button
+          .col-xs-4(style="text-align: right")
+            button.btn.btn-default.btn-sm(
+              ng-class="{'active color-orange': queryjob.userHeart}",
+              ng-click="toggleHeart(queryjob)")
+              | Thank You DUB-E &nbsp;
               i.fa.fa-heart
+              span(ng-show="queryjob.userHeart")
+                | +{{queryjob.hearts.length}}

@@ -17,24 +17,23 @@ var ObjectID = require('mongodb').ObjectID;
 router.post('/', function(req, res, next) {
   var db = req.db;
 
-  var comment = {};
-  comment.timecommented = new Date(req.body.timecommented);
-  comment.comment = req.body.comment;
-  comment.queryjob = {
+  var heart = {};
+  heart.queryjob = {
     id: new ObjectID(req.body.qid),
   };
-  comment.user = {
+  heart.user = {
     id: req.user._id,
     name: req.user.name,
     email: req.user.google.email,
   };
 
-  db.collection('comments').insert(comment, function(err, result) {
+  db.collection('hearts').insert(heart, function(err, result) {
     if (err) {
       return next(err);
     }
     res.send(result);
   });
+
 });
 
 // Retrieve.
@@ -49,14 +48,27 @@ router.get('/list/:qid', function(req, res, next) {
     criteria['queryjob.id'] = new ObjectID(qid);
   }
 
-  // returns comments in decreasing timecommented sorted manner
-  db.collection('comments').find(criteria).sort({
-    'timecommented': 1
-  }).toArray(function(err, results) {
+  db.collection('hearts').find(criteria)
+    .toArray(function(err, results) {
+      if (err) {
+        return next(err);
+      }
+      console.log(results);
+      res.send(results);
+    });
+});
+
+// Delete.
+router.delete('/:id', function(req, res, next) {
+  var db = req.db;
+  var id = new ObjectID(req.params.id);
+  db.collection('hearts').removeById(id, function(err, result) {
     if (err) {
       return next(err);
     }
-    res.send(results);
+    res.send({
+      msg: ''
+    });
   });
 });
 

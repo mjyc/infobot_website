@@ -5,7 +5,8 @@ var homeControllers = angular.module('askdubeApp');
 homeControllers.controller('HomeController', ['$scope', '$http',
   function($scope, $http) {
 
-    // Global variables.
+    // Globals
+
     $scope.RECEIVED = 0;
     $scope.SCHEDULED = 1;
     $scope.RUNNING = 2;
@@ -13,23 +14,12 @@ homeControllers.controller('HomeController', ['$scope', '$http',
     $scope.CANCELLED = 4;
     $scope.FAILED = 5;
 
-    // Get data from the server.
+
+    // User Menu
+
     $http.get('users/current').success(function(data) {
       $scope.user = data;
     });
-
-    var addComments = function(i, queryjob) {
-      $http.get('comments/list/' + queryjob._id).success(function(data) {
-        queryjob.comments = data;
-      });
-    };
-    $http.get('queryjobs/list/userall/' + new Date().getTime() + '/10')
-      .success(function(data) {
-        $scope.queryjobs = data;
-        jQuery.each($scope.queryjobs, addComments);
-      });
-
-    // User Menu
 
     $scope.userMenuItems = [{
       url: '/profile',
@@ -46,6 +36,59 @@ homeControllers.controller('HomeController', ['$scope', '$http',
     }, ];
 
 
+    // QueryJob Wall
+
+    // Load data.
+    var loadComments = function(i, queryjob) {
+      $http.get('comments/list/' + queryjob._id).success(function(data) {
+        queryjob.comments = data;
+      });
+    };
+    var loadHearts = function(i, queryjob) {
+      $http.get('hearts/list/' + queryjob._id).success(function(data) {
+        queryjob.hearts = data;
+        queryjob.userHeart = queryjob.hearts.filter(function(heart) {
+          return $scope.user._id === heart.user.id;
+        });
+        queryjob.userHeart = queryjob.userHeart[0];
+        if (queryjob.userHeart) {
+          queryjob.userHeartActive = 'active';
+        } else {
+          queryjob.userHeartActive = 'btn';
+        }
+      });
+    };
+    $http.get('queryjobs/list/userall/' + new Date().getTime() + '/10')
+      .success(function(data) {
+        $scope.queryjobs = data;
+        jQuery.each($scope.queryjobs, loadComments);
+        jQuery.each($scope.queryjobs, loadHearts);
+      });
+
+    // Infinite scroll setup.
+    $scope.loadBusy = false;
+    $scope.loadMore = function() {
+      var qjs = $scope.queryjobs;
+      if (qjs && qjs.length > 1) {
+        $scope.loadAfter = new Date(qjs[qjs.length - 1].timeissued).getTime();
+        $scope.loadBusy = true;
+        $http.get('/queryjobs/list/userall/' + $scope.loadAfter + '/10')
+          .success(function(data) {
+            for (var i = 0; i < data.length; i++) {
+              $scope.queryjobs.push(data[i]);
+            }
+            $scope.loadBusy = false;
+          })
+          .error(function(data) {
+            alert('Oops, something went wrong. Please try refreshing the ' +
+              'page.');
+          });
+      }
+    };
+
+
+    // Question Input
+
     // Question Options.
     $scope.questionForm = {
       timeissued: null,
@@ -55,6 +98,7 @@ homeControllers.controller('HomeController', ['$scope', '$http',
       is_public: true,
       deadline: null,
     };
+
     // Button options.
     $scope.questionOptions = {
       audience: [{
@@ -104,7 +148,7 @@ homeControllers.controller('HomeController', ['$scope', '$http',
     $scope.questionDeadline = new Date(1970, 0, 1, new Date().getHours() + 1,
       new Date().getMinutes(), 0);
 
-    // Submit function.
+    // Submit question function.
     $scope.submitQuestion = function() {
       // input check
       if ($scope.questionForm.typed_cmd === '') {
@@ -155,6 +199,9 @@ homeControllers.controller('HomeController', ['$scope', '$http',
         });
     };
 
+
+    // Comments
+
     // Submit comment.
     $scope.commentForm = {
       timecommented: null,
@@ -172,7 +219,7 @@ homeControllers.controller('HomeController', ['$scope', '$http',
 
       $http.post('/comments', $scope.commentForm)
         .success(function(data) {
-          $scope.queryjobs.filter(function(queryjob) {
+          $scope.queryjobs.forEach(function(queryjob) {
             if (queryjob._id === qid) {
               queryjob.comments.push(data[0]);
             }
@@ -184,25 +231,26 @@ homeControllers.controller('HomeController', ['$scope', '$http',
         });
     };
 
-    // Infinite scroll setup.
-    $scope.loadBusy = false;
-    $scope.loadMore = function() {
-      var qjs = $scope.queryjobs;
-      if (qjs && qjs.length > 1) {
-        $scope.loadAfter = new Date(qjs[qjs.length-1].timeissued).getTime();
-        $scope.loadBusy = true;
-        $http.get('/queryjobs/list/userall/' + $scope.loadAfter + '/10')
+
+    // Hearts
+
+    $scope.toggleHeart = function(queryjob) {
+      // var queryjob = $scope.queryjobs.filter(function(queryjob) {
+      //   return queryjob._id === qid;
+      // })[0];
+      if (queryjob.userHeart) {
+        $http.delete('/hearts/' + queryjob.userHeart._id)
           .success(function(data) {
-            for (var i = 0; i < data.length; i++) {
-              $scope.queryjobs.push(data[i]);
-            }
-            $scope.loadBusy = false;
-          })
-          .error(function(data) {
-            alert('Oops, something went wrong. Please try refreshing the ' +
-              'page.');
+            loadHearts(0, queryjob);
           });
+      } else {
+        $http.post('/hearts', {
+          qid: queryjob._id
+        }).success(function(data) {
+          loadHearts(0, queryjob);
+        });
       }
     };
+
   }
 ]);

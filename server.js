@@ -21,6 +21,7 @@ var routesBasic = require('./routes/basic');
 var routesUsers = require('./routes/users');
 var routesQueryjobs = require('./routes/queryjobs');
 var routesComments = require('./routes/comments');
+var routesHearts = require('./routes/hearts');
 
 
 // =====================================================================
@@ -94,6 +95,7 @@ app.use('/', routesBasic);
 app.use('/users', routesUsers);
 app.use('/queryjobs', routesQueryjobs);
 app.use('/comments', routesComments);
+app.use('/hearts', routesHearts);
 
 // For angular.
 app.get('*', function(req, res) {
