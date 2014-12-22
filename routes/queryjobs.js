@@ -38,18 +38,18 @@ router.post('/', function(req, res, next) {
   });
 });
 
-// Retrieve
+// Retrieve.
 
 // retrieve list
-router.get('/list/:select/:limit/:after?', function(req, res, next) {
+router.get('/list/:select/:after/:limit', function(req, res, next) {
   var db = req.db;
 
   // publicOnly: retrieve querjobs which has "true" value for the public field
   // userOnly: retrieve querjobs which are belong to the current user
-  // limit: maximum number of items desired
   // after: retrieve querjobs with their timeissued field larger than "after"
   //        utc time string in miliseconds
-  //        0 < means from after === now
+  // limit: maximum number of items desired
+  //        <= 0 means all items
   var publicOnly = true;
   var userOnly = false;
   switch (req.params.select) {
@@ -73,13 +73,10 @@ router.get('/list/:select/:limit/:after?', function(req, res, next) {
       publicOnly = true;
       userOnly = false;
   }
+  var after = JSON.parse(req.params.after);
   var limit = JSON.parse(req.params.limit);
   if (limit <= 0) {
     limit = 0;
-  }
-  var after = JSON.parse(req.params.after);
-  if (after <= 0) {
-    after = new Date().getTime();
   }
 
   var criteria = {};

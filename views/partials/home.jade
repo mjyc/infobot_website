@@ -77,12 +77,12 @@
 
 //- QueryJob List
 
-.container(infinite-scroll='loadMore()', infinite-scroll-disabled='loadBusy')
+.container(infinite-scroll="loadMore()", infinite-scroll-disabled="loadBusy")
   .panel.panel-default(ng-repeat="queryjob in queryjobs")
     .panel-body.body(style="padding-top: 0px;")
       .row
         //- user stuff
-        div(style='text-align: left')
+        div(style="text-align: left")
           //- cancel button
           button.btn.btn-default.btn-sm.pull-right.cancel-text(ng-if="queryjob.status > 3")
             | Cancel
@@ -99,25 +99,40 @@
             span &nbsp;&nbsp;·&nbsp;&nbsp;
             i.fa.fa-exclamation-triangle &nbsp;
             span {{queryjob.deadline | date:'medium'}}
-          p(style='font-size; 25px').userCmd.lead.col-xs-12
+          p(style="font-size; 25px").userCmd.lead.col-xs-12
             | {{queryjob.typed_cmd}}
         //- robot stuff
-        div(style='text-align: right')
-          p(style='text-align: right').col-xs-12
+        div(style="text-align: right")
+          p(style="text-align: right").col-xs-12
             span.name-text DUB-E &nbsp;&nbsp;
             //- TODO: make below depends on "status"
             spen.time-text {{queryjob.timeissued | date:'medium'}}
-          //- TODO: make below depends on the "response"
+          //- TODO(mjyc): make below depends on the "response"
           //- p.col-xs-12
           //-   i.fa.fa-bar-chart-o &nbsp;
           //-   span 90%
-          p(style='font-size; 25px').lead.col-xs-12
+          p(style="font-size; 25px").lead.col-xs-12
             | Yes.
-          //- TODO: add image
+          //- TODO(mjyc): add image
         div.col-xs-12
           p
-            //- TODO: make below depends on "status"
-            div(style='text-align: center; margin-bottom: 0px').alert.alert-warning Running
-    //- TODO: implement header and fotter
-    //- .panel-footer.footer
-    //-   .row
+            //- TODO(mjyc): make below depends on "status"
+            div(style="text-align: center; margin-bottom: 0px").alert.alert-warning Running
+    .panel-footer.footer
+      .row
+        .col-xs-9
+          p(ng-repeat="comment in queryjob.comments")
+            small
+              b {{comment.user.name}} &nbsp;
+              span(style="color: gray;") {{comment.timecommented | date:'medium'}} &nbsp;
+              span {{comment.comment}}
+        p
+          form(ng-submit="submitComment(queryjob._id)").col-xs-9
+            .input-group.input-group-sm
+              input.form-control(type="text", placeholder="Write a comment...",
+                ng-model="commentForm.comment")
+              .input-group-btn
+                button.btn.btn-default.btn-sm Post
+          .col-xs-3(style="text-align: right")
+            button.btn.btn-default.btn-sm Thank You DUB-E &nbsp;
+              i.fa.fa-heart

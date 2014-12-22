@@ -18,9 +18,16 @@ homeControllers.controller('HomeController', ['$scope', '$http',
       $scope.user = data;
     });
 
-    $http.get('queryjobs/list/userall/5/0').success(function(data) {
-      $scope.queryjobs = data;
-    });
+    var addComments = function(i, queryjob) {
+      $http.get('comments/list/' + queryjob._id).success(function(data) {
+        queryjob.comments = data;
+      });
+    };
+    $http.get('queryjobs/list/userall/' + new Date().getTime() + '/10')
+      .success(function(data) {
+        $scope.queryjobs = data;
+        jQuery.each($scope.queryjobs, addComments);
+      });
 
     // User Menu
 
@@ -98,7 +105,6 @@ homeControllers.controller('HomeController', ['$scope', '$http',
       new Date().getMinutes(), 0);
 
     // Submit function.
-    // TODO: also check current "status" of the user's last queryjob
     $scope.submitQuestion = function() {
       // input check
       if ($scope.questionForm.typed_cmd === '') {
@@ -121,7 +127,7 @@ homeControllers.controller('HomeController', ['$scope', '$http',
       }
 
       // check if the user has an unanswered queryjob
-      $http.get('/queryjobs/list/userall/0/0')
+      $http.get('/queryjobs/list/userall/' + new Date().getTime() + '/0')
         .success(function(data) {
           var numUnansweredJobs = 0;
           for (var i = data.length - 1; i >= 0; i--) {
@@ -141,9 +147,37 @@ homeControllers.controller('HomeController', ['$scope', '$http',
 
       $http.post('/queryjobs', $scope.questionForm)
         .success(function(data) {
-          var newQueryJob = jQuery.extend(true, {}, $scope.questionForm);
-          $scope.queryjobs.unshift(newQueryJob);
+          $scope.queryjobs.unshift(data[0]);
           $scope.questionForm.typed_cmd = '';
+        })
+        .error(function(data) {
+          alert('Oops, something went wrong. Please try refreshing the page.');
+        });
+    };
+
+    // Submit comment.
+    $scope.commentForm = {
+      timecommented: null,
+      comment: '',
+      qid: null,
+    };
+    $scope.submitComment = function(qid) {
+      // input check
+      if ($scope.commentForm.typed_cmd === '') {
+        return;
+      }
+      // setting timestamps
+      $scope.commentForm.timecommented = new Date();
+      $scope.commentForm.qid = qid;
+
+      $http.post('/comments', $scope.commentForm)
+        .success(function(data) {
+          $scope.queryjobs.filter(function(queryjob) {
+            if (queryjob._id === qid) {
+              queryjob.comments.push(data[0]);
+            }
+          });
+          $scope.commentForm.comment = '';
         })
         .error(function(data) {
           alert('Oops, something went wrong. Please try refreshing the page.');
@@ -157,7 +191,7 @@ homeControllers.controller('HomeController', ['$scope', '$http',
       if (qjs && qjs.length > 1) {
         $scope.loadAfter = new Date(qjs[qjs.length-1].timeissued).getTime();
         $scope.loadBusy = true;
-        $http.get('/queryjobs/list/userall/5/' + $scope.loadAfter)
+        $http.get('/queryjobs/list/userall/' + $scope.loadAfter + '/10')
           .success(function(data) {
             for (var i = 0; i < data.length; i++) {
               $scope.queryjobs.push(data[i]);
