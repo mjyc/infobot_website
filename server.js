@@ -133,14 +133,6 @@ app.use(function(err, req, res, next) {
   });
 });
 
-var counter = 0;
-var interval = setInterval( function() {
-  console.log('Bar', counter);
-  counter++;
-  if (counter >= 3) {
-    clearInterval(interval);
-  }
-}, 1000);
 
 // =====================================================================
 // Module
