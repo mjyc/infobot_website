@@ -24,12 +24,13 @@
       to improve your experience.
     </p><![endif]-->
 
-  <div class="jumbotron">
-    <div class="container">
-      <h2>DUB-E is taking a rest...</h2>
-      <p>Come back between 9am-5pm, Monday (9/29) through Wednesday (10/1)!</p>
+    <div class="jumbotron">
+      <div class="container">
+        <img id="image" style="width:100%">
+        <h2>Ask DUB-E is temporarily down for maintenance.</h2>
+        <p>We'll <i>hopefully</i> be back up soon.</p>
+      </div>
     </div>
-  </div>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="/bower_components/jquery/dist/jquery.min.js"><\/script>')</script>
@@ -41,6 +42,11 @@
       e.src='//www.google-analytics.com/analytics.js';
       r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
       ga('create','UA-XXXXX-X');ga('send','pageview');
+    </script>
+
+    <script>
+      var images = ['ironman.jpg', 'marvin.gif', 'marvin.jpg', 'r2d2.jpg', 'r2d2.png', 'walle.jpg'];
+      $('#image').attr('src', 'img/maintenance/'+images[Math.floor(Math.random() * images.length)]);
     </script>
   </body>
 </html>
