@@ -8,15 +8,14 @@ var askdubeApp = angular.module('askdubeApp', [
   'askdubeFilters',
 ]);
 
-// Simple controller.
+// logout controller.
 askdubeApp.controller('logout', ['$window', function($window) {
   $window.location.href = '/logout';
 }]);
 
 // ng-route setting.
-askdubeApp.config(['$routeProvider', '$locationProvider',
+askdubeApp.config(['$routeProvider',
   function($routeProvider, $locationProvider) {
-    $locationProvider.html5Mode(true);
 
     $routeProvider
       .when('/home', {

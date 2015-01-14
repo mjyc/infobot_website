@@ -1,4 +1,6 @@
+//-=====================================================================
 //- Menubar
+//-=====================================================================
 
 .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
   .container
@@ -26,7 +28,9 @@
                 span {{item.name}}
 
 
+//-=====================================================================
 //- Question Input Interface
+//-=====================================================================
 
 .jumbotron.jumbotron-home
   .container
@@ -72,7 +76,9 @@
             placeholder="HH:mm:ss" required)
 
 
+//-=====================================================================
 //- QueryJob List
+//-=====================================================================
 
 .container(infinite-scroll="loadMore()", infinite-scroll-disabled="loadBusy")
   .panel.panel-default(ng-repeat="queryjob in queryjobs")
@@ -129,18 +135,18 @@
                 | {{comment.timecommented | today}}
         p
           //- input comment
-          form(ng-submit="submitComment(queryjob._id)").col-xs-8
+          form(ng-submit="submitComment(queryjob._id)").col-xs-9
             .input-group.input-group-sm
               input.form-control(type="text", placeholder="Write a comment...",
                 ng-model="commentForm.comment")
               .input-group-btn
                 button.btn.btn-default.btn-sm Post
           //- heart button
-          .col-xs-4(style="text-align: right")
-            button.btn.btn-default.btn-sm(
+          .col-xs-3(style="text-align: right")
+            button.btn.btn-link.btn-sm(
               ng-class="{'active color-orange': queryjob.userHeart}",
               ng-click="toggleHeart(queryjob)")
-              | Thank You DUB-E &nbsp;
+              small Thank You DUB-E &nbsp;
               i.fa.fa-heart
               span(ng-show="queryjob.userHeart")
                 | +{{queryjob.hearts.length}}
