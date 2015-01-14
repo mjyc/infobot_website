@@ -22,10 +22,6 @@ askdubeApp.config(['$routeProvider',
         templateUrl: '/partials/home',
         controller: 'HomeController',
       })
-      .when('/profile', {
-        templateUrl: '/partials/profile',
-        controller: 'ProfileController',
-      })
       .when('/liveparser', {
         templateUrl: '/partials/liveparser',
         controller: 'LiveParserController',
