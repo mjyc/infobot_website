@@ -14,8 +14,9 @@ askdubeApp.controller('logout', ['$window', function($window) {
 }]);
 
 // ng-route setting.
-askdubeApp.config(['$routeProvider',
+askdubeApp.config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
+    $locationProvider.html5Mode(true);
 
     $routeProvider
       .when('/home', {
