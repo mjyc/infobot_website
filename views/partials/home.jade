@@ -135,18 +135,18 @@
                 | {{comment.timecommented | today}}
         p
           //- input comment
-          form(ng-submit="submitComment(queryjob._id)").col-xs-9
+          form(ng-submit="submitComment(queryjob._id)").col-xs-8.col-sm-9
             .input-group.input-group-sm
               input.form-control(type="text", placeholder="Write a comment...",
                 ng-model="commentForm.comment")
               .input-group-btn
                 button.btn.btn-default.btn-sm Post
           //- heart button
-          .col-xs-3(style="text-align: right")
-            button.btn.btn-link.btn-sm(
-              ng-class="{'active color-orange': queryjob.userHeart}",
+          .col-xs-4.col-sm-3(style="text-align: right")
+            button.btn.btn-default.btn-sm(
+              ng-class="{'color-orange': queryjob.userHeart}",
               ng-click="toggleHeart(queryjob)")
-              small Thank You DUB-E &nbsp;
+              span Thank You DUB-E &nbsp;
               i.fa.fa-heart
-              span(ng-show="queryjob.userHeart")
-                | +{{queryjob.hearts.length}}
+              span &nbsp;{{queryjob.hearts.length}}
+
