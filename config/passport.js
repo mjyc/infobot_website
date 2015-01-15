@@ -255,23 +255,8 @@ module.exports = function(passport, db, mode) {
         } else {
           // User already exists and is logged in, we have to link
           // accounts.
-          var user = req.user;  // pull the user out of the session
-
-          user.google.id = profile.id;
-          user.google.token = token;
-          user.google.name = profile.displayName;
-          user.google.email = (
-            profile.emails[0].value || ''
-          ).toLowerCase();  // pull the first email
-
-          db.collection('users').insert(user, function(err) {
-            if (err) {
-              return done(err);
-            }
-
-            return done(null, user);
-          });
-
+          var user = req.user;
+          return done(null, user);
         }
 
       });
