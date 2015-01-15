@@ -14,6 +14,7 @@ var mongo = require('mongoskin');
 var passport = require('passport');
 var flash = require('connect-flash');
 var expressSession = require('express-session');
+var connectMongo = require('connect-mongo');
 
 // Locals.
 var config = require('config');
@@ -45,7 +46,7 @@ require('./config/passport')(passport, db);
 var app = express();
 
 // Setup
-var MongoStore = require('connect-mongo')(expressSession);
+var MongoStore = connectMongo(expressSession);
 var sessionStore = new MongoStore({
   url: dbUrl
 });

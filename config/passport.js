@@ -190,7 +190,7 @@ module.exports = function(passport, db, mode) {
       clientSecret: googleAuth.clientSecret,
       callbackURL: googleAuth.callbackURL,
       passReqToCallback: true  // allows us to pass in the req from our
-      // route (lets us check if a user is logged in or not)
+      //   route (lets us check if a user is logged in or not)
 
     },
     function(req, token, refreshToken, profile, done) {
