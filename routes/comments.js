@@ -19,7 +19,7 @@ router.post('/', function(req, res, next) {
 
   var comment = {};
   comment.timecommented = new Date(req.body.timecommented);
-  comment.comment = req.body.comment;
+  comment.text = req.body.text;
   comment.queryjob = {
     id: new ObjectID(req.body.qid),
   };

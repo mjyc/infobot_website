@@ -40,6 +40,10 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     $scope.CANCELLED = 4;
     $scope.FAILED = 5;
 
+    var isQueryJobFinished = function(status) {
+      return status > $scope.RUNNING;
+    };
+
 
     //==================================================================
     // Menubar
@@ -218,11 +222,21 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         }
       });
     };
+    var processQueryJob = function(i, queryjob) {
+      queryjob.isFinished = isQueryJobFinished(queryjob.status);
+      queryjob.audienceDesc = (queryjob.is_public) ?
+        'Shared with CSE' : 'Only Me';
+      queryjob.notificationDesc = (queryjob.notification_email) ?
+        'Email' : 'Feed Only';
+      //- TODO: make below depends on "status"
+      queryjob.robottimestamp = queryjob.timeissued;
+    };
     $http.get('queryjobs/list/userall/' + new Date().getTime() + '/10')
       .success(function(data) {
         $scope.queryjobs = data;
         jQuery.each($scope.queryjobs, loadComments);
         jQuery.each($scope.queryjobs, loadHearts);
+        jQuery.each($scope.queryjobs, processQueryJob);
       });
 
     // Infinite scroll setup.
@@ -247,16 +261,15 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     };
 
 
-    // Comments
-
-    // Submit comment.
+    // Comments control.
     $scope.commentForm = {
       timecommented: null,
       comment: '',
       qid: null,
     };
+
     $scope.submitComment = function(qid) {
-      // input check
+      // input validation
       if ($scope.commentForm.typed_cmd === '') {
         return;
       }
@@ -271,7 +284,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
               queryjob.comments.push(data[0]);
             }
           });
-          $scope.commentForm.comment = '';
+          $scope.commentForm.text = '';
         })
         .error(function(data) {
           $scope.openErrorModal('Oops, something went wrong. Please try ' +
@@ -280,8 +293,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     };
 
 
-    // Hearts
-
+    // Hearts control.
     $scope.toggleHeart = function(queryjob) {
       if (queryjob.userHeart) {
         $http.delete('/hearts/' + queryjob.userHeart._id)

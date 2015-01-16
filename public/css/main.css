@@ -30,12 +30,17 @@
 .margin-left-5px {
   margin-left: 5px;
 }
+
 .margin-left-10px {
   margin-left: 10px;
 }
 
 .text-align-center {
   text-align: center;
+}
+
+.color-black {
+  color: black !important;
 }
 
 .color-orange {

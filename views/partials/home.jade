@@ -88,29 +88,32 @@
         div(style="text-align: left")
           //- cancel button
           button.btn.btn-default.btn-sm.pull-right.cancel-text(
-            ng-if="queryjob.status > 3")
+            ng-if="queryjob.isFinished")
             | Cancel
-          div(style="padding-top: 15px;", ng-if="!(queryjob.status > 3)")
+          div(style="padding-top: 15px;", ng-if="!(queryjob.isFinished)")
           p.col-xs-12
-            span.name-text {{queryjob.user.name}} &nbsp;&nbsp;
+            span.name-text.margin-right-10px {{queryjob.user.name}}
             span.time-text {{queryjob.timeissued | today}}
           p.col-xs-12
-            i.fa.fa-users(ng-if="(queryjob.is_public)")
-            i.fa.fa-lock(ng-if="!(queryjob.is_public)")
-            span &nbsp;&nbsp;·&nbsp;&nbsp;
-            i.fa.fa-envelope(ng-if="queryjob.notification_email")
-            i.fa.fa-newspaper-o(ng-if="!(queryjob.notification_email)")
-            span &nbsp;&nbsp;·&nbsp;&nbsp;
-            i.fa.fa-exclamation-triangle &nbsp;
+            span(ng-repeat="icon in queryjob.userIcons")
+            a.color-black(tooltip="{{queryjob.audienceDesc}}")
+              i.fa.fa-users(ng-if="queryjob.is_public")
+              i.fa.fa-lock(ng-if="!(queryjob.is_public)")
+            span.margin-left-10px.margin-right-10px ·
+            a.color-black(tooltip="{{queryjob.notificationDesc}}")
+              i.fa.fa-envelope(ng-if="queryjob.notification_email")
+              i.fa.fa-newspaper-o(ng-if="!(queryjob.notification_email)")
+            span.margin-left-10px.margin-right-10px ·
+            a.color-black(tooltip="Deadline")
+              i.fa.fa-exclamation-triangle &nbsp;
             span {{queryjob.deadline | today}}
           p(style="font-size; 25px").userCmd.lead.col-xs-12
             | {{queryjob.typed_cmd}}
         //- robot stuff
         div(style="text-align: right")
           p(style="text-align: right").col-xs-12
-            span.name-text DUB-E &nbsp;&nbsp;
-            //- TODO: make below depends on "status"
-            spen.time-text {{queryjob.timeissued | today}}
+            span.name-text.margin-right-10px DUB-E
+            spen.time-text {{queryjob.robottimestamp | today}}
           //- TODO(mjyc): make below depends on the "response"
           //- p.col-xs-12
           //-   i.fa.fa-bar-chart-o &nbsp;
