@@ -13,6 +13,13 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
+
+add_message_files(
+ FILES
+ QueryJob.msg
+ Result.msg
+)
+
 add_service_files(DIRECTORY srv
   FILES
   ParseQuestion.srv
