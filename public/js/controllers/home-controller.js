@@ -2,8 +2,32 @@
 
 var homeControllers = angular.module('askdubeApp');
 
-homeControllers.controller('HomeController', ['$scope', '$http',
-  function($scope, $http) {
+homeControllers.controller('ModalInstanceCtrl',
+  function ($scope, $modalInstance, msg) {
+
+    $scope.errorModalMsg = msg;
+
+    $scope.ok = function () {
+      $modalInstance.close();
+    };
+  });
+
+homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
+  function($scope, $http, $modal) {
+
+    $scope.openErrorModal = function (msg) {
+
+      var modalInstance = $modal.open({
+        templateUrl: 'homeErrorModal.html',
+        controller: 'ModalInstanceCtrl',
+        resolve: {
+          msg: function () {
+            return msg;
+          }
+        }
+      });
+    };
+
 
     //==================================================================
     // Globals
@@ -112,11 +136,12 @@ homeControllers.controller('HomeController', ['$scope', '$http',
 
     // Submit question function.
     $scope.submitQuestion = function() {
-      // input check
+      // typed_cmd validation
       if ($scope.questionForm.typed_cmd === '') {
         return;
       }
-      // setting timestamps
+
+      // copying deadline
       $scope.questionForm.timeissued = new Date();
       $scope.questionForm.deadline = new Date();
       $scope.questionForm.deadline.setSeconds(0, 0);
@@ -124,15 +149,19 @@ homeControllers.controller('HomeController', ['$scope', '$http',
         $scope.questionDeadline.getHours());
       $scope.questionForm.deadline.setMinutes(
         $scope.questionDeadline.getMinutes());
-      // checking timestamps
+
+      // deadline validation
       var d = $scope.questionForm.deadline.getTime();
       var c = $scope.questionForm.timeissued.getTime();
+      console.log(d - 1000 * 60 * 10 * 1 * 1);
+      console.log(c);
       if (d - 1000 * 60 * 10 * 1 * 1 < c) {
-        alert('Deadline is too close! Please give more than 10min for DUB-E ' +
-          'to answer your question.');
+        $scope.openErrorModal('Deadline is too close! Please give more than' +
+          ' 10min for DUB-E to answer your question.');
+        return;
       }
 
-      // check if the user has an unanswered queryjob
+      // user queryjob validation
       $http.get('/queryjobs/list/userall/' + new Date().getTime() + '/0')
         .success(function(data) {
           var numUnansweredJobs = 0;
@@ -144,20 +173,23 @@ homeControllers.controller('HomeController', ['$scope', '$http',
             }
           }
           if (numUnansweredJobs >= 1) {
-            alert('Oops, you have an unanswered question. You can only ' +
-              'add new question after the current question is answered.');
+            $scope.openErrorModal('Oops, you have an unanswered question. ' +
+              'You can only  add new question after the current question is' +
+              ' answered.');
             $scope.questionForm.typed_cmd = '';
             return;
           }
         });
 
+      // post!
       $http.post('/queryjobs', $scope.questionForm)
         .success(function(data) {
           $scope.queryjobs.unshift(data[0]);
           $scope.questionForm.typed_cmd = '';
         })
         .error(function(data) {
-          alert('Oops, something went wrong. Please try refreshing the page.');
+          $scope.openErrorModal('Oops, something went wrong. Please try ' +
+            'refreshing the page.');
         });
     };
 
@@ -208,8 +240,8 @@ homeControllers.controller('HomeController', ['$scope', '$http',
             $scope.loadBusy = false;
           })
           .error(function(data) {
-            alert('Oops, something went wrong. Please try refreshing the ' +
-              'page.');
+            $scope.openErrorModal('Oops, something went wrong. Please try ' +
+            'refreshing the page.');
           });
       }
     };
@@ -242,7 +274,8 @@ homeControllers.controller('HomeController', ['$scope', '$http',
           $scope.commentForm.comment = '';
         })
         .error(function(data) {
-          alert('Oops, something went wrong. Please try refreshing the page.');
+          $scope.openErrorModal('Oops, something went wrong. Please try ' +
+            'refreshing the page.');
         });
     };
 

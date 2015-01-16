@@ -2,8 +2,6 @@
 //- Menubar
 //-=====================================================================
 
-<div ng-include="menu"></div>
-
 .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
   .container
     .navbar-header
@@ -89,7 +87,8 @@
         //- user stuff
         div(style="text-align: left")
           //- cancel button
-          button.btn.btn-default.btn-sm.pull-right.cancel-text(ng-if="queryjob.status > 3")
+          button.btn.btn-default.btn-sm.pull-right.cancel-text(
+            ng-if="queryjob.status > 3")
             | Cancel
           div(style="padding-top: 15px;", ng-if="!(queryjob.status > 3)")
           p.col-xs-12
@@ -122,7 +121,8 @@
         div.col-xs-12
           p
             //- TODO(mjyc): make below depends on "status"
-            .alert.alert-warning(style="text-align: center; margin-bottom: 0px")
+            .alert.alert-warning(
+              style="text-align: center; margin-bottom: 0px")
               | Running
     .panel-footer.footer
       .row
@@ -151,3 +151,18 @@
               span Thank You DUB-E &nbsp;
               i.fa.fa-heart
               span &nbsp;{{queryjob.hearts.length}}
+
+
+//-=====================================================================
+//- Modals
+//-=====================================================================
+script(type="text/ng-template", id="homeErrorModal.html").
+  <div class="modal-header" style="background-color: #d2322d;">
+    <h4 class="modal-title" style="color: white;">ERROR</h3>
+  </div>
+  <div class="modal-body">
+    {{errorModalMsg}}
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">OK</button>
+  </div>
