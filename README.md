@@ -77,7 +77,7 @@ On first terminal, run
 
 ```
 cd ~/path/to/sara_uw_website
-roslaunch launch/run_rosnodes.launch
+roslaunch launch/webserver.launch
 ```
 
 On second terminal, run

@@ -1,0 +1,7 @@
+# Placeholder action definition.
+string queryjob_id  # target document id
+---
+string text  # message
+string confidence  # message
+string img_path  # message
+---

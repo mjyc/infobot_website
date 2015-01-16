@@ -1,0 +1,3 @@
+string queryjob_id  # target document id
+---
+bool success

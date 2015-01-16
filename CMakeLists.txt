@@ -5,10 +5,15 @@ project(sara_uw_website)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  actionlib
+  actionlib_msgs
+  message_generation
   message_generation
   rospy
   std_msgs
 )
+
+catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -22,14 +27,35 @@ add_message_files(
 
 add_service_files(DIRECTORY srv
   FILES
+  # queryjob_scheduler_node
+  CancelQueryJob.srv
+  ScheduleQueryJob.srv
+  # question_parser_node
   ParseQuestion.srv
+  # nodejs server node via rosbridge
+  ReloadQueryJob.srv
 )
 
-generate_messages(DEPENDENCIES std_msgs)
+add_action_files(DIRECTORY action
+  FILES
+  RunQuery.action
+)
+
+generate_messages(DEPENDENCIES actionlib_msgs std_msgs)
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 catkin_package(
- CATKIN_DEPENDS message_runtime std_msgs
+ CATKIN_DEPENDS actionlib_msgs message_runtime std_msgs
 )
+
+#############
+## Testing ##
+#############
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(catkin COMPONENTS rostest)
+
+  add_rostest(test/test_queryjob_scheduler.test)
+endif()

@@ -74,10 +74,10 @@ module.exports = function(grunt) {
         failOnError: true
       },
       ros: {
-        command: 'roslaunch launch/run_rosnodes.launch',
+        command: 'roslaunch launch/webserver.launch',
       },
       ros4test: {
-        command: 'roslaunch launch/run_rosnodes_test.launch',
+        command: 'roslaunch launch/webserver_test.launch',
       },
       sleep: {
         command: 'sleep 5',

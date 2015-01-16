@@ -1,0 +1,268 @@
+#!/usr/bin/env python
+
+'''This node schedules, executes and cancels QueryJobs and executes
+them. Schedulring algorithm is based on "timeissued" fields (FIFO).
+'''
+
+# ######################################################################
+# Imports
+# ######################################################################
+
+import rospy
+
+# System builtins
+from datetime import datetime as dt
+from pytz import utc
+
+# ROS
+import actionlib
+from actionlib_msgs.msg import GoalStatus
+
+# SARA
+from bson.objectid import ObjectId
+from pymongo import MongoClient
+
+# Local
+from sara_uw_website.msg import (
+    RunQueryAction, RunQueryGoal, QueryJob
+)
+from sara_uw_website.srv import (
+    CancelQueryJob,
+    CancelQueryJobResponse,
+    ScheduleQueryJob,
+    ScheduleQueryJobResponse
+)
+
+
+# ######################################################################
+# Module level constants
+# ######################################################################
+
+RECEIVED = QueryJob.STATUS_RECEIVED
+SCHEDULED = QueryJob.STATUS_SCHEDULED
+RUNNING = QueryJob.STATUS_RUNNING
+SUCCEEDED = QueryJob.STATUS_SUCCEEDED
+CANCELLED = QueryJob.STATUS_CANCELLED
+FAILED = QueryJob.STATUS_FAILED
+
+
+# ######################################################################
+# Classes
+# ######################################################################
+class QueryJobScheduler:
+
+    def __init__(self):
+        rospy.init_node("queryjob_scheduler")
+
+        # Connect to DB.
+        host = rospy.get_param("~host", "localhost")
+        port = rospy.get_param("~port", 27017)
+        dbname = rospy.get_param("~dbname", "sara_uw_website")
+        collname = rospy.get_param("~collname", "queryjobs")
+        client = MongoClient(host, port, tz_aware=True)
+        db = client[dbname]
+        self._collection = db[collname]
+
+        # ROS Service and Publisher.
+        rospy.Service(
+            "/schedule_queryjob", ScheduleQueryJob,
+            self.handle_schedule_queryjob)
+        rospy.Service(
+            "/cancel_queryjob", CancelQueryJob,
+            self.handle_cancel_queryjob)
+        self._pub = rospy.Publisher(
+            '/updated_queryjob', QueryJob, queue_size=10000)
+
+        # ROS SimpleActionClient.
+        self._ac = actionlib.SimpleActionClient("/run_query", RunQueryAction)
+        rospy.loginfo("Waiting for server...")
+        self._ac.wait_for_server()
+        rospy.loginfo("Connected!")
+        self.execute_queryjobs()
+
+    def handle_cancel_queryjob(self, req):
+        # Parse input.
+        queryjob_id = ObjectId(req.queryjob_id)
+
+        # Set to cancel and log.
+        query = {"_id": queryjob_id}
+        update = {"$set": {
+            "status": CANCELLED,
+            "timecompleted": dt.utcnow().replace(tzinfo=utc)
+        }}
+        q = self._collection.find_and_modify(query, update)
+        if not q:
+            return CancelQueryJobResponse(False)
+
+        # Extra step is needed for running jobs.
+        if q["status"] == RUNNING:
+            if self._ac.get_state() != GoalStatus.ACTIVE:
+                rospy.logerr("The goal MUST be active!")
+                return CancelQueryJobResponse(False)
+            self._ac.cancel_goal()
+
+        return CancelQueryJobResponse(True)
+
+    def handle_schedule_queryjob(self, req):
+        # Input processing.
+        queryjob_id = ObjectId(req.queryjob_id)
+        timeissued = dt.utcfromtimestamp(req.timeissued).replace(tzinfo=utc)
+
+        # Prevent multiple scheduling.
+        qr = self._collection.find({
+            "_id": queryjob_id,
+            # "timeissued" field can be overwritten.
+            "order": {"$ne": None},
+            "timestarted": {"$ne": None},
+            "timecompleted": {"$ne": None},
+            "status": {"$ne": RECEIVED},
+            "response_text": {"$ne": None}
+        })
+        if qr.count() == 1:
+            rospy.logwarn("{0} is already scheduled!".format(queryjob_id))
+            return ScheduleQueryJobResponse(False)
+
+        # Modify data.
+        # Note that this node DOES NOT CREATE a new document.
+        data = {
+            "timeissued": timeissued,
+            "status": RECEIVED,
+            "order": None,
+            "timestarted": None,
+            "timecompleted": None,
+            "result": None
+        }
+        query = {"_id": queryjob_id}
+        update = {"$set": data}
+        if self._collection.find_and_modify(query, update):
+            return ScheduleQueryJobResponse(True)
+        else:
+            return ScheduleQueryJobResponse(False)
+
+    def schedule_queryjobs_timeissued_FIFO(self):
+        ''' Schedule QueryJobs based on timeissued values--first in
+        first out. Currently schedule every time this function gets
+        called. However, this can be modified since all the outputs are
+        written in database.
+            Also has some flavor of loadDB. For example, this code is
+        setting previously failed RUNNING jobs to FAILED.
+        '''
+
+        self._collection.find_and_modify(
+            {"status": RUNNING},
+            {"$set": {"status": CANCELLED,
+                      "timecompleted": dt.utcnow().replace(tzinfo=utc)}}
+        )
+
+        queue = []
+        query = {"$or": [{"status": RECEIVED}, {"status": SCHEDULED}]}
+        qr = self._collection.find(query).sort("timeissued")
+        order = 1  # order starts from 1
+        for q in qr:
+            queryjob_id = q["_id"]
+            query = {"_id": q["_id"]}
+            update = {"$set": {
+                "order": order,
+                "status": SCHEDULED
+            }}
+            if not self._collection.find_and_modify(query, update):
+                rospy.logerr("Error while writing schedule results!")
+                rospy.signal_shutdown("Bye!")
+
+            # Notify updates.
+            msg = QueryJob()
+            msg.id = str(queryjob_id)
+            # TODO(mjyc): do rest of transition here.
+            self._pub.publish(msg)
+
+            queue.append(queryjob_id)
+            order += 1
+
+    def execute_queryjobs(self):
+        # time.sleep(2)  # give sometime.
+
+        # Execution loop.
+        r = rospy.Rate(1)
+        while not rospy.is_shutdown():
+
+            # Schedule if there are new QueryJobs.
+            qr = self._collection.find({"status": RECEIVED})
+            if qr.count() > 0:
+                self.schedule_queryjobs_timeissued_FIFO()
+
+            # Check if there is any QueryJob to execute.
+            qr = self._collection.find({"status": SCHEDULED}).sort("order")
+            if qr.count() == 0:
+                rospy.logdebug("Waiting for a new QueryJob...")
+                r.sleep()
+                continue
+
+            # Start a QueryJob.
+            queryjob_id = qr[0]["_id"]
+            query = {"_id": queryjob_id}
+            timestarted = dt.utcnow().replace(tzinfo=utc)
+            update = {"$set": {
+                "timestarted": timestarted,
+                "status": RUNNING
+            }}
+            if self._collection.find_and_modify(query, update):
+                # Notify updates.
+                # msg = QueryJobUpdate()
+                # msg.queryjob_id = str(queryjob_id)
+                # msg.field_names = ["timestarted", "status"]
+                # self._pub.publish(msg)
+
+                goal = RunQueryGoal(str(queryjob_id))
+                self._ac.send_goal(goal)
+            else:
+                rospy.logerr("Error while writing send_goal results!")
+                rospy.signal_shutdown("Bye!")
+
+            # Finished the QueryJob.
+            self._ac.wait_for_result()
+            state = self._ac.get_state()
+            result = self._ac.get_result()
+
+            if result is not None:
+                response_text = result.text
+                response_confidence = result.confidence
+                response_img_path = result.img_path
+            else:
+                response_text = ""
+                response_confidence = -1
+                response_img_path = ""
+
+            status = FAILED
+            if state == GoalStatus.SUCCEEDED:
+                status = SUCCEEDED
+            elif state == GoalStatus.PREEMPTED:
+                status = CANCELLED
+
+            query = {"_id": queryjob_id}
+            timecompleted = dt.utcnow().replace(tzinfo=utc)
+            # need to insert new result object at this point of time.
+            update = {"$set": {
+                "timecompleted": timecompleted,
+                "status": status,
+                "response_text": response_text,
+                "response_confidence": response_confidence,
+                "response_img_path": response_img_path
+            }}
+            if not self._collection.find_and_modify(query, update):
+                rospy.logerr("Error while writing get_state results!")
+                rospy.signal_shutdown("Bye!")
+            # Notify updates.
+            # msg = QueryJobUpdate()
+            # msg.queryjob_id = str(queryjob_id)
+            # msg.field_names = ["timecompleted", "status"]
+            # self._pub.publish(msg)
+
+
+# ######################################################################
+# Main
+# ######################################################################
+if __name__ == "__main__":
+    try:
+        node = QueryJobScheduler()
+    except rospy.ROSInterruptException:
+        pass
