@@ -35,7 +35,7 @@ from sara_uw_website.srv import (
 
 
 # ######################################################################
-# Module level constants, functions
+# Module level constants
 # ######################################################################
 
 RECEIVED = QueryJob.STATUS_RECEIVED
@@ -45,6 +45,10 @@ SUCCEEDED = QueryJob.STATUS_SUCCEEDED
 CANCELLED = QueryJob.STATUS_CANCELLED
 FAILED = QueryJob.STATUS_FAILED
 
+
+# ######################################################################
+# Functions
+# ######################################################################
 
 def torostime(t):
     ''' Converts datetime.datetime object to rospy.rostime.Time object.
@@ -71,7 +75,6 @@ def torosuser(u):
     sara_uw_website/Result msg.
     '''
 
-    print u
     if u:
         return User(u["email"], u["name"])
     else:
@@ -192,6 +195,7 @@ class QueryJobScheduler:
         else:
             return ScheduleQueryJobResponse(False)
 
+    # NOTE: below function can be refactored to ROS service.
     def schedule_queryjobs_timeissued_FIFO(self):
         ''' Schedule QueryJobs based on timeissued values--first in
         first out. Currently schedule every time this function gets
