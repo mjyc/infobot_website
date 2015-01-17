@@ -1,13 +1,14 @@
 <?xml version="1.0" ?>
 <launch>
 
+  <arg name="exclude_mongodb" default="false"/>
   <arg name="host" default="localhost"/>
   <arg name="port" default="27017"/>
   <arg name="dbname" default="sara_uw_website"/>
   <arg name="collname" default="queryjobs"/>
 
   <!-- Make sure to run DB -->
-  <node name="mongo" type="mongo_wrapper_ros.py" pkg="warehouse_ros" output="log">
+  <node name="mongo" type="mongo_wrapper_ros.py" pkg="warehouse_ros" output="log" unless="$(arg exclude_mongodb)">
     <param name="database_path" value="~/sara/db"/>
     <param name="overwrite" value="false"/>
   </node>

@@ -30,6 +30,12 @@ router.post('/', function(req, res, next) {
     email: req.user.google.email,
   };
 
+  queryjob.status = null;
+  queryjob.order = null;
+  queryjob.timestarted = null;
+  queryjob.timecompleted = null;
+  queryjob.result = null;
+
   db.collection('queryjobs').insert(queryjob, function(err, result) {
     if (err) {
       return next(err);

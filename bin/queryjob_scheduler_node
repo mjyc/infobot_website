@@ -24,7 +24,7 @@ from pymongo import MongoClient
 
 # Local
 from sara_uw_website.msg import (
-    RunQueryAction, RunQueryGoal, QueryJob
+    RunQueryAction, RunQueryGoal, RunQueryResult, QueryJob, Result, User
 )
 from sara_uw_website.srv import (
     CancelQueryJob,
@@ -35,7 +35,7 @@ from sara_uw_website.srv import (
 
 
 # ######################################################################
-# Module level constants
+# Module level constants, functions
 # ######################################################################
 
 RECEIVED = QueryJob.STATUS_RECEIVED
@@ -44,6 +44,62 @@ RUNNING = QueryJob.STATUS_RUNNING
 SUCCEEDED = QueryJob.STATUS_SUCCEEDED
 CANCELLED = QueryJob.STATUS_CANCELLED
 FAILED = QueryJob.STATUS_FAILED
+
+
+def torostime(t):
+    ''' Converts datetime.datetime object to rospy.rostime.Time object.
+    '''
+
+    if t:
+        s = (t - dt(1970, 1, 1).replace(tzinfo=utc)).total_seconds()
+    else:
+        s = 0
+    return rospy.Time(s)
+
+def torosresult(r):
+    ''' Converts queryjob.result retrieved from DB to
+    sara_uw_website/Result msg.
+    '''
+
+    if r:
+        return Result(r["text"], r["confidence"], r["img_path"])
+    else:
+        return Result()
+
+def torosuser(u):
+    ''' Converts queryjob.result retrieved from DB to
+    sara_uw_website/Result msg.
+    '''
+
+    print u
+    if u:
+        return User(u["email"], u["name"])
+    else:
+        return User()
+
+def torosqueryjob(queryjob):
+    ''' Converts queryjob retrieved from DB to sara_uw_website/QueryJob
+    msg.
+    '''
+
+    msg = QueryJob()
+    msg.id = str(queryjob["_id"])
+
+    msg.timeissued = torostime(queryjob["timeissued"])
+    msg.typed_cmd = queryjob["typed_cmd"]
+    msg.notification_sms = queryjob["notification_sms"]
+    msg.notification_email = queryjob["notification_email"]
+    msg.is_public = queryjob["is_public"]
+    msg.deadline = torostime(queryjob["deadline"])
+    msg.user = torosuser(queryjob["user"])
+
+    msg.status = queryjob["status"]
+    msg.order = queryjob["order"]
+    msg.timestarted = torostime(queryjob["timestarted"])
+    msg.timecompleted = torostime(queryjob["timecompleted"])
+    msg.result = torosresult(queryjob["result"])
+
+    return msg
 
 
 # ######################################################################
@@ -75,9 +131,6 @@ class QueryJobScheduler:
 
         # ROS SimpleActionClient.
         self._ac = actionlib.SimpleActionClient("/run_query", RunQueryAction)
-        rospy.loginfo("Waiting for server...")
-        self._ac.wait_for_server()
-        rospy.loginfo("Connected!")
         self.execute_queryjobs()
 
     def handle_cancel_queryjob(self, req):
@@ -116,7 +169,7 @@ class QueryJobScheduler:
             "timestarted": {"$ne": None},
             "timecompleted": {"$ne": None},
             "status": {"$ne": RECEIVED},
-            "response_text": {"$ne": None}
+            "result": {"$ne": None}
         })
         if qr.count() == 1:
             rospy.logwarn("{0} is already scheduled!".format(queryjob_id))
@@ -172,18 +225,20 @@ class QueryJobScheduler:
             # Notify updates.
             msg = QueryJob()
             msg.id = str(queryjob_id)
-            # TODO(mjyc): do rest of transition here.
             self._pub.publish(msg)
 
             queue.append(queryjob_id)
             order += 1
 
     def execute_queryjobs(self):
-        # time.sleep(2)  # give sometime.
 
         # Execution loop.
         r = rospy.Rate(1)
         while not rospy.is_shutdown():
+            # Make sure server is running.
+            rospy.logdebug("Waiting for server...")
+            self._ac.wait_for_server()
+            rospy.logdebug("Connected!")
 
             # Schedule if there are new QueryJobs.
             qr = self._collection.find({"status": RECEIVED})
@@ -193,7 +248,8 @@ class QueryJobScheduler:
             # Check if there is any QueryJob to execute.
             qr = self._collection.find({"status": SCHEDULED}).sort("order")
             if qr.count() == 0:
-                rospy.logdebug("Waiting for a new QueryJob...")
+                rospy.logdebug(
+                    "Waiting for a new QueryJob...")
                 r.sleep()
                 continue
 
@@ -205,14 +261,13 @@ class QueryJobScheduler:
                 "timestarted": timestarted,
                 "status": RUNNING
             }}
-            if self._collection.find_and_modify(query, update):
-                # Notify updates.
-                # msg = QueryJobUpdate()
-                # msg.queryjob_id = str(queryjob_id)
-                # msg.field_names = ["timestarted", "status"]
-                # self._pub.publish(msg)
 
-                goal = RunQueryGoal(str(queryjob_id))
+            # Notify updates.
+            q = self._collection.find_and_modify(query, update, new=True)
+            if q:
+                msg = torosqueryjob(q)
+                self._pub.publish(msg)
+                goal = RunQueryGoal(msg)
                 self._ac.send_goal(goal)
             else:
                 rospy.logerr("Error while writing send_goal results!")
@@ -222,15 +277,11 @@ class QueryJobScheduler:
             self._ac.wait_for_result()
             state = self._ac.get_state()
             result = self._ac.get_result()
-
-            if result is not None:
-                response_text = result.text
-                response_confidence = result.confidence
-                response_img_path = result.img_path
-            else:
-                response_text = ""
-                response_confidence = -1
-                response_img_path = ""
+            if result is None:
+                result = RunQueryResult()
+                result.result.text = ""
+                result.result.confidence = 0.0
+                result.result.img_path = ""
 
             status = FAILED
             if state == GoalStatus.SUCCEEDED:
@@ -240,22 +291,23 @@ class QueryJobScheduler:
 
             query = {"_id": queryjob_id}
             timecompleted = dt.utcnow().replace(tzinfo=utc)
-            # need to insert new result object at this point of time.
+            # need to insert new result object at this point of time
             update = {"$set": {
                 "timecompleted": timecompleted,
                 "status": status,
-                "response_text": response_text,
-                "response_confidence": response_confidence,
-                "response_img_path": response_img_path
+                "result": {
+                    "text": result.result.text,
+                    "confidence": result.result.confidence,
+                    "img_path": result.result.img_path
+                }
             }}
-            if not self._collection.find_and_modify(query, update):
+            q = self._collection.find_and_modify(query, update)
+            if not q:
                 rospy.logerr("Error while writing get_state results!")
                 rospy.signal_shutdown("Bye!")
             # Notify updates.
-            # msg = QueryJobUpdate()
-            # msg.queryjob_id = str(queryjob_id)
-            # msg.field_names = ["timecompleted", "status"]
-            # self._pub.publish(msg)
+            msg = torosqueryjob(q)
+            self._pub.publish(msg)
 
 
 # ######################################################################

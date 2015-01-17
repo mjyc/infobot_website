@@ -23,6 +23,7 @@ add_message_files(
  FILES
  QueryJob.msg
  Result.msg
+ User.msg
 )
 
 add_service_files(DIRECTORY srv

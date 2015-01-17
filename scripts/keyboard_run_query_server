@@ -23,6 +23,18 @@ from sara_uw_website.msg import RunQueryAction, RunQueryResult
 
 
 # ######################################################################
+# Functions
+# ######################################################################
+
+def tolocaldt(rt):
+    ''' Converts rospy.rostime.Time object to .
+    '''
+
+    utc = dt.fromtimestamp(rt.to_sec()).replace(tzinfo=pytz.timezone("UTC"))
+    return utc.astimezone(pytz.timezone("US/Pacific"))
+
+
+# ######################################################################
 # Class
 # ######################################################################
 
@@ -65,7 +77,7 @@ class KeyboardRunQueryServer():
             "/run_query", RunQueryAction)
         self.current_goal = None
 
-    def is_server_updated_(self):
+    def _is_server_updated(self):
         if not self._server._as.is_active():
             print("Server is not active.")
             return True
@@ -74,20 +86,9 @@ class KeyboardRunQueryServer():
             return True
         return False
 
-    def confirm_email_sent_(self, queryjob, text):
+    def _confirm_img_cp(self, queryjob):
         while True:
-            send_email(queryjob, text)
-
-            def update_email_confirm():
-                print("\nDid you send the email above? y/N: ")
-            self._server.set_update_db(update_email_confirm)
-            ri = raw_input("Did you send the email above? y/N: ")
-            if ri.lower() == "y":
-                break
-
-    def confirm_img_cp_(self, queryjob):
-        while True:
-            print("\n" + str(queryjob['_id']) + ".png")
+            print("\n" + str(queryjob.id) + ".png")
 
             def update_img_confirm():
                 print("\nDid you create the above image? y/N: ")
@@ -112,34 +113,25 @@ class KeyboardRunQueryServer():
             # Displays information about current goal.
             print("Information about server's current goal:")
             self.current_goal = self._server._as.current_goal.get_goal()
-            qr = self._collection.find({
-                "_id": ObjectId(self.current_goal.queryjob_id)
-            })
+            queryjob = self.current_goal.queryjob
+
             # Passed deadline.
-            if qr[0]["deadline"] < dt.utcnow():
+            if queryjob.deadline < rospy.Time.now():
                 result = RunQueryResult()
-                result.text = ("Sorry, could not answer your question by the "
-                               "deadline.")
+                result.result.text = ("Sorry, could not answer your question "
+                                      "by the deadline.")
                 self._server.abort(result)
-                if qr[0]["notification_email"]:
-                    self.confirm_email_sent_(qr[0], result.text)
                 continue
 
             # Print info about the current goal.
-            timeissued_utc = qr[0]["timeissued"].replace(
-                tzinfo=pytz.timezone("UTC"))
-            deadline_utc = qr[0]["deadline"].replace(
-                tzinfo=pytz.timezone("UTC"))
-            timeissued_local = timeissued_utc.astimezone(
-                pytz.timezone("US/Pacific"))
-            deadline_local = deadline_utc.astimezone(
-                pytz.timezone("US/Pacific"))
-            print("  QueryJob ID: {0}".format(qr[0]["_id"]))
-            print("  User name: {0}".format(qr[0]["user_name"]))
+            timeissued_local = tolocaldt(queryjob.timeissued)
+            deadline_local = tolocaldt(queryjob.deadline)
+            print("  QueryJob ID: {0}".format(queryjob.id))
+            print("  User name: {0}".format(queryjob.user.name))
             print("  Timeissued: {0}".format(timeissued_local))
-            print("  Typed CMD: {0}".format(qr[0]["typed_cmd"]))
-            print("  SMS: {0}".format(qr[0]["notification_sms"]))
-            print("  Email: {0}".format(qr[0]["notification_email"]))
+            print("  Typed CMD: {0}".format(queryjob.typed_cmd))
+            print("  SMS: {0}".format(queryjob.notification_sms))
+            print("  Email: {0}".format(queryjob.notification_email))
             print("  Deadline: {0}".format(deadline_local))
 
             # Ask server action to take from the user.
@@ -149,7 +141,7 @@ class KeyboardRunQueryServer():
             ri = raw_input(
                 "Choose to (s)ucceed, (p)reempt, (a)bort and (q)uit: ")
             # Check if something has changed.
-            if self.is_server_updated_():
+            if self._is_server_updated():
                 continue
 
             # Parse the user input
@@ -166,31 +158,30 @@ class KeyboardRunQueryServer():
                 def update_success_msg():
                     print("\nDUB-E's success message: ")
                 self._server.set_update_db(update_success_msg)
-                result.text = raw_input("DUB-E's success message: ")
+                result.result.text = raw_input("DUB-E's success message: ")
 
                 def update_confidence():
                     print("\nDUB-E's confidence: ")
                 self._server.set_update_db(update_confidence)
-                result.confidence = raw_input("DUB-E's confidence: ")
+                result.result.confidence = float(
+                    raw_input("DUB-E's confidence: "))
                 img_path = os.path.join(
-                    "img", "results", self.current_goal.queryjob_id + ".png")
-                result.img_path = img_path
-                if self.is_server_updated_():
+                    "img", "results", self.current_goal.queryjob.id + ".png")
+                result.result.img_path = img_path
+                if self._is_server_updated():
                     continue
                 self._server.succeed(result)
-                self.confirm_img_cp_(qr[0])
+                self._confirm_img_cp(queryjob)
             elif ri == "p":
-                result.text = raw_input("DUB-E's cancel message: ")
-                if self.is_server_updated_():
+                result.result.text = raw_input("DUB-E's cancel message: ")
+                if self._is_server_updated():
                     continue
                 self._server.preempt(result)
             elif ri == "a":
-                result.text = raw_input("DUB-E's abort message: ")
-                if self.is_server_updated_():
+                result.result.text = raw_input("DUB-E's abort message: ")
+                if self._is_server_updated():
                     continue
                 self._server.abort(result)
-            if qr[0]["notification_email"]:
-                self.confirm_email_sent_(qr[0], result.text)
 
             r.sleep()
 

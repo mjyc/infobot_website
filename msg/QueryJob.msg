@@ -6,10 +6,11 @@ bool notification_sms    # a boolean indicating sms notification is desired.
 bool notification_email  # a boolean indicating email notification is desired.
 bool is_public           # a boolean indicating privacy status.
 time deadline            # a desired query deadline timestamp.
+sara_uw_website/User user  # requested user.
 
 # Modified from ROS
 uint8 status             # can take one of the following values.
-uint64 order              # a scheduling output in integer. Lower number means sooner the job will be executed (1 is the lowest order).
+uint64 order             # a scheduling output in integer. Lower number means sooner the job will be executed (1 is the lowest order).
 time timestarted         # a timestamp created when a ROS goal representing a single QueryJob is sent.
 time timecompleted       # a timestamp created when a result of the ROS goal is received.
 sara_uw_website/Result result  # result returned from the robot.
