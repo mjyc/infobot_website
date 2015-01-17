@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+
+'''Mock action server based on keyboard.
+'''
+
+# System built-ins
+import argparse
+from pytz import utc
+import datetime
+dt = datetime.datetime
+
+# SARA
+from pymongo import MongoClient
+
+# Local
+from sara_uw_website.msg import QueryJob
+
+
+# ######################################################################
+# Main
+# ######################################################################
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    # db arguments
+    parser.add_argument("--host", type=str, default="localhost")
+    parser.add_argument("--port", type=int, default=27017)
+    parser.add_argument(
+        "--dbname", type=str, default="sara_uw_website")
+    parser.add_argument(
+        "--collname", type=str, default="queryjobs")
+    # db arguments
+    parser.add_argument("-t", "--typed_cmd", type=str, default="Hello World!")
+    parser.add_argument("-e", "--notification_email", action="store_true",
+                        default=False)
+    parser.add_argument("-p", "--is_public", action="store_true",
+                        default=False)
+    parser.add_argument("-s", "--set_status", action="store_true",
+                        default=False)
+    args, unknown = parser.parse_known_args()
+
+    # Connect to DB.
+    dbname = args.dbname
+    collname = args.collname
+    client = MongoClient(args.host, args.port)
+    db = client[dbname]
+    collection = db[collname]
+
+    timeissued = dt.utcnow().replace(tzinfo=utc)
+    deadline = timeissued + datetime.timedelta(hours=1)
+    status = None
+    if args.set_status:
+        status = QueryJob.STATUS_RECEIVED
+        print "setting status to RECEIVED."
+    qid = collection.insert({
+        "timeissued": timeissued,
+        "typed_cmd": args.typed_cmd,
+        "notification_sms": False,
+        "notification_email": args.notification_email,
+        "is_public": args.is_public,
+        "deadline": deadline,
+        "user": {
+            "_id": "54b9b2e0db18687e998bf9b4",
+            "name": "Ask DUB-E Admin",
+            "email": "ask-dube-admin@cs.washington.edu",
+        },
+        "status": status,
+        "order": None,
+        "timestarted": None,
+        "timecompleted": None,
+        "result": None
+    })
+    print "queryjob DB obejct with id=%s was created." % qid
