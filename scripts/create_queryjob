@@ -31,10 +31,11 @@ if __name__ == "__main__":
         "--collname", type=str, default="queryjobs")
     # db arguments
     parser.add_argument("-t", "--typed_cmd", type=str, default="Hello World!")
-    parser.add_argument("-e", "--notification_email", action="store_true",
-                        default=False)
     parser.add_argument("-p", "--is_public", action="store_true",
                         default=False)
+    parser.add_argument("-e", "--notification_email", action="store_true",
+                        default=False)
+    parser.add_argument("-d", "--deadline_delta_min", type=int, default=10)
     parser.add_argument("-s", "--set_status", action="store_true",
                         default=False)
     args, unknown = parser.parse_known_args()
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     collection = db[collname]
 
     timeissued = dt.utcnow().replace(tzinfo=utc)
-    deadline = timeissued + datetime.timedelta(hours=1)
+    deadline = timeissued + datetime.timedelta(minutes=args.deadline_delta_min)
     status = None
     if args.set_status:
         status = QueryJob.STATUS_RECEIVED
