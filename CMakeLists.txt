@@ -30,7 +30,6 @@ add_service_files(DIRECTORY srv
   FILES
   # queryjob_server_node
   CancelQueryJob.srv
-  SetQueryJobROSFields.srv
   # question_parser_node
   ParseQuestion.srv
 )
@@ -56,5 +55,5 @@ catkin_package(
 if(CATKIN_ENABLE_TESTING)
   find_package(catkin COMPONENTS rostest)
 
-  add_rostest(test/test_queryjob_scheduler.test)
+  add_rostest(test/test_queryjob_server.test)
 endif()

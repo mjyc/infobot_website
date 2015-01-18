@@ -12,8 +12,8 @@
     <param name="overwrite" value="true"/>
   </node>
 
-  <!-- queryjob_scheduler node -->
-  <node name="queryjob_scheduler" pkg="sara_uw_website" type="queryjob_scheduler_node" output="screen" respawn="True">
+  <!-- queryjob_server node -->
+  <node name="queryjob_server" pkg="sara_uw_website" type="queryjob_server_node" output="screen" respawn="True">
     <param name="host" type="str" value="$(arg host)"/>
     <param name="port" type="int" value="$(arg port)"/>
     <param name="dbname" type="str" value="$(arg dbname)"/>
@@ -21,5 +21,6 @@
   </node>
 
   <!-- Test nodes -->
-  <test test-name="test_queryjob_scheduler_valid_resp_n_db" pkg="sara_uw_website" type="test_queryjob_scheduler" args="--testcase_id 0 --host $(arg host) --port $(arg port)  --dbname $(arg dbname) --collname $(arg collname)"/>
+  <test test-name="test_queryjob_server_valid_execution" pkg="sara_uw_website" type="test_queryjob_server" args="--testcase_id 0 --host $(arg host) --port $(arg port)  --dbname $(arg dbname) --collname $(arg collname)"/>
+  <test test-name="test_queryjob_server_cancel" pkg="sara_uw_website" type="test_queryjob_server" args="--testcase_id 1 --host $(arg host) --port $(arg port)  --dbname $(arg dbname) --collname $(arg collname)"/>
 </launch>

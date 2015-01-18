@@ -17,7 +17,7 @@
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
 
   <!-- Run QueryJob handlers -->
-  <node name="queryjob_scheduler" pkg="sara_uw_website" type="queryjob_scheduler_node" output="screen" respawn="True">
+  <node name="queryjob_scheduler" pkg="sara_uw_website" type="queryjob_server_node" output="screen" respawn="True">
     <param name="host" type="str" value="$(arg host)"/>
     <param name="port" type="int" value="$(arg port)"/>
     <param name="dbname" type="str" value="$(arg dbname)"/>

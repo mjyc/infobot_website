@@ -29,8 +29,6 @@ from sara_uw_website.msg import (
 from sara_uw_website.srv import (
     CancelQueryJob,
     CancelQueryJobResponse,
-    ScheduleQueryJob,
-    ScheduleQueryJobResponse
 )
 
 
@@ -42,7 +40,7 @@ RECEIVED = QueryJob.STATUS_RECEIVED
 SCHEDULED = QueryJob.STATUS_SCHEDULED
 RUNNING = QueryJob.STATUS_RUNNING
 SUCCEEDED = QueryJob.STATUS_SUCCEEDED
-CANCELLED = QueryJob.STATUS_CANCELLED
+CANCELED = QueryJob.STATUS_CANCELED
 FAILED = QueryJob.STATUS_FAILED
 
 
@@ -124,13 +122,10 @@ class QueryJobScheduler:
 
         # ROS Service and Publisher.
         rospy.Service(
-            "/schedule_queryjob", ScheduleQueryJob,
-            self.handle_schedule_queryjob)
-        rospy.Service(
             "/cancel_queryjob", CancelQueryJob,
             self.handle_cancel_queryjob)
         self._pub = rospy.Publisher(
-            '/updated_queryjob', QueryJob, queue_size=10000)
+            '/queryjob', QueryJob, queue_size=10000)
 
         # ROS SimpleActionClient.
         self._ac = actionlib.SimpleActionClient("/run_query", RunQueryAction)
@@ -138,12 +133,12 @@ class QueryJobScheduler:
 
     def handle_cancel_queryjob(self, req):
         # Parse input.
-        queryjob_id = ObjectId(req.queryjob_id)
+        queryjob_id = ObjectId(req.id)
 
         # Set to cancel and log.
         query = {"_id": queryjob_id}
         update = {"$set": {
-            "status": CANCELLED,
+            "status": CANCELED,
             "timecompleted": dt.utcnow().replace(tzinfo=utc)
         }}
         q = self._collection.find_and_modify(query, update)
@@ -152,6 +147,7 @@ class QueryJobScheduler:
 
         # Extra step is needed for running jobs.
         if q["status"] == RUNNING:
+            rospy.sleep(0.5)  # give server some time to respond
             if self._ac.get_state() != GoalStatus.ACTIVE:
                 rospy.logerr("The goal MUST be active!")
                 return CancelQueryJobResponse(False)
@@ -159,61 +155,24 @@ class QueryJobScheduler:
 
         return CancelQueryJobResponse(True)
 
-    def handle_schedule_queryjob(self, req):
-        # Input processing.
-        queryjob_id = ObjectId(req.queryjob_id)
-        timeissued = dt.utcfromtimestamp(req.timeissued).replace(tzinfo=utc)
-
-        # Prevent multiple scheduling.
-        qr = self._collection.find({
-            "_id": queryjob_id,
-            # "timeissued" field can be overwritten.
-            "order": {"$ne": None},
-            "timestarted": {"$ne": None},
-            "timecompleted": {"$ne": None},
-            "status": {"$ne": RECEIVED},
-            "result": {"$ne": None}
-        })
-        if qr.count() == 1:
-            rospy.logwarn("{0} is already scheduled!".format(queryjob_id))
-            return ScheduleQueryJobResponse(False)
-
-        # Modify data.
-        # Note that this node DOES NOT CREATE a new document.
-        data = {
-            "timeissued": timeissued,
-            "status": RECEIVED,
-            "order": None,
-            "timestarted": None,
-            "timecompleted": None,
-            "result": None
-        }
-        query = {"_id": queryjob_id}
-        update = {"$set": data}
-        if self._collection.find_and_modify(query, update):
-            return ScheduleQueryJobResponse(True)
-        else:
-            return ScheduleQueryJobResponse(False)
-
-    # NOTE: below function can be refactored to ROS service.
     def schedule_queryjobs_timeissued_FIFO(self):
-        ''' Schedule QueryJobs based on timeissued values--first in
-        first out. Currently schedule every time this function gets
-        called. However, this can be modified since all the outputs are
-        written in database.
-            Also has some flavor of loadDB. For example, this code is
-        setting previously failed RUNNING jobs to FAILED.
+        ''' Schedule QueryJobs based on timeissued values; first comes
+        first served or first in first out (FIFO).
         '''
 
+        # Cancel previously running QueryJobs.
         self._collection.find_and_modify(
             {"status": RUNNING},
-            {"$set": {"status": CANCELLED,
+            {"$set": {"status": CANCELED,
                       "timecompleted": dt.utcnow().replace(tzinfo=utc)}}
         )
 
+        # Retrieve unscheduled QueryJobs.
         queue = []
         query = {"$or": [{"status": RECEIVED}, {"status": SCHEDULED}]}
         qr = self._collection.find(query).sort("timeissued")
+
+        # Schedule FIFO.
         order = 1  # order starts from 1
         for q in qr:
             queryjob_id = q["_id"]
@@ -226,7 +185,7 @@ class QueryJobScheduler:
                 rospy.logerr("Error while writing schedule results!")
                 rospy.signal_shutdown("Bye!")
 
-            # Notify updates.
+            # notify updates
             msg = QueryJob()
             msg.id = str(queryjob_id)
             self._pub.publish(msg)
@@ -248,12 +207,13 @@ class QueryJobScheduler:
             qr = self._collection.find({"status": RECEIVED})
             if qr.count() > 0:
                 self.schedule_queryjobs_timeissued_FIFO()
+            else:
+                rospy.logdebug("No RECEIVED QueryJob.")
 
             # Check if there is any QueryJob to execute.
             qr = self._collection.find({"status": SCHEDULED}).sort("order")
             if qr.count() == 0:
-                rospy.logdebug(
-                    "Waiting for a new QueryJob...")
+                rospy.logdebug("Waiting for a QueryJob...")
                 r.sleep()
                 continue
 
@@ -273,14 +233,17 @@ class QueryJobScheduler:
                 self._pub.publish(msg)
                 goal = RunQueryGoal(msg)
                 self._ac.send_goal(goal)
+                rospy.logdebug("Sent goal: %s" % goal)
             else:
                 rospy.logerr("Error while writing send_goal results!")
                 rospy.signal_shutdown("Bye!")
 
             # Finished the QueryJob.
+            rospy.logdebug("Waiting for result...")
             self._ac.wait_for_result()
             state = self._ac.get_state()
             result = self._ac.get_result()
+            rospy.logdebug("Received result: %s" % result)
             if result is None:
                 result = RunQueryResult()
                 result.result.text = ""
@@ -291,7 +254,7 @@ class QueryJobScheduler:
             if state == GoalStatus.SUCCEEDED:
                 status = SUCCEEDED
             elif state == GoalStatus.PREEMPTED:
-                status = CANCELLED
+                status = CANCELED
 
             query = {"_id": queryjob_id}
             timecompleted = dt.utcnow().replace(tzinfo=utc)

@@ -36,8 +36,6 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--notification_email", action="store_true",
                         default=False)
     parser.add_argument("-d", "--deadline_delta_min", type=int, default=10)
-    parser.add_argument("-s", "--set_status", action="store_true",
-                        default=False)
     args, unknown = parser.parse_known_args()
 
     # Connect to DB.
@@ -49,10 +47,6 @@ if __name__ == "__main__":
 
     timeissued = dt.utcnow().replace(tzinfo=utc)
     deadline = timeissued + datetime.timedelta(minutes=args.deadline_delta_min)
-    status = None
-    if args.set_status:
-        status = QueryJob.STATUS_RECEIVED
-        print "setting status to RECEIVED."
     qid = collection.insert({
         "timeissued": timeissued,
         "typed_cmd": args.typed_cmd,
@@ -65,7 +59,7 @@ if __name__ == "__main__":
             "name": "Ask DUB-E Admin",
             "email": "ask-dube-admin@cs.washington.edu",
         },
-        "status": status,
+        "status": QueryJob.STATUS_RECEIVED,
         "order": None,
         "timestarted": None,
         "timecompleted": None,

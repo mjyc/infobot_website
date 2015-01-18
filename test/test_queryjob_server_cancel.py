@@ -6,7 +6,8 @@
 # ######################################################################
 
 # System built-ins
-from datetime import datetime as dt
+import datetime
+dt = datetime.datetime
 from pytz import utc
 
 # ROS
@@ -14,7 +15,7 @@ import rospy
 
 # Local
 from sara_uw_website.msg import QueryJob, RunQueryAction
-from sara_uw_website.srv import CancelQueryJob, ScheduleQueryJob
+from sara_uw_website.srv import CancelQueryJob
 from sara_uw_website.simpler_action_server import SimplerActionServer
 from testutils import random_unix_epoch
 
@@ -37,31 +38,43 @@ def test_valid_cancel(self):
     # Wait for the service to start
     rospy.wait_for_service("/cancel_queryjob")
     c = rospy.ServiceProxy("/cancel_queryjob", CancelQueryJob)
-    rospy.wait_for_service("/schedule_queryjob")
-    s = rospy.ServiceProxy("/schedule_queryjob", ScheduleQueryJob)
 
     # Create test instances.
     N = 50  # MUST BE DIVISIBLE BY 2
-    test_inputs = []
+    timeissued_ints = []
     for i in range(N):
-        timeissued_int = random_unix_epoch()
+        timeissued_ints.append(random_unix_epoch())
+    timeissued_ints.sort()
+    test_inputs = []
+    # extend test_inputs with queryjob_id fields
+    for timeissued_int in timeissued_ints:
         timeissued = dt.utcfromtimestamp(timeissued_int).replace(tzinfo=utc)
-        queryjob_id = self._collection.insert({"dummy": None})
-        test_inputs.append({
-            "queryjob_id": queryjob_id,
-            "queryjob_id_str": str(queryjob_id),
+        deadline = timeissued + \
+            datetime.timedelta(minutes=10)
+        queryjob_id = self._collection.insert({
             "timeissued": timeissued,
-            "timeissued_int": timeissued_int
+            "typed_cmd": str(i),  # dummy
+            "notification_sms": False,  # dummy
+            "notification_email": False,  # dummy
+            "is_public": False,  # dummy
+            "deadline": deadline,  # dummy
+            "user": {  # dummy
+                "_id": "",
+                "name": "",
+                "email": "",
+            },  # dummy
+            "status": QueryJob.STATUS_RECEIVED,
+            "order": None,
+            "timestarted": None,
+            "timecompleted": None,
+            "result": None
         })
-    # Assume QueryJobs are created in order of "timeissued".
-    test_inputs.sort(key=lambda x: x["timeissued"])
-
-    # Call service.
-    resps = []
-    for test_input in test_inputs:
-        resp = s(
-            test_input["queryjob_id_str"], test_input["timeissued_int"])
-        resps.append(resp)
+        test_inputs.append({
+            "timeissued": timeissued,
+            "timeissued_int": timeissued_int,
+            "queryjob_id": queryjob_id,
+            "queryjob_id_str": str(queryjob_id)
+        })
 
     # Check number of documents in DB.
     self.assertTrue(self._collection.find().count(), N)
@@ -82,7 +95,7 @@ def test_valid_cancel(self):
         }
         qr = self._collection.find(query)
         self.assertEqual(qr.count(), 1)
-        self.assertEqual(qr[0]["status"], QueryJob.STATUS_CANCELLED)
+        self.assertEqual(qr[0]["status"], QueryJob.STATUS_CANCELED)
         self.assertEqual(
             qr[0]["timeissued"].replace(tzinfo=utc), test_input["timeissued"])
 
@@ -112,7 +125,7 @@ def test_valid_cancel(self):
         }
         qr = self._collection.find(query)
         self.assertEqual(qr.count(), 1)
-        self.assertEqual(qr[0]["status"], QueryJob.STATUS_CANCELLED)
+        self.assertEqual(qr[0]["status"], QueryJob.STATUS_CANCELED)
         self.assertEqual(
             qr[0]["timeissued"].replace(tzinfo=utc), test_input["timeissued"])
         i += 1

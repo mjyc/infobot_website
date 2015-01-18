@@ -21,5 +21,5 @@ uint8 STATUS_RECEIVED = 0   # assigned after a service request is received.
 uint8 STATUS_SCHEDULED = 1  # assigned after the scheduling is done.
 uint8 STATUS_RUNNING = 2    # assigned right before sending an ROS action goal.
 uint8 STATUS_SUCCEEDED = 3  # assigned when a returned result has "SUCCEEDED" state.
-uint8 STATUS_CANCELLED = 4  # assigned when a returned result has "PREEMPTED" state.
+uint8 STATUS_CANCELED = 4   # assigned when a returned result has "PREEMPTED" state.
 uint8 STATUS_FAILED = 5     # are assigned when a returned result has other state.
