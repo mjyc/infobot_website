@@ -15,6 +15,14 @@
 
 /* Alias */
 
+.color-black {
+  color: black !important;
+}
+
+.color-orange {
+  color: orange !important;
+}
+
 .margin-right-2px {
   margin-right: 2px;
 }
@@ -35,18 +43,13 @@
   margin-left: 10px;
 }
 
+.opacity-half {
+ opacity: 0.5;
+}
+
 .text-align-center {
   text-align: center;
 }
-
-.color-black {
-  color: black !important;
-}
-
-.color-orange {
-  color: orange !important;
-}
-
 
 /* Custom */
 

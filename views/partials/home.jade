@@ -81,14 +81,16 @@
 //-=====================================================================
 
 .container(infinite-scroll="loadMore()", infinite-scroll-disabled="loadBusy")
-  .panel.panel-default(ng-repeat="queryjob in queryjobs")
+  .panel.panel-default(ng-repeat="queryjob in queryjobs",
+                       ng-class="{'opacity-half': queryjob.status.isCanceled}")
     .panel-body.body(style="padding-top: 0px;")
       .row
         //- user stuff
         div(style="text-align: left")
           //- cancel button
           button.btn.btn-default.btn-sm.pull-right.cancel-text(
-            ng-if="!(queryjob.status.isFinished)")
+            ng-if="!(queryjob.status.isFinished)"
+            ng-click="cancelQueryjob(queryjob)")
             | Cancel
           div(style="padding-top: 15px;", ng-if="queryjob.status.isFinished")
           p.col-xs-12
@@ -117,7 +119,11 @@
             span {{queryjob.result.confidence}}
           p(style="font-size; 25px").lead.col-xs-12
             | {{queryjob.robot.text}}
-          //- TODO(mjyc): add image
+          p.col-xs-12(ng-if="queryjob.status.isSucceeded")
+            a(ng-href="#",ng-click="toggleImg(queryjob)")
+              img.img-thumbnail(
+                ng-src="{{queryjob.result.img_path}}",
+                ng-class="queryjob.resultImgClass")
         div.col-xs-12
           p
             div(ng-class="queryjob.status.class"

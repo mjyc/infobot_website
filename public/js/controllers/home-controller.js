@@ -15,6 +15,68 @@ homeControllers.controller('ModalInstanceCtrl',
 homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
   function($scope, $http, $modal) {
 
+    // ROS
+    var ros = new ROSLIB.Ros({
+      url: 'ws://localhost:9090'
+    });
+    ros.connection = false;
+    ros.on('connection', function() {
+      ros.connected = true;
+      console.log('Connected to websocket server.');
+    });
+    ros.on('error', function(error) {
+      ros.connected = false;
+      console.log('Error connecting to websocket server: ', error);
+    });
+    ros.on('close', function() {
+      console.log(ros);
+      ros.connected = false;
+      console.log('Connection to websocket server closed.');
+    });
+
+    var reloadQueryjob = function(qidStr) {
+      $http.get('queryjobs/' + qidStr).success(function(data) {
+        $scope.queryjobs.forEach(function(queryjob, i) {
+          if (String(queryjob._id) === qidStr) {
+            $scope.queryjobs[i] = convertQueryjob(data);
+          }
+        });
+      });
+    };
+
+    var listener = new ROSLIB.Topic({
+      ros: ros,
+      name: '/queryjob',
+      messageType: 'sara_uw_website/QueryJob'
+    });
+    listener.subscribe(function(msg) {
+      reloadQueryjob(msg.id);
+    });
+
+    $scope.cancelQueryjob = function(queryjob) {
+      var request = new ROSLIB.ServiceRequest({
+        id: queryjob._id
+      });
+      var addTwoIntsClient = new ROSLIB.Service({
+        ros : ros,
+        name : '/cancel_queryjob',
+        serviceType : 'sara_uw_website/CancelQueryJob'
+      });
+      addTwoIntsClient.callService(request, function(result) {
+        if (result.success) {
+          reloadQueryjob(String(queryjob._id));
+        }
+      });
+    };
+
+    $scope.toggleImg = function(queryjob) {
+      if (queryjob.resultImgClass === 'result-img-sm') {
+        queryjob.resultImgClass = 'result-img-lg';
+      } else if (queryjob.resultImgClass === 'result-img-lg') {
+        queryjob.resultImgClass = 'result-img-sm';
+      }
+    };
+
     //==================================================================
     // Constants
     //==================================================================
@@ -96,7 +158,8 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
           desc: statusToStr[queryjob.status * 1],
           class: statusToClass[queryjob.status * 1],
           isFinished: statusToIsFinished[queryjob.status * 1],
-          isSucceeded: (queryjob.status === SUCCEEDED)
+          isSucceeded: (queryjob.status === SUCCEEDED),
+          isCanceled: (queryjob.status === CANCELED)
         },
         robot: {
           name: 'DUB-E',
@@ -104,6 +167,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
           text: statusToText[queryjob.status * 1]
         },
         result: queryjob.result,
+        resultImgClass: 'result-img-sm',
         comments: [],
         commentForm: {
           timecommented: null,
@@ -267,7 +331,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
             // post!
             $http.post('/queryjobs', $scope.questionForm)
               .success(function(data) {
-                var json = queryjobToJSON(data[0]);
+                var json = convertQueryjob(data[0]);
                 $scope.queryjobs.unshift(json);
                 $scope.questionForm.typed_cmd = '';
               })
@@ -299,7 +363,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         queryjob.heartClass = queryjob.heart ? 'active color-orange' : '';
       });
     };
-    $http.get('queryjobs/list/all/' + new Date().getTime() + '/10?offset=0')
+    $http.get('queryjobs/list/all/' + new Date().getTime() + '/20')
       .success(function(data) {
         $scope.queryjobs = data;
         $scope.queryjobs.forEach(loadComments);
@@ -318,7 +382,9 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         $scope.loadBusy = true;
         $http.get('/queryjobs/list/userall/' + $scope.loadAfter + '/10')
           .success(function(data) {
-            data.forEach(function(v) {$scope.queryjobs.push(v);});
+            data.forEach(function(v) {
+              $scope.queryjobs.push(v);
+            });
             $scope.loadBusy = false;
           })
           .error(function(data) {

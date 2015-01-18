@@ -45,7 +45,7 @@ class KeyboardActionServer(SimplerActionServer):
 
     def preempt_cb(self):
         result = RunQueryResult()
-        result.text = 'Successfully canceled your question.'
+        result.result.text = 'Successfully canceled your question.'
         if self._as.is_active():
             print("\n(Server) Update: Preempting current goal!")
             self._as.set_preempted(result)
