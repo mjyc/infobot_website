@@ -37,7 +37,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     $scope.SCHEDULED = 1;
     $scope.RUNNING = 2;
     $scope.SUCCEEDED = 3;
-    $scope.CANCELLED = 4;
+    $scope.CANCELED = 4;
     $scope.FAILED = 5;
 
     var isQueryJobFinished = function(status) {
@@ -166,34 +166,38 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       }
 
       // user queryjob validation
-      $http.get('/queryjobs/list/userall/' + new Date().getTime() + '/0')
+      $http.get('/queryjobs/list/all/' + new Date().getTime() + '/0')
         .success(function(data) {
           var numUnansweredJobs = 0;
           for (var i = data.length - 1; i >= 0; i--) {
+            console.log('data[i].status');
+            console.log(data[i].status);
             if (data[i].status === $scope.RECEIVED ||
               data[i].status === $scope.SCHEDULED ||
               data[i].status === $scope.RUNNING) {
               numUnansweredJobs += 1;
             }
           }
+          console.log('numUnansweredJobs');
+          console.log(numUnansweredJobs);
           if (numUnansweredJobs >= 1) {
             $scope.openErrorModal('Oops, you have an unanswered question. ' +
               'You can only  add new question after the current question is' +
               ' answered.');
             $scope.questionForm.typed_cmd = '';
             return;
+          } else {
+            // post!
+            $http.post('/queryjobs', $scope.questionForm)
+              .success(function(data) {
+                $scope.queryjobs.unshift(data[0]);
+                $scope.questionForm.typed_cmd = '';
+              })
+              .error(function(data) {
+                $scope.openErrorModal('Oops, something went wrong. Please ' +
+                  'try refreshing the page.');
+              });
           }
-        });
-
-      // post!
-      $http.post('/queryjobs', $scope.questionForm)
-        .success(function(data) {
-          $scope.queryjobs.unshift(data[0]);
-          $scope.questionForm.typed_cmd = '';
-        })
-        .error(function(data) {
-          $scope.openErrorModal('Oops, something went wrong. Please try ' +
-            'refreshing the page.');
         });
     };
 
@@ -231,7 +235,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       //- TODO: make below depends on "status"
       queryjob.robottimestamp = queryjob.timeissued;
     };
-    $http.get('queryjobs/list/userall/' + new Date().getTime() + '/10')
+    $http.get('queryjobs/list/all/' + new Date().getTime() + '/10')
       .success(function(data) {
         $scope.queryjobs = data;
         jQuery.each($scope.queryjobs, loadComments);

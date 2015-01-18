@@ -30,7 +30,7 @@ router.post('/', function(req, res, next) {
     email: req.user.google.email,
   };
 
-  queryjob.status = null;
+  queryjob.status = 0;
   queryjob.order = null;
   queryjob.timestarted = null;
   queryjob.timecompleted = null;
