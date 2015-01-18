@@ -17,7 +17,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
 
     // ROS
     var ros = new ROSLIB.Ros({
-      url: 'ws://localhost:9090'
+      url: rosUrl
     });
     ros.connection = false;
     ros.on('connection', function() {

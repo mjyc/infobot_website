@@ -16,7 +16,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 router.get('/', function(req, res) {
   if (req.isAuthenticated()) {
-    res.render('index', { DEV: req.DEV });
+    res.render('index', { DEV: req.DEV, ROSURL: req.ROSURL });
   } else {
     res.render('signup');
   }
@@ -24,7 +24,7 @@ router.get('/', function(req, res) {
 
 router.get('/partials/:name', function(req, res) {
   var name = req.params.name;
-  res.render('partials/' + name, { DEV: req.DEV });
+  res.render('partials/' + name, { DEV: req.DEV, ROSURL: req.ROSURL });
 });
 
 // Logout.

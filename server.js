@@ -36,25 +36,6 @@ var db = mongo.db(dbUrl, {
   native_parser: true
 }); // connect to db
 
-// ROS
-var ros = new ROSLIB.Ros({
-  url: config.get('rosConfig').url
-});
-ros.connection = false;
-ros.on('connection', function() {
-  ros.connected= true;
-  console.log('Connected to websocket server.');
-});
-ros.on('error', function(error) {
-  ros.connected= false;
-  console.log('Error connecting to websocket server: ', error);
-});
-ros.on('close', function() {
-  console.log(ros);
-  ros.connected= false;
-  console.log('Connection to websocket server closed.');
-});
-
 // Passport.
 require('./config/passport')(passport, db);
 
@@ -97,6 +78,7 @@ app.use(flash()); // use connect-flash for flash messages stored in
 app.use(function(req, res, next) {
   req.db = db;
   req.DEV = (app.get('env') === 'development');
+  req.ROSURL = config.get('rosConfig').url;
   next();
 });
 
