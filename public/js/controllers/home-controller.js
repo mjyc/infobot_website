@@ -3,11 +3,11 @@
 var homeControllers = angular.module('askdubeApp');
 
 homeControllers.controller('ModalInstanceCtrl',
-  function ($scope, $modalInstance, msg) {
+  function($scope, $modalInstance, msg) {
 
     $scope.errorModalMsg = msg;
 
-    $scope.ok = function () {
+    $scope.ok = function() {
       $modalInstance.close();
     };
   });
@@ -16,7 +16,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
   function($scope, $http, $modal) {
 
     //==================================================================
-    // Global Constants
+    // Constants
     //==================================================================
 
     // IMPORTANT: make sure to sync with msg/QueryJob.js file!
@@ -27,79 +27,105 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     var CANCELED = 4;
     var FAILED = 5;
 
-    var statusToStr = [
-      'In Queue',    // RECEIVED
-      'In Queue',    // SCHEDULED
-      'Running',     // RUNNING
-      'Success :)',  // SUCCEEDED
-      'Canceled',    // CANCELED
-      'Failed :('    // FAILED
-    ];
-
-    var statusToClass = [
-      'alert alert-info',        // RECEIVED
-      'alert alert-info',        // SCHEDULED
-      'alert alert-warning',     // RUNNING
-      'alert alert-success :)',  // SUCCEEDED
-      'alert alert-danger',      // CANCELED
-      'alert alert-danger :('    // FAILED
-    ];
-
-    var isFinished = [
-      false,  // RECEIVED
-      false,  // SCHEDULED
-      false,  // RUNNING
-      true,   // SUCCEEDED
-      true,   // CANCELED
-      true    // FAILED
-    ];
-
 
     //==================================================================
-    // Global Functions
+    // Functions
     //==================================================================
 
-    // For Modal.
-    $scope.openErrorModal = function (msg) {
+    // Convert queryjob to template friendly format.
+    var convertQueryjob = function(queryjob) {
+      var statusToStr = [
+        'In Queue', // RECEIVED
+        'In Queue', // SCHEDULED
+        'Running', // RUNNING
+        'Success :)', // SUCCEEDED
+        'Canceled', // CANCELED
+        'Failed :(' // FAILED
+      ];
+      var statusToClass = [
+        'alert alert-info', // RECEIVED
+        'alert alert-info', // SCHEDULED
+        'alert alert-warning', // RUNNING
+        'alert alert-success :)', // SUCCEEDED
+        'alert alert-danger', // CANCELED
+        'alert alert-danger :(' // FAILED
+      ];
+      var statusToIsFinished = [
+        false, // RECEIVED
+        false, // SCHEDULED
+        false, // RUNNING
+        true, // SUCCEEDED
+        true, // CANCELED
+        true // FAILED
+      ];
+      var statusToTimestamp = [
+        queryjob.timeissued, // RECEIVED
+        queryjob.timeissued, // SCHEDULED
+        queryjob.timestarted, // RUNNING
+        queryjob.timecompleted, // SUCCEEDED
+        queryjob.timecompleted, // CANCELED
+        queryjob.timecompleted // FAILED
+      ];
+      var statusToText = [
+        'Will work on your question as soon as possible...', // RECEIVED
+        'Will work on your question as soon as possible...', // SCHEDULED
+        'Working on your question!', // RUNNING
+        queryjob.result ? queryjob.result.text : '', // SUCCEEDED
+        queryjob.result ? queryjob.result.text : '', // CANCELED
+        queryjob.result ? queryjob.result.text : '' // FAILED
+      ];
 
+      return {
+        _id: queryjob._id,
+        user: {
+          name: queryjob.user.name,
+          timestamp: queryjob.timeissued,
+          text: queryjob.typed_cmd
+        },
+        audience: {
+          desc: queryjob.is_public ? 'Shared with CSE' : 'Only Me',
+          icon: queryjob.is_public ? 'fa fa-users' : 'fa fa-lock'
+        },
+        notification: {
+          desc: queryjob.notification_email ? 'Email' : 'Feed Only',
+          icon: queryjob.notification_email ?
+            'fa fa-envelope' : 'fa fa-newspaper-o'
+        },
+        deadline: queryjob.deadline,
+        status: {
+          desc: statusToStr[queryjob.status * 1],
+          class: statusToClass[queryjob.status * 1],
+          isFinished: statusToIsFinished[queryjob.status * 1],
+          isSucceeded: (queryjob.status === SUCCEEDED)
+        },
+        robot: {
+          name: 'DUB-E',
+          timestamp: statusToTimestamp[queryjob.status * 1],
+          text: statusToText[queryjob.status * 1]
+        },
+        result: queryjob.result,
+        comments: [],
+        commentForm: {
+          timecommented: null,
+          text: '',
+          qid: queryjob._id
+        },
+        hearts: [],
+        heartClass: ''
+      };
+    };
+
+    // For modal.
+    $scope.openErrorModal = function(msg) {
       var modalInstance = $modal.open({
         templateUrl: 'homeErrorModal.html',
         controller: 'ModalInstanceCtrl',
         resolve: {
-          msg: function () {
+          msg: function() {
             return msg;
           }
         }
       });
-    };
-
-    // For Processing QueryJob.
-
-    var processQueryJob = function(queryjob) {
-      queryjob.audienceDesc = (queryjob.is_public) ?
-        'Shared with CSE' : 'Only Me';
-      queryjob.notificationDesc = (queryjob.notification_email) ?
-        'Email' : 'Feed Only';
-      queryjob.confidenceDesc = 'Confidence';
-
-      queryjob.statusStr = statusToStr[queryjob.status*1];
-      queryjob.statusClass = statusToClass[queryjob.status*1];
-      queryjob.isFinished = isFinished[queryjob.status*1];
-      queryjob.isSuccess = (queryjob.status === SUCCEEDED);
-
-      if (queryjob.status === RECEIVED ||
-          queryjob.status === SCHEDULED) {
-        queryjob.robotTimestamp = queryjob.timeissued;
-        queryjob.robotText = 'Will work on your question as soon as ' +
-          'possible...';
-      } else if (queryjob.status === RUNNING) {
-        queryjob.robotTimestamp = queryjob.timestarted;
-        queryjob.robotText = 'Working on your question!';
-      } else {
-        queryjob.robotTimestamp = queryjob.timecompleted;
-        queryjob.robotText = queryjob.result.text;
-        queryjob.robotConfidence = false;
-      }
     };
 
 
@@ -226,9 +252,8 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         .success(function(data) {
           var numUnansweredJobs = 0;
           for (var i = data.length - 1; i >= 0; i--) {
-            if (data[i].status === $scope.RECEIVED ||
-              data[i].status === $scope.SCHEDULED ||
-              data[i].status === $scope.RUNNING) {
+            if (data[i].status === RECEIVED || data[i].status === SCHEDULED ||
+              data[i].status === RUNNING) {
               numUnansweredJobs += 1;
             }
           }
@@ -242,8 +267,8 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
             // post!
             $http.post('/queryjobs', $scope.questionForm)
               .success(function(data) {
-                processQueryJob(data[0]);
-                $scope.queryjobs.unshift(data[0]);
+                var json = queryjobToJSON(data[0]);
+                $scope.queryjobs.unshift(json);
                 $scope.questionForm.typed_cmd = '';
               })
               .error(function(data) {
@@ -260,37 +285,28 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     //==================================================================
 
     // Load data.
-    var loadComments = function(i, queryjob) {
+    var loadComments = function(queryjob) {
       $http.get('comments/list/' + queryjob._id).success(function(data) {
         queryjob.comments = data;
-        queryjob.commentForm = {
-          timecommented: null,
-          text: '',
-          qid: null,
-        };
       });
     };
-    var loadHearts = function(i, queryjob) {
+    var loadHearts = function(queryjob) {
       $http.get('hearts/list/' + queryjob._id).success(function(data) {
         queryjob.hearts = data;
-        queryjob.userHeart = queryjob.hearts.filter(function(heart) {
+        queryjob.heart = data.filter(function(heart) {
           return $scope.user._id === heart.user.id;
-        });
-        queryjob.userHeart = queryjob.userHeart[0];
-        if (queryjob.userHeart) {
-          queryjob.userHeartActive = 'active';
-        } else {
-          queryjob.userHeartActive = 'btn';
-        }
+        })[0];
+        queryjob.heartClass = queryjob.heart ? 'active color-orange' : '';
       });
     };
-    $http.get('queryjobs/list/all/' + new Date().getTime() + '/10')
+    $http.get('queryjobs/list/all/' + new Date().getTime() + '/10?offset=0')
       .success(function(data) {
         $scope.queryjobs = data;
-        jQuery.each($scope.queryjobs, loadComments);
-        jQuery.each($scope.queryjobs, loadHearts);
-        jQuery.each($scope.queryjobs,
-          function(i, v) { return processQueryJob(v); });
+        $scope.queryjobs.forEach(loadComments);
+        $scope.queryjobs.forEach(loadHearts);
+        $scope.queryjobs.forEach(function(v, i) {
+          $scope.queryjobs[i] = convertQueryjob(v);
+        });
       });
 
     // Infinite scroll setup.
@@ -302,40 +318,28 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         $scope.loadBusy = true;
         $http.get('/queryjobs/list/userall/' + $scope.loadAfter + '/10')
           .success(function(data) {
-            for (var i = 0; i < data.length; i++) {
-              $scope.queryjobs.push(data[i]);
-            }
+            data.forEach(function(v) {$scope.queryjobs.push(v);});
             $scope.loadBusy = false;
           })
           .error(function(data) {
             $scope.openErrorModal('Oops, something went wrong. Please try ' +
-            'refreshing the page.');
+              'refreshing the page.');
           });
       }
     };
 
-
-    $scope.submitComment = function(qid) {
-      var queryjob = $scope.queryjobs.filter(function(queryjob) {
-        return queryjob._id === qid;
-      });
-      queryjob = queryjob[0];
-
+    // Comments setup.
+    $scope.submitComment = function(queryjob) {
       // input validation
       if (queryjob.commentForm.text === '') {
         return;
       }
       // setting timestamps
       queryjob.commentForm.timecommented = new Date();
-      queryjob.commentForm.qid = qid;
 
       $http.post('/comments', queryjob.commentForm)
         .success(function(data) {
-          $scope.queryjobs.forEach(function(queryjob) {
-            if (queryjob._id === qid) {
-              queryjob.comments.push(data[0]);
-            }
-          });
+          queryjob.comments.push(data[0]);
           queryjob.commentForm.text = '';
         })
         .error(function(data) {
@@ -344,19 +348,18 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         });
     };
 
-
-    // Hearts control.
+    // Hearts setup.
     $scope.toggleHeart = function(queryjob) {
-      if (queryjob.userHeart) {
-        $http.delete('/hearts/' + queryjob.userHeart._id)
+      if (queryjob.heart) {
+        $http.delete('/hearts/' + queryjob.heart._id)
           .success(function(data) {
-            loadHearts(0, queryjob);
+            loadHearts(queryjob);
           });
       } else {
         $http.post('/hearts', {
           qid: queryjob._id
         }).success(function(data) {
-          loadHearts(0, queryjob);
+          loadHearts(queryjob);
         });
       }
     };

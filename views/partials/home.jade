@@ -88,45 +88,42 @@
         div(style="text-align: left")
           //- cancel button
           button.btn.btn-default.btn-sm.pull-right.cancel-text(
-            ng-if="!(queryjob.isFinished)")
+            ng-if="!(queryjob.status.isFinished)")
             | Cancel
-          div(style="padding-top: 15px;", ng-if="queryjob.isFinished")
+          div(style="padding-top: 15px;", ng-if="queryjob.status.isFinished")
           p.col-xs-12
             span.name-text.margin-right-10px {{queryjob.user.name}}
-            span.time-text {{queryjob.timeissued | today}}
+            span.time-text {{queryjob.user.timestamp | today}}
           p.col-xs-12
-            span(ng-repeat="icon in queryjob.userIcons")
-            a.color-black(tooltip="{{queryjob.audienceDesc}}")
-              i.fa.fa-users(ng-if="queryjob.is_public")
-              i.fa.fa-lock(ng-if="!(queryjob.is_public)")
+            a.color-black(tooltip="{{queryjob.audience.desc}}")
+              i(ng-class="queryjob.audience.icon")
             span.margin-left-10px.margin-right-10px ·
-            a.color-black(tooltip="{{queryjob.notificationDesc}}")
-              i.fa.fa-envelope(ng-if="queryjob.notification_email")
-              i.fa.fa-newspaper-o(ng-if="!(queryjob.notification_email)")
+            a.color-black(tooltip="{{queryjob.notification.desc}}")
+              i(ng-class="queryjob.notification.icon")
             span.margin-left-10px.margin-right-10px ·
             a.color-black(tooltip="Deadline")
               i.fa.fa-exclamation-triangle &nbsp;
             span {{queryjob.deadline | today}}
           p(style="font-size; 25px").userCmd.lead.col-xs-12
-            | {{queryjob.typed_cmd}}
+            | {{queryjob.user.text}}
         //- robot stuff
         div(style="text-align: right")
           p(style="text-align: right").col-xs-12
-            span.name-text.margin-right-10px DUB-E
-            spen.time-text {{queryjob.robotTimestamp | today}}
-          p.col-xs-12(ng-if="queryjob.isSuccess")
-            a.color-black(tooltip="{{queryjob.confidenceDesc}}")
+            span.name-text.margin-right-10px {{queryjob.robot.name}}
+            spen.time-text {{queryjob.robot.timestamp | today}}
+          p.col-xs-12(ng-if="queryjob.status.isSuccess")
+            a.color-black(tooltip="Confidence")
               i.fa.fa-bar-chart-o &nbsp;
             span {{queryjob.result.confidence}}
           p(style="font-size; 25px").lead.col-xs-12
-            | {{queryjob.robotText}}
+            | {{queryjob.robot.text}}
           //- TODO(mjyc): add image
         div.col-xs-12
           p
-            div(ng-class="queryjob.statusClass"
+            div(ng-class="queryjob.status.class"
                 style="text-align: center; margin-bottom: 0px")
-              | {{queryjob.statusStr}}
-    .panel-footer.footer(ng-if="queryjob.isSuccess")
+              | {{queryjob.status.desc}}
+    .panel-footer.footer(ng-if="queryjob.status.isSucceeded")
       .row
         //- comments history
         .col-xs-12
@@ -139,7 +136,7 @@
                 | {{comment.timecommented | today}}
         p
           //- input comment
-          form(ng-submit="submitComment(queryjob._id)").col-xs-8.col-sm-9
+          form(ng-submit="submitComment(queryjob)").col-xs-8.col-sm-9
             .input-group.input-group-sm
               input.form-control(type="text", placeholder="Write a comment...",
                 ng-model="queryjob.commentForm.text")
@@ -148,7 +145,7 @@
           //- heart button
           .col-xs-4.col-sm-3(style="text-align: right")
             button.btn.btn-default.btn-sm(
-              ng-class="{'color-orange': queryjob.userHeart}",
+              ng-class="queryjob.heartClass",
               ng-click="toggleHeart(queryjob)")
               span Thank You DUB-E &nbsp;
               i.fa.fa-heart

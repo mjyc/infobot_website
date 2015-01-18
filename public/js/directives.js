@@ -16,5 +16,5 @@ angular.module('askdubeApp').directive('ngEnter', function($document) {
         };
         $document.bind('keydown keypress', enterWatcher);
       }
-    }
+    };
   });
