@@ -1,6 +1,6 @@
-# Modified from Node.js
-string id                # ROS msg can't have name _id
+# Modified by Node.js server
 time timeissued          # a timestamp created when a user issued a query.
+string id                # ROS msg can't have name _id
 string typed_cmd         # a raw command typed by a user.
 bool notification_sms    # a boolean indicating sms notification is desired.
 bool notification_email  # a boolean indicating email notification is desired.
@@ -8,7 +8,7 @@ bool is_public           # a boolean indicating privacy status.
 time deadline            # a desired query deadline timestamp.
 sara_uw_website/User user  # requested user.
 
-# Modified from ROS
+# Modified by ROS node
 uint8 status             # can take one of the following values.
 uint64 order             # a scheduling output in integer. Lower number means sooner the job will be executed (1 is the lowest order).
 time timestarted         # a timestamp created when a ROS goal representing a single QueryJob is sent.

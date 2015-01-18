@@ -28,13 +28,11 @@ add_message_files(
 
 add_service_files(DIRECTORY srv
   FILES
-  # queryjob_scheduler_node
+  # queryjob_server_node
   CancelQueryJob.srv
-  ScheduleQueryJob.srv
+  SetQueryJobROSFields.srv
   # question_parser_node
   ParseQuestion.srv
-  # nodejs server node via rosbridge
-  ReloadQueryJob.srv
 )
 
 add_action_files(DIRECTORY action

@@ -1,6 +1,0 @@
-string queryjob_id  # target document id
-
-int32 timeissued  # in seconds
-                  # a timestamp created when a user issued a query
----
-bool success
