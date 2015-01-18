@@ -15,6 +15,51 @@ homeControllers.controller('ModalInstanceCtrl',
 homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
   function($scope, $http, $modal) {
 
+    //==================================================================
+    // Global Constants
+    //==================================================================
+
+    // IMPORTANT: make sure to sync with msg/QueryJob.js file!
+    var RECEIVED = 0;
+    var SCHEDULED = 1;
+    var RUNNING = 2;
+    var SUCCEEDED = 3;
+    var CANCELED = 4;
+    var FAILED = 5;
+
+    var statusToStr = [
+      'In Queue',    // RECEIVED
+      'In Queue',    // SCHEDULED
+      'Running',     // RUNNING
+      'Success :)',  // SUCCEEDED
+      'Canceled',    // CANCELED
+      'Failed :('    // FAILED
+    ];
+
+    var statusToClass = [
+      'alert alert-info',        // RECEIVED
+      'alert alert-info',        // SCHEDULED
+      'alert alert-warning',     // RUNNING
+      'alert alert-success :)',  // SUCCEEDED
+      'alert alert-danger',      // CANCELED
+      'alert alert-danger :('    // FAILED
+    ];
+
+    var isFinished = [
+      false,  // RECEIVED
+      false,  // SCHEDULED
+      false,  // RUNNING
+      true,   // SUCCEEDED
+      true,   // CANCELED
+      true    // FAILED
+    ];
+
+
+    //==================================================================
+    // Global Functions
+    //==================================================================
+
+    // For Modal.
     $scope.openErrorModal = function (msg) {
 
       var modalInstance = $modal.open({
@@ -28,20 +73,33 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       });
     };
 
+    // For Processing QueryJob.
 
-    //==================================================================
-    // Globals
-    //==================================================================
+    var processQueryJob = function(queryjob) {
+      queryjob.audienceDesc = (queryjob.is_public) ?
+        'Shared with CSE' : 'Only Me';
+      queryjob.notificationDesc = (queryjob.notification_email) ?
+        'Email' : 'Feed Only';
+      queryjob.confidenceDesc = 'Confidence';
 
-    $scope.RECEIVED = 0;
-    $scope.SCHEDULED = 1;
-    $scope.RUNNING = 2;
-    $scope.SUCCEEDED = 3;
-    $scope.CANCELED = 4;
-    $scope.FAILED = 5;
+      queryjob.statusStr = statusToStr[queryjob.status*1];
+      queryjob.statusClass = statusToClass[queryjob.status*1];
+      queryjob.isFinished = isFinished[queryjob.status*1];
+      queryjob.isSuccess = (queryjob.status === SUCCEEDED);
 
-    var isQueryJobFinished = function(status) {
-      return status > $scope.RUNNING;
+      if (queryjob.status === RECEIVED ||
+          queryjob.status === SCHEDULED) {
+        queryjob.robotTimestamp = queryjob.timeissued;
+        queryjob.robotText = 'Will work on your question as soon as ' +
+          'possible...';
+      } else if (queryjob.status === RUNNING) {
+        queryjob.robotTimestamp = queryjob.timestarted;
+        queryjob.robotText = 'Working on your question!';
+      } else {
+        queryjob.robotTimestamp = queryjob.timecompleted;
+        queryjob.robotText = queryjob.result.text;
+        queryjob.robotConfidence = false;
+      }
     };
 
 
@@ -157,8 +215,6 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       // deadline validation
       var d = $scope.questionForm.deadline.getTime();
       var c = $scope.questionForm.timeissued.getTime();
-      console.log(d - 1000 * 60 * 10 * 1 * 1);
-      console.log(c);
       if (d - 1000 * 60 * 10 * 1 * 1 < c) {
         $scope.openErrorModal('Deadline is too close! Please give more than' +
           ' 10min for DUB-E to answer your question.');
@@ -170,16 +226,12 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         .success(function(data) {
           var numUnansweredJobs = 0;
           for (var i = data.length - 1; i >= 0; i--) {
-            console.log('data[i].status');
-            console.log(data[i].status);
             if (data[i].status === $scope.RECEIVED ||
               data[i].status === $scope.SCHEDULED ||
               data[i].status === $scope.RUNNING) {
               numUnansweredJobs += 1;
             }
           }
-          console.log('numUnansweredJobs');
-          console.log(numUnansweredJobs);
           if (numUnansweredJobs >= 1) {
             $scope.openErrorModal('Oops, you have an unanswered question. ' +
               'You can only  add new question after the current question is' +
@@ -190,6 +242,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
             // post!
             $http.post('/queryjobs', $scope.questionForm)
               .success(function(data) {
+                processQueryJob(data[0]);
                 $scope.queryjobs.unshift(data[0]);
                 $scope.questionForm.typed_cmd = '';
               })
@@ -210,6 +263,11 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     var loadComments = function(i, queryjob) {
       $http.get('comments/list/' + queryjob._id).success(function(data) {
         queryjob.comments = data;
+        queryjob.commentForm = {
+          timecommented: null,
+          text: '',
+          qid: null,
+        };
       });
     };
     var loadHearts = function(i, queryjob) {
@@ -226,21 +284,13 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         }
       });
     };
-    var processQueryJob = function(i, queryjob) {
-      queryjob.isFinished = isQueryJobFinished(queryjob.status);
-      queryjob.audienceDesc = (queryjob.is_public) ?
-        'Shared with CSE' : 'Only Me';
-      queryjob.notificationDesc = (queryjob.notification_email) ?
-        'Email' : 'Feed Only';
-      //- TODO: make below depends on "status"
-      queryjob.robottimestamp = queryjob.timeissued;
-    };
     $http.get('queryjobs/list/all/' + new Date().getTime() + '/10')
       .success(function(data) {
         $scope.queryjobs = data;
         jQuery.each($scope.queryjobs, loadComments);
         jQuery.each($scope.queryjobs, loadHearts);
-        jQuery.each($scope.queryjobs, processQueryJob);
+        jQuery.each($scope.queryjobs,
+          function(i, v) { return processQueryJob(v); });
       });
 
     // Infinite scroll setup.
@@ -265,30 +315,28 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     };
 
 
-    // Comments control.
-    $scope.commentForm = {
-      timecommented: null,
-      comment: '',
-      qid: null,
-    };
-
     $scope.submitComment = function(qid) {
+      var queryjob = $scope.queryjobs.filter(function(queryjob) {
+        return queryjob._id === qid;
+      });
+      queryjob = queryjob[0];
+
       // input validation
-      if ($scope.commentForm.typed_cmd === '') {
+      if (queryjob.commentForm.text === '') {
         return;
       }
       // setting timestamps
-      $scope.commentForm.timecommented = new Date();
-      $scope.commentForm.qid = qid;
+      queryjob.commentForm.timecommented = new Date();
+      queryjob.commentForm.qid = qid;
 
-      $http.post('/comments', $scope.commentForm)
+      $http.post('/comments', queryjob.commentForm)
         .success(function(data) {
           $scope.queryjobs.forEach(function(queryjob) {
             if (queryjob._id === qid) {
               queryjob.comments.push(data[0]);
             }
           });
-          $scope.commentForm.text = '';
+          queryjob.commentForm.text = '';
         })
         .error(function(data) {
           $scope.openErrorModal('Oops, something went wrong. Please try ' +

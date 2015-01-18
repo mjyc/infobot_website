@@ -88,9 +88,9 @@
         div(style="text-align: left")
           //- cancel button
           button.btn.btn-default.btn-sm.pull-right.cancel-text(
-            ng-if="queryjob.isFinished")
+            ng-if="!(queryjob.isFinished)")
             | Cancel
-          div(style="padding-top: 15px;", ng-if="!(queryjob.isFinished)")
+          div(style="padding-top: 15px;", ng-if="queryjob.isFinished")
           p.col-xs-12
             span.name-text.margin-right-10px {{queryjob.user.name}}
             span.time-text {{queryjob.timeissued | today}}
@@ -113,28 +113,27 @@
         div(style="text-align: right")
           p(style="text-align: right").col-xs-12
             span.name-text.margin-right-10px DUB-E
-            spen.time-text {{queryjob.robottimestamp | today}}
-          //- TODO(mjyc): make below depends on the "response"
-          //- p.col-xs-12
-          //-   i.fa.fa-bar-chart-o &nbsp;
-          //-   span 90%
+            spen.time-text {{queryjob.robotTimestamp | today}}
+          p.col-xs-12(ng-if="queryjob.isSuccess")
+            a.color-black(tooltip="{{queryjob.confidenceDesc}}")
+              i.fa.fa-bar-chart-o &nbsp;
+            span {{queryjob.result.confidence}}
           p(style="font-size; 25px").lead.col-xs-12
-            | Yes.
+            | {{queryjob.robotText}}
           //- TODO(mjyc): add image
         div.col-xs-12
           p
-            //- TODO(mjyc): make below depends on "status"
-            .alert.alert-warning(
-              style="text-align: center; margin-bottom: 0px")
-              | Running
-    .panel-footer.footer
+            div(ng-class="queryjob.statusClass"
+                style="text-align: center; margin-bottom: 0px")
+              | {{queryjob.statusStr}}
+    .panel-footer.footer(ng-if="queryjob.isSuccess")
       .row
         //- comments history
         .col-xs-12
           p(ng-repeat="comment in queryjob.comments")
             small
               b {{comment.user.name}} &nbsp;
-              span {{comment.comment}}
+              span {{comment.text}}
               br
               span(style="color: gray;")
                 | {{comment.timecommented | today}}
@@ -143,7 +142,7 @@
           form(ng-submit="submitComment(queryjob._id)").col-xs-8.col-sm-9
             .input-group.input-group-sm
               input.form-control(type="text", placeholder="Write a comment...",
-                ng-model="commentForm.comment")
+                ng-model="queryjob.commentForm.text")
               .input-group-btn
                 button.btn.btn-default.btn-sm Post
           //- heart button
@@ -167,5 +166,5 @@ script(type="text/ng-template", id="homeErrorModal.html").
     {{errorModalMsg}}
   </div>
   <div class="modal-footer">
-    <button class="btn btn-primary" ng-click="ok()">OK</button>
+    <button class="btn btn-primary" ng-enter="ok();" ng-click="ok()">OK</button>
   </div>

@@ -17,6 +17,7 @@ sara_uw_website/Result result  # result returned from the robot.
 
 
 # Constants
+# IMPORTANT: make sure to sync with public/js/controllers/home-controller.js file!
 uint8 STATUS_RECEIVED = 0   # assigned after a service request is received.
 uint8 STATUS_SCHEDULED = 1  # assigned after the scheduling is done.
 uint8 STATUS_RUNNING = 2    # assigned right before sending an ROS action goal.
