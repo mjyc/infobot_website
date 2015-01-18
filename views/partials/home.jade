@@ -111,7 +111,7 @@
           p(style="text-align: right").col-xs-12
             span.name-text.margin-right-10px {{queryjob.robot.name}}
             spen.time-text {{queryjob.robot.timestamp | today}}
-          p.col-xs-12(ng-if="queryjob.status.isSuccess")
+          p.col-xs-12(ng-if="queryjob.status.isSucceeded")
             a.color-black(tooltip="Confidence")
               i.fa.fa-bar-chart-o &nbsp;
             span {{queryjob.result.confidence}}
