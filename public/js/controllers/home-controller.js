@@ -15,6 +15,11 @@ homeControllers.controller('ModalInstanceCtrl',
 homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
   function($scope, $http, $modal) {
 
+    //
+    $scope.afterhoursMode = (new Date().getHours() < 9 ||
+      new Date().getHours() > 16) && !dev;
+    console.log($scope.afterhoursMode);
+
     // ROS.
     $scope.ros = new ROSLIB.Ros({
       url: rosUrl  // rosUrl defined in index.jade
