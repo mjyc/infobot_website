@@ -95,8 +95,6 @@ node bin/www
 
 This node is a ROS server that supplements the Node.js webserver (e.g., server.js). This node accesses the database directly, makes modification and publishes updates using ROS topic. Specifically, once proper queryjob instances are created by the Node.js webserver, this node (1) scans DB to check if there are any queryjob instances that can be run, (2) schedules the found instances in FIFO manner, (3) runs them using the ROS action client API, and (4) provides a ROS service for canceling a running queryjob. Note that you can use `scripts/create_queryjob` script to create a queryjob DB instance without running the Node.js webserver, and you can use `scripts/keyboard_run_query_server` to launch keyboard based fake (e.g., no real robot running) ROS action server.
 
-, and to
-
 #### Action API
 
 ##### Action Subscribed Topics
