@@ -39,7 +39,7 @@ npm install -g node-inspector  # for debugging
 npm install -g bower
 bower install
 
-# install sendemail (not included in rosdistro yet) for scripts/keyboard_run_query_server
+# install sendemail (not included in rosdistro yet) for scripts/keyboard_run_query_server or will use python-based sendemail library in future.
 sudo apt-get install sendmail
 ```
 
