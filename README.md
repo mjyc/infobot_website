@@ -93,31 +93,33 @@ node bin/www
 
 ### queryjob_server_node
 
-This node is a ROS server that supplements the Node.js webserver (e.g., server.js). This node accesses the database directly, makes modification and publishes updates using ROS topic. To create a queryjob DB object instance without running Node.js webserver, use `scripts/create_queryjob`. This node (1) scans DB to see if there are any queryjob instances to run, (2) schedules instances that can be run in FIFO style, (3) runs them using a ROS action client, and (4) provides ROS service for canceling a queryjob.
+This node is a ROS server that supplements the Node.js webserver (e.g., server.js). This node accesses the database directly, makes modification and publishes updates using ROS topic. Specifically, once proper queryjob instances are created by the Node.js webserver, this node (1) scans DB to check if there are any queryjob instances that can be run, (2) schedules the found instances in FIFO manner, (3) runs them using the ROS action client API, and (4) provides a ROS service for canceling a running queryjob. Note that you can use `scripts/create_queryjob` script to create a queryjob DB instance without running the Node.js webserver, and you can use `scripts/keyboard_run_query_server` to launch keyboard based fake (e.g., no real robot running) ROS action server.
+
+, and to
 
 #### Action API
 
 ##### Action Subscribed Topics
 
-* run_query/result (sara_uw_website/RunQueryActionResult)
-  Monitor result from the robot-side executor.
+* `run_query/result` (sara_uw_website/RunQueryActionResult)
+  * Monitor result from the robot-side executor.
 
 ##### Action Published Topics
 
-* run_query/goal(sara_uw_website/RunQueryActionGoal)
-  Sends goals to the robot-side executor.
-* run_query/cancel(actionlib_msgs/GoalID)
-  Sends cancel requests to the robot-side executor.
+* `run_query/goal` (sara_uw_website/RunQueryActionGoal)
+  * Sends goals to the robot-side executor.
+* `run_query/cancel` (actionlib_msgs/GoalID)
+  * Sends cancel requests to the robot-side executor.
 
 #### Published Topics
 
-* queryjob (sara_uw_website/QueryJob)
-  Updated queryjob wrapped in ROS msg.
+* `queryjob` (sara_uw_website/QueryJob)
+  * Updated queryjob wrapped in ROS msg.
 
 #### Services
 
 * `cancel_queryjob` (sara_uw_website/CancelQueryJob)
-  Cancel service can be called at any stage of scheduling.
+  * Cancel service can be called at any stage of scheduling.
 
 ### question_parser_node
 
