@@ -161,15 +161,15 @@ def send_any_email(to, subject, message):
 
 def send_email(queryjob, text):
     send_any_email(queryjob.user.email, "Notification from DUB-E",
-                   "Hi %s!\n\n"
+                   "Hello %s!\n\n"
                    "You asked: %s\n\n"
                    "The answer is: %s\n\n"
-                   "Go to \"Ask DUB-E\": http://dub-e.org"
                    "---\n"
                    "DUB-E, Service Robot\n"
                    "Computer Science & Engineering\n"
                    "University of Washington\n"
-                   % (queryjob.user, queryjob.typed_cmd, text))
+                   "Ask DUB-E: http://dub-e.org\n"
+                   % (queryjob.user.name, queryjob.typed_cmd, text))
 
 
 # ######################################################################
