@@ -23,6 +23,14 @@
   color: orange !important;
 }
 
+.margin-left-5px {
+  margin-left: 5px;
+}
+
+.margin-left-10px {
+  margin-left: 10px;
+}
+
 .margin-right-2px {
   margin-right: 2px;
 }
@@ -35,16 +43,12 @@
   margin-right: 10px;
 }
 
-.margin-left-5px {
-  margin-left: 5px;
-}
-
-.margin-left-10px {
-  margin-left: 10px;
-}
-
 .opacity-half {
  opacity: 0.5;
+}
+
+.padding-top-70px {
+  margin-top: 70px;
 }
 
 .text-align-center {

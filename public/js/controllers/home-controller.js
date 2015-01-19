@@ -15,25 +15,25 @@ homeControllers.controller('ModalInstanceCtrl',
 homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
   function($scope, $http, $modal) {
 
-    // ROS
-    var ros = new ROSLIB.Ros({
-      url: rosUrl
+    // ROS.
+    $scope.ros = new ROSLIB.Ros({
+      url: rosUrl  // rosUrl defined in index.jade
     });
-    ros.connection = false;
-    ros.on('connection', function() {
-      ros.connected = true;
+    $scope.ros.connected = false;
+    $scope.ros.on('connection', function() {
+      $scope.ros.connected = true;
       console.log('Connected to websocket server.');
     });
-    ros.on('error', function(error) {
-      ros.connected = false;
+    $scope.ros.on('error', function(error) {
+      $scope.ros.connected = false;
       console.log('Error connecting to websocket server: ', error);
     });
-    ros.on('close', function() {
-      console.log(ros);
-      ros.connected = false;
+    $scope.ros.on('close', function() {
+      $scope.ros.connected = false;
       console.log('Connection to websocket server closed.');
     });
 
+    // Util.
     var reloadQueryjob = function(qidStr) {
       $http.get('queryjobs/' + qidStr).success(function(data) {
         $scope.queryjobs.forEach(function(queryjob, i) {
@@ -44,8 +44,9 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       });
     };
 
+    // For updating current questions.
     var listener = new ROSLIB.Topic({
-      ros: ros,
+      ros: $scope.ros,
       name: '/queryjob',
       messageType: 'sara_uw_website/QueryJob'
     });
@@ -53,12 +54,13 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       reloadQueryjob(msg.id);
     });
 
+    // For cancel.
     $scope.cancelQueryjob = function(queryjob) {
       var request = new ROSLIB.ServiceRequest({
         id: queryjob._id
       });
       var addTwoIntsClient = new ROSLIB.Service({
-        ros : ros,
+        ros : $scope.ros,
         name : '/cancel_queryjob',
         serviceType : 'sara_uw_website/CancelQueryJob'
       });
@@ -69,12 +71,23 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       });
     };
 
+    // Result image display.
     $scope.toggleImg = function(queryjob) {
       if (queryjob.resultImgClass === 'result-img-sm') {
         queryjob.resultImgClass = 'result-img-lg';
       } else if (queryjob.resultImgClass === 'result-img-lg') {
         queryjob.resultImgClass = 'result-img-sm';
       }
+    };
+
+    $scope.mode = 'userall';
+    $scope.setHome = function() {
+      $scope.mode = 'userall';
+      reloadQueryjobs();
+    };
+    $scope.setWall = function() {
+      $scope.mode = 'cse';
+      reloadQueryjobs();
     };
 
     //==================================================================
@@ -312,7 +325,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       }
 
       // user queryjob validation
-      $http.get('/queryjobs/list/all/' + new Date().getTime() + '/0')
+      $http.get('/queryjobs/list/' + $scope.mode + '/' + new Date().getTime() + '/0')
         .success(function(data) {
           var numUnansweredJobs = 0;
           for (var i = data.length - 1; i >= 0; i--) {
@@ -363,15 +376,19 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         queryjob.heartClass = queryjob.heart ? 'active color-orange' : '';
       });
     };
-    $http.get('queryjobs/list/all/' + new Date().getTime() + '/20')
-      .success(function(data) {
-        $scope.queryjobs = data;
-        $scope.queryjobs.forEach(loadComments);
-        $scope.queryjobs.forEach(loadHearts);
-        $scope.queryjobs.forEach(function(v, i) {
-          $scope.queryjobs[i] = convertQueryjob(v);
+    var reloadQueryjobs = function() {
+      console.log('what?')
+      $http.get('queryjobs/list/' + $scope.mode + '/' + new Date().getTime() + '/20')
+        .success(function(data) {
+          $scope.queryjobs = data;
+          $scope.queryjobs.forEach(loadComments);
+          $scope.queryjobs.forEach(loadHearts);
+          $scope.queryjobs.forEach(function(v, i) {
+            $scope.queryjobs[i] = convertQueryjob(v);
+          });
         });
-      });
+    };
+    reloadQueryjobs();
 
     // Infinite scroll setup.
     $scope.loadBusy = false;
@@ -380,7 +397,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       if (qjs && qjs.length > 1) {
         $scope.loadAfter = new Date(qjs[qjs.length - 1].timeissued).getTime();
         $scope.loadBusy = true;
-        $http.get('/queryjobs/list/userall/' + $scope.loadAfter + '/10')
+        $http.get('/queryjobs/list/' + $scope.mode + '/' + $scope.loadAfter + '/10')
           .success(function(data) {
             data.forEach(function(v) {
               $scope.queryjobs.push(v);

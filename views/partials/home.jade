@@ -15,6 +15,11 @@
         span.icon-bar
         span.icon-bar
     .navbar-collapse.collapse
+      ul.nav.navbar-nav
+        li(ng-class="{ active: mode==='userall'}")
+          a(href="#", ng-click="setHome()") Home
+        li(ng-class="{ active: mode==='cse'}")
+          a(href="#", ng-click="setWall()") Wall
       ul.nav.navbar-nav.navbar-right
         li.dropdown
           a.dropdown-toggle(data-toggle="dropdown", role="button",
@@ -32,7 +37,7 @@
 //- Question Input Interface
 //-=====================================================================
 
-.jumbotron.jumbotron-home
+.jumbotron.jumbotron-home(ng-if="ros.connected && (mode==='userall')")
   .container
     form(ng-submit="submitQuestion()")
       .form-horizontal
@@ -75,6 +80,13 @@
             input.qoption-deadline(type="time", ng-model="questionDeadline",
               placeholder="HH:mm:ss", min="08:00:00", max="17:00:00" required)
 
+.padding-top-70px(ng-if="(mode==='cse') || !(ros.connected)")
+
+.container(ng-if="!(ros.connected)")
+  .alert.alert-info(role="alert")
+    b
+      i.fa.fa-info-circle.margin-right-5px
+      span DUB-E is temporary down. It will be back.
 
 //-=====================================================================
 //- QueryJob List
