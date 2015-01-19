@@ -26,6 +26,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     $scope.ros.connected = false;
     $scope.ros.on('connection', function() {
       $scope.ros.connected = true;
+      reloadQueryjobs();  // NOTE: heck to make it work in firefox.
       console.log('Connected to websocket server.');
     });
     $scope.ros.on('error', function(error) {
