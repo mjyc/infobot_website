@@ -11,11 +11,14 @@ them. Schedulring algorithm is based on "timeissued" fields (FIFO).
 import rospy
 
 # System builtins
+import os
+import subprocess
 from datetime import datetime as dt
 from pytz import utc
 
 # ROS
 import actionlib
+import rospkg
 from actionlib_msgs.msg import GoalStatus
 
 # SARA
@@ -101,6 +104,72 @@ def torosqueryjob(queryjob):
     msg.result = torosresult(queryjob["result"])
 
     return msg
+
+# For sending email.
+
+def run_command(cmd, stdin=None):
+    print "Running command: " + cmd
+    if stdin is not None:
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE,
+            stdin=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            shell=True)
+        out = proc.communicate(stdin)[0]
+    else:
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            shell=True)
+        out = proc.communicate()[0]
+    out = out.strip()
+    rc = proc.returncode
+    return rc, out
+
+def get_smtp_passwd():
+    ''' Reads SMTP password from the file.
+    '''
+    rospack = rospkg.RosPack()
+    passFile = os.path.join(rospack.get_path("sara_uw_website"), "config",
+                            "smtp_password_dub-e_at_dub-e_org")
+    str = ""
+    try:
+        f = open(passFile, "r")
+        str = f.read()
+    except:
+        print("Error: Cannot read the password from '" + passFile + "'.")
+        return None
+    return str.strip()
+
+def send_any_email(to, subject, message):
+
+    passwd = get_smtp_passwd()
+    if not passwd:
+        rospy.loginfo("No passwd, skipping email.")
+        return
+
+    rospy.loginfo("Sending email... ")
+
+    (rc, out) = run_command("sendemail -f dub-e@dub-e.org -t " + to + " -u \"" + subject
+                            + "\" -s smtp.gmail.com -o tls=yes -xu dub-e@dub-e.org -xp " +
+                            passwd, message)
+    if ("Email was sent successfully!" in out) and (rc == 0):
+        print "Done!"
+    else:
+        print "Error!"
+
+def send_email(queryjob, text):
+    send_any_email(queryjob.user.email, "Notification from DUB-E",
+                   "Hi %s!\n\n"
+                   "You asked: %s\n\n"
+                   "The answer is: %s\n\n"
+                   "Go to \"Ask DUB-E\": http://dub-e.org"
+                   "---\n"
+                   "DUB-E, Service Robot\n"
+                   "Computer Science & Engineering\n"
+                   "University of Washington\n"
+                   % (queryjob.user, queryjob.typed_cmd, text))
 
 
 # ######################################################################
@@ -275,6 +344,10 @@ class QueryJobScheduler:
             # Notify updates.
             msg = torosqueryjob(q)
             self._pub.publish(msg)
+
+            # Send email.
+            if status == SUCCEEDED:
+                send_email(msg, result.result.text)
 
 
 # ######################################################################

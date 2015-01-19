@@ -37,6 +37,9 @@ npm install -g node-inspector  # for debugging
 # install web components
 npm install -g bower
 bower install
+
+# install sendemail (not included in rosdistro yet) for scripts/keyboard_run_query_server
+sudo apt-get install sendmail
 ```
 
 #### On Mac OS X 10.9
@@ -62,8 +65,6 @@ bower install
 
 ## Running Website Server
 
-Frist, contact the admin to get the `config` folder and place it in `~/path/to/sara_uw_website`.
-
 #### Using [Grunt](http://gruntjs.com/)
 
 ```
@@ -87,6 +88,36 @@ cd ~/path/to/sara_uw_website
 node bin/www
 ```
 
-## Database Models
+## Nodes
 
-see the [database model doc on google drive](https://docs.google.com/document/d/15Mvr-qWT-urHocsiDXLwXAtiwZ0kJiqtb0C6rsN1Soo/edit?usp=sharing) for details.
+### queryjob_server_node
+
+This node is a ROS server that supplements the Node.js webserver (e.g., server.js). This node accesses the database directly, makes modification and publishes updates using ROS topic. To create a queryjob DB object instance without running Node.js webserver, use `scripts/create_queryjob`. This node (1) scans DB to see if there are any queryjob instances to run, (2) schedules instances that can be run in FIFO style, (3) runs them using a ROS action client, and (4) provides ROS service for canceling a queryjob.
+
+#### Action API
+
+##### Action Subscribed Topics
+
+* run_query/result (sara_uw_website/RunQueryActionResult)
+  Monitor result from the robot-side executor.
+
+##### Action Published Topics
+
+* run_query/goal(sara_uw_website/RunQueryActionGoal)
+  Sends goals to the robot-side executor.
+* run_query/cancel(actionlib_msgs/GoalID)
+  Sends cancel requests to the robot-side executor.
+
+#### Published Topics
+
+* queryjob (sara_uw_website/QueryJob)
+  Updated queryjob wrapped in ROS msg.
+
+#### Services
+
+* `cancel_queryjob` (sara_uw_website/CancelQueryJob)
+  Cancel service can be called at any stage of scheduling.
+
+### question_parser_node
+
+TBA
