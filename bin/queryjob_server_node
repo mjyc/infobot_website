@@ -160,16 +160,17 @@ def send_any_email(to, subject, message):
         print "Error!"
 
 def send_email(queryjob, text):
-    send_any_email(queryjob.user.email, "Notification from DUB-E",
-                   "Hello %s!\n\n"
-                   "You asked: %s\n\n"
-                   "The answer is: %s\n\n"
+    first_name = queryjob.user.name.split(" ")[0]
+    send_any_email(queryjob.user.email, "Notification from DUB-E: %s" % text,
+                   "Hello %s,\n\n"
+                   "Your question was: %s\n\n"
+                   "My response is: %s\n\n"
+                   "Visit dub-e.org to see full details about my response.\n"
                    "---\n"
                    "DUB-E, Service Robot\n"
                    "Computer Science & Engineering\n"
                    "University of Washington\n"
-                   "Ask DUB-E: http://dub-e.org\n"
-                   % (queryjob.user.name, queryjob.typed_cmd, text))
+                   % (first_name, queryjob.typed_cmd, text))
 
 
 # ######################################################################
@@ -346,7 +347,7 @@ class QueryJobScheduler:
             self._pub.publish(msg)
 
             # Send email.
-            if status == SUCCEEDED:
+            if status != RECEIVED and status != SCHEDULED:
                 send_email(msg, result.result.text)
 
 
