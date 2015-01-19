@@ -378,7 +378,6 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       });
     };
     var reloadQueryjobs = function() {
-      console.log('what?')
       $http.get('queryjobs/list/' + $scope.mode + '/' + new Date().getTime() + '/20')
         .success(function(data) {
           $scope.queryjobs = data;

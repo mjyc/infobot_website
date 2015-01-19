@@ -32,6 +32,7 @@ npm install canvas
 npm install
 npm install bson
 npm install -g grunt-cli  # grunt is like makefile for node
+npm install -g nodemon  # for debugging
 npm install -g node-inspector  # for debugging
 
 # install web components
