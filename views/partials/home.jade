@@ -121,10 +121,11 @@
         div(style="text-align: left")
           //- cancel button
           button.btn.btn-default.btn-sm.pull-right.cancel-text(
-            ng-if="!(queryjob.status.isFinished)"
-            ng-click="cancelQueryjob(queryjob)")
+            ng-if="!(queryjob.status.isFinished) && (mode==='userall')"
+            ng-click="cancelQueryjob(queryjob)",
+            ng-disabled="{{!(ros.connected)}}")
             | Cancel
-          div(style="padding-top: 15px;", ng-if="queryjob.status.isFinished")
+          div(style="padding-top: 15px;", ng-if="queryjob.status.isFinished || (mode==='cse')")
           p.col-xs-12
             span.name-text.margin-right-10px {{queryjob.user.name}}
             span.time-text {{queryjob.user.timestamp | today}}
