@@ -394,7 +394,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     $scope.loadMore = function() {
       var qjs = $scope.queryjobs;
       if (qjs && qjs.length > 1) {
-        $scope.loadAfter = new Date(qjs[qjs.length - 1].timeissued).getTime();
+        $scope.loadAfter = new Date(qjs[qjs.length - 1].user.timestamp).getTime();
         $scope.loadBusy = true;
         $http.get('/queryjobs/list/' + $scope.mode + '/' + $scope.loadAfter + '/10')
           .success(function(data) {
