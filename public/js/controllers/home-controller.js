@@ -85,7 +85,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       }
     };
 
-    $scope.mode = 'userall';
+    $scope.mode = 'cse';
     $scope.setHome = function() {
       $scope.mode = 'userall';
       reloadQueryjobs();
