@@ -94,7 +94,7 @@
             input.qoption-deadline(type="time", ng-model="questionDeadline",
               placeholder="HH:mm:ss", min="09:00:00", max="17:00:00" required)
 
-.padding-top-70px(ng-if="(mode==='cse') || !(ros.connected)")
+.padding-top-70px(ng-if="(mode==='cse') || !(ros.connected) || afterhoursMode")
 
 .container(ng-if="!(ros.connected)")
   .alert.alert-danger(role="alert")
