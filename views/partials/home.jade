@@ -20,6 +20,20 @@
           a(href="#", ng-click="setHome()") Home
         li(ng-class="{ active: mode==='cse'}")
           a(href="#", ng-click="setWall()") Wall
+        li.dropdown
+          a.dropdown-toggle(href="#", data-toggle="dropdown", role="button",
+                            aria-expanded="false")
+            | CSE &nbsp;
+            i.fa.fa-caret-down
+          ul.dropdown-menu(role="menu")
+            li
+              a(href="https://reserve.cs.washington.edu") CSE Reservation System
+            li
+              a(href="https://norfolk.cs.washington.edu/directory/") CSE Internel Directory
+            li
+              a(href="http://dada.cs.washington.edu/lfprintercam/CgiStart?page=Single&Language=0") Poster room webcam
+            li
+              a(href="http://dada.cs.washington.edu/coffeecam/ViewerFrame?Mode=Motion&Language=0") Coffee room webcam
       ul.nav.navbar-nav.navbar-right
         li.dropdown
           a.dropdown-toggle(data-toggle="dropdown", role="button",

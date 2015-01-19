@@ -215,10 +215,6 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     });
 
     $scope.userMenuItems = [{
-      url: '/profile',
-      icon: 'fa fa-user',
-      name: 'Profile',
-    }, {
       url: '/liveparser',
       icon: 'fa fa-keyboard-o',
       name: 'LiveParser',
