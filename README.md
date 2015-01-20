@@ -40,7 +40,7 @@ npm install -g bower
 bower install
 
 # install sendemail (not included in rosdistro yet) for scripts/keyboard_run_query_server or will use python-based sendemail library in future.
-sudo apt-get install sendmail
+sudo apt-get install sendemail
 ```
 
 #### On Mac OS X 10.9
