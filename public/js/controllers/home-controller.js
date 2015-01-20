@@ -44,6 +44,8 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         $scope.queryjobs.forEach(function(queryjob, i) {
           if (String(queryjob._id) === qidStr) {
             $scope.queryjobs[i] = convertQueryjob(data);
+            loadComments($scope.queryjobs[i])
+            loadHearts($scope.queryjobs[i])
           }
         });
       });
@@ -381,10 +383,10 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       $http.get('queryjobs/list/' + $scope.mode + '/' + new Date().getTime() + '/20')
         .success(function(data) {
           $scope.queryjobs = data;
-          $scope.queryjobs.forEach(loadComments);
-          $scope.queryjobs.forEach(loadHearts);
           $scope.queryjobs.forEach(function(v, i) {
             $scope.queryjobs[i] = convertQueryjob(v);
+            loadComments($scope.queryjobs[i])
+            loadHearts($scope.queryjobs[i])
           });
         });
     };
