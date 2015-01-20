@@ -298,8 +298,9 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
 
 
     // Deadline option.
-    $scope.questionDeadline = new Date(1970, 0, 1, new Date().getHours() + 1,
-      new Date().getMinutes(), 0);
+    // NOTE(mjyc): buffer was used to prevent scoping issue with ng-if
+    $scope.buffer = {questionDeadline: new Date(1970, 0, 1, new Date().getHours() + 1,
+      new Date().getMinutes(), 0)};
 
 
     // Submit question function.
@@ -314,13 +315,15 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       $scope.questionForm.deadline = new Date();
       $scope.questionForm.deadline.setSeconds(0, 0);
       $scope.questionForm.deadline.setHours(
-        $scope.questionDeadline.getHours());
+        $scope.buffer.questionDeadline.getHours());
       $scope.questionForm.deadline.setMinutes(
-        $scope.questionDeadline.getMinutes());
+        $scope.buffer.questionDeadline.getMinutes());
 
       // deadline validation
       var d = $scope.questionForm.deadline.getTime();
       var c = $scope.questionForm.timeissued.getTime();
+      console.log(d - 1000 * 60 * 10 * 1 * 1);
+      console.log(c);
       if (d - 1000 * 60 * 10 * 1 * 1 < c) {
         $scope.openErrorModal('Deadline is too close! Please give more than' +
           ' 10min for DUB-E to answer your question.');
@@ -365,6 +368,9 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     //==================================================================
 
     // Load data.
+    // NOTE(mjyc): put below two functions in convertQueryjob and only
+    // use convertQueryjob and reloadQueryjob or reloadHeart, etc. In
+    // fact, maybe refactor them into angular's service.js
     var loadComments = function(queryjob) {
       $http.get('comments/list/' + queryjob._id).success(function(data) {
         queryjob.comments = data;

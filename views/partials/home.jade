@@ -88,10 +88,10 @@
           b Deadline
             small &nbsp; (Today) &nbsp;
           if DEV
-            input.qoption-deadline(type="time", ng-model="questionDeadline",
+            input.qoption-deadline(type="time", ng-model="buffer.questionDeadline",
               placeholder="HH:mm:ss" required)
           else
-            input.qoption-deadline(type="time", ng-model="questionDeadline",
+            input.qoption-deadline(type="time", ng-model="buffer.questionDeadline",
               placeholder="HH:mm:ss", min="09:00:00", max="17:00:00" required)
 
 .padding-top-70px(ng-if="(mode==='cse') || !(ros.connected) || afterhoursMode")
@@ -121,7 +121,7 @@
         div(style="text-align: left")
           //- cancel button
           button.btn.btn-default.btn-sm.pull-right.cancel-text(
-            ng-if="!(queryjob.status.isFinished) && (mode==='userall')"
+            ng-if="!(queryjob.status.isFinished)"
             ng-click="cancelQueryjob(queryjob)",
             ng-disabled="{{!(ros.connected)}}")
             | Cancel
