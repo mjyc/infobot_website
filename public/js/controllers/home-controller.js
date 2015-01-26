@@ -120,17 +120,17 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         'In Queue', // RECEIVED
         'In Queue', // SCHEDULED
         'Running', // RUNNING
-        'Success :)', // SUCCEEDED
+        'Success', // SUCCEEDED
         'Canceled', // CANCELED
-        'Failed :(' // FAILED
+        'Failed' // FAILED
       ];
       var statusToClass = [
         'alert alert-info', // RECEIVED
         'alert alert-info', // SCHEDULED
         'alert alert-warning', // RUNNING
-        'alert alert-success :)', // SUCCEEDED
+        'alert alert-success', // SUCCEEDED
         'alert alert-danger', // CANCELED
-        'alert alert-danger :(' // FAILED
+        'alert alert-danger' // FAILED
       ];
       var statusToIsFinished = [
         false, // RECEIVED
@@ -392,8 +392,8 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
           $scope.queryjobs = data;
           $scope.queryjobs.forEach(function(v, i) {
             $scope.queryjobs[i] = convertQueryjob(v);
-            loadComments($scope.queryjobs[i])
-            loadHearts($scope.queryjobs[i])
+            loadComments($scope.queryjobs[i]);
+            loadHearts($scope.queryjobs[i]);
           });
         });
     };
