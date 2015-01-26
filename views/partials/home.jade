@@ -51,7 +51,7 @@
 //- Question Input Interface
 //-=====================================================================
 
-.jumbotron.jumbotron-home(ng-if="ros.connected && (mode==='userall') && !(afterhoursMode)")
+.jumbotron.jumbotron-home(ng-if="ros.connected && !(afterhoursMode)")
   .container
     form(ng-submit="submitQuestion()")
       .form-horizontal
