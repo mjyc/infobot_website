@@ -121,7 +121,7 @@
         div(style="text-align: left")
           //- cancel button
           button.btn.btn-default.btn-sm.pull-right.cancel-text(
-            ng-if="!(queryjob.status.isFinished)"
+            ng-if="!(queryjob.status.isFinished) && queryjob.user.mine"
             ng-click="cancelQueryjob(queryjob)",
             ng-disabled="{{!(ros.connected)}}")
             | Cancel

@@ -44,8 +44,8 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         $scope.queryjobs.forEach(function(queryjob, i) {
           if (String(queryjob._id) === qidStr) {
             $scope.queryjobs[i] = convertQueryjob(data);
-            loadComments($scope.queryjobs[i])
-            loadHearts($scope.queryjobs[i])
+            loadComments($scope.queryjobs[i]);
+            loadHearts($scope.queryjobs[i]);
           }
         });
       });
@@ -162,7 +162,8 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
         user: {
           name: queryjob.user.name,
           timestamp: queryjob.timeissued,
-          text: queryjob.typed_cmd
+          text: queryjob.typed_cmd,
+          mine: (queryjob.user._id === $scope.user.id)
         },
         audience: {
           desc: queryjob.is_public ? 'Shared with CSE' : 'Only Me',
