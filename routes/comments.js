@@ -16,10 +16,10 @@ var ObjectID = require('mongodb').ObjectID;
 // Create.
 router.post('/', function(req, res, next) {
   var db = req.db;
-  var comment = {};
 
+  var comment = {};
   comment.timecommented = new Date(req.body.timecommented);
-  comment.comment = req.body.comment;
+  comment.text = req.body.text;
   comment.queryjob = {
     id: new ObjectID(req.body.qid),
   };
@@ -38,13 +38,15 @@ router.post('/', function(req, res, next) {
 });
 
 // Retrieve.
+
+// retrieve list with queryjob id
 router.get('/list/:qid', function(req, res, next) {
   var db = req.db;
 
-  var qid = req.param.qid;
+  var qid = req.params.qid;
   var criteria = {};
   if (qid) {
-    criteria.queryjob_id = new ObjectID(qid);
+    criteria['queryjob.id'] = new ObjectID(qid);
   }
 
   // returns comments in decreasing timecommented sorted manner

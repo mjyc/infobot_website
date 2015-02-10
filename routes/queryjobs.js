@@ -16,8 +16,8 @@ var ObjectID = require('mongodb').ObjectID;
 // Create.
 router.post('/', function(req, res, next) {
   var db = req.db;
-  var queryjob = {};
 
+  var queryjob = {};
   queryjob.timeissued = new Date(req.body.timeissued);
   queryjob.typed_cmd = req.body.typed_cmd;
   queryjob.notification_sms = JSON.parse(req.body.notification_sms || false);
@@ -30,6 +30,12 @@ router.post('/', function(req, res, next) {
     email: req.user.google.email,
   };
 
+  queryjob.status = 0;
+  queryjob.order = null;
+  queryjob.timestarted = null;
+  queryjob.timecompleted = null;
+  queryjob.result = null;
+
   db.collection('queryjobs').insert(queryjob, function(err, result) {
     if (err) {
       return next(err);
@@ -38,18 +44,18 @@ router.post('/', function(req, res, next) {
   });
 });
 
-// Retrieve
+// Retrieve.
 
 // retrieve list
-router.get('/list/:select/:limit/:after?', function(req, res, next) {
+router.get('/list/:select/:after/:limit', function(req, res, next) {
   var db = req.db;
 
   // publicOnly: retrieve querjobs which has "true" value for the public field
   // userOnly: retrieve querjobs which are belong to the current user
-  // limit: maximum number of items desired
   // after: retrieve querjobs with their timeissued field larger than "after"
   //        utc time string in miliseconds
-  //        0 < means from after === now
+  // limit: maximum number of items desired
+  //        <= 0 means all items
   var publicOnly = true;
   var userOnly = false;
   switch (req.params.select) {
@@ -73,13 +79,10 @@ router.get('/list/:select/:limit/:after?', function(req, res, next) {
       publicOnly = true;
       userOnly = false;
   }
+  var after = JSON.parse(req.params.after);
   var limit = JSON.parse(req.params.limit);
   if (limit <= 0) {
     limit = 0;
-  }
-  var after = JSON.parse(req.params.after);
-  if (after <= 0) {
-    after = new Date().getTime();
   }
 
   var criteria = {};
@@ -108,81 +111,14 @@ router.get('/list/:select/:limit/:after?', function(req, res, next) {
 // retrieve single object
 router.get('/:id', function(req, res, next) {
   var db = req.db;
-  var queryjobID = new ObjectID(req.params.id);
-  db.collection('queryjobs').findById(queryjobID, function(err, result) {
+
+  var qid = new ObjectID(req.params.id);
+  db.collection('queryjobs').findById(qid, function(err, result) {
     if (err) {
       return next(err);
     }
     res.send(result);
   });
-});
-
-
-// Hearts
-
-router.post('/addheart', function(req, res, next) {
-  var db = req.db;
-
-  db.collection('queryjobs').findAndModify({
-    _id: new ObjectID(req.body.queryjobID)
-  }, {}, {
-    '$push': {
-      hearts: req.user._id
-    }
-  }, {
-    new: true
-  }, function(err, result) {
-    if (err) {
-      return next(err);
-    }
-    res.send(result);
-  });
-
-});
-
-router.post('/removeheart', function(req, res, next) {
-  var db = req.db;
-
-  db.collection('queryjobs').findAndModify({
-    _id: new ObjectID(req.body.queryjobID)
-  }, {}, {
-    $pull: {
-      hearts: req.user._id
-    }
-  }, {
-    new: true
-  }, function(err, result) {
-    if (err) {
-      return next(err);
-    }
-    res.send(result);
-  });
-
-});
-
-router.post('/checkheart', function(req, res, next) {
-  var db = req.db;
-
-  db.collection('queryjobs').findOne({
-    _id: new ObjectID(req.body.queryjobID)
-  }, function(err, result) {
-    if (err) {
-      return next(err);
-    }
-    var sendTrue = false;
-    for (var i = result.hearts.length - 1; i >= 0; i--) {
-      if (result.hearts[i].toString() === req.user._id.toString()) {
-        sendTrue = true;
-        break;
-      }
-    }
-    if (sendTrue) {
-      res.send(true);
-    } else {
-      res.send(false);
-    }
-  });
-
 });
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var debug = require('debug')('sara_uw_website');
-var app = require('../server');
+var app = (process.argv.length > 2 && process.argv[2] === 'down') ? require('../serverdown'):require('../server');
 
 app.set('port', process.env.PORT || 8080);
 

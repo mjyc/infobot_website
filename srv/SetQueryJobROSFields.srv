@@ -1,0 +1,10 @@
+string id  # target document id
+
+uint8 status        # can take one of the following values.
+uint64 order        # a scheduling output in integer. Lower number means sooner the job will be executed (1 is the lowest order).
+time timestarted    # a timestamp created when a ROS goal representing a single QueryJob is sent.
+time timecompleted  # a timestamp created when a result of the ROS goal is received.
+
+sara_uw_website/Result result  # result returned from the robot.
+---
+bool success

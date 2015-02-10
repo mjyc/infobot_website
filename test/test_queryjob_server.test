@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="host" default="localhost"/>
+  <arg name="port" default="27017"/>
+  <arg name="dbname" default="test_sara_uw_website"/>
+  <arg name="collname" default="test_queryjobs"/>
+
+  <!-- Make sure to run DB -->
+  <node name="mongo" type="mongo_wrapper_ros.py" pkg="warehouse_ros" output="log">
+    <param name="database_path" value="/tmp/test_sara_db"/>
+    <param name="overwrite" value="true"/>
+  </node>
+
+  <!-- queryjob_server node -->
+  <node name="queryjob_server" pkg="sara_uw_website" type="queryjob_server_node" output="screen" respawn="True">
+    <param name="host" type="str" value="$(arg host)"/>
+    <param name="port" type="int" value="$(arg port)"/>
+    <param name="dbname" type="str" value="$(arg dbname)"/>
+    <param name="collname" type="str" value="$(arg collname)"/>
+  </node>
+
+  <!-- Test nodes -->
+  <test test-name="test_queryjob_server_valid_execution" pkg="sara_uw_website" type="test_queryjob_server" args="--testcase_id 0 --host $(arg host) --port $(arg port)  --dbname $(arg dbname) --collname $(arg collname)"/>
+  <test test-name="test_queryjob_server_cancel" pkg="sara_uw_website" type="test_queryjob_server" args="--testcase_id 1 --host $(arg host) --port $(arg port)  --dbname $(arg dbname) --collname $(arg collname)"/>
+</launch>

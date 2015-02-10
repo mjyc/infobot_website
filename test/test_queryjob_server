@@ -1,0 +1,52 @@
+#!/usr/bin/python
+
+# ######################################################################
+# Imports
+# ######################################################################
+
+import rostest
+
+# System-builtins
+import argparse
+import sys
+
+# Local
+from testutils import TestQueryJobStore
+from test_queryjob_server_execution import test_valid_execution
+from test_queryjob_server_cancel import test_valid_cancel
+
+
+# ######################################################################
+# Module level constants
+# ######################################################################
+
+PKG = "sara_uw_website"
+
+
+# ######################################################################
+# Main
+# ######################################################################
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--testcase_id", type=int,
+                        help="ID of the test case.")
+    args, unknown = parser.parse_known_args()
+
+    if args.testcase_id == 0:
+        NAME = "test_valid_execution"
+        setattr(TestQueryJobStore,
+                NAME,
+                test_valid_execution)
+        rostest.run(PKG, NAME, TestQueryJobStore)
+    elif args.testcase_id == 1:
+        NAME = "test_valid_cancel"
+        setattr(TestQueryJobStore,
+                NAME,
+                test_valid_cancel)
+        rostest.run(PKG, NAME, TestQueryJobStore)
+    else:
+        print >> sys.stderr, "unknown testcase_id: {0}".format(
+            args.testcase_id)
+        sys.exit(1)

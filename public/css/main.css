@@ -15,6 +15,22 @@
 
 /* Alias */
 
+.color-black {
+  color: black !important;
+}
+
+.color-orange {
+  color: orange !important;
+}
+
+.margin-left-5px {
+  margin-left: 5px;
+}
+
+.margin-left-10px {
+  margin-left: 10px;
+}
+
 .margin-right-2px {
   margin-right: 2px;
 }
@@ -27,17 +43,17 @@
   margin-right: 10px;
 }
 
-.margin-left-5px {
-  margin-left: 5px;
+.opacity-half {
+ opacity: 0.5;
 }
-.margin-left-10px {
-  margin-left: 10px;
+
+.padding-top-70px {
+  margin-top: 70px;
 }
 
 .text-align-center {
   text-align: center;
 }
-
 
 /* Custom */
 
@@ -97,6 +113,7 @@
   font-weight: bold;
   border-top-width: 0px;
   border-right-width: 0px;
+  border-radius: 2px;
 }
 
 .name-text {

@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="exclude_mongodb" default="false"/>
+  <arg name="host" default="localhost"/>
+  <arg name="port" default="27017"/>
+  <arg name="dbname" default="sara_uw_website"/>
+  <arg name="collname" default="queryjobs"/>
+
+  <arg name="rosbridge_address" default=""/>
+
+  <!-- Make sure to run DB -->
+  <node name="mongo" type="mongo_wrapper_ros.py" pkg="warehouse_ros" output="log" unless="$(arg exclude_mongodb)">
+    <param name="database_path" value="~/sara/db"/>
+    <param name="overwrite" value="false"/>
+  </node>
+
+  <!-- Run rosbridge -->
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+	  <arg name="address" value="$(arg rosbridge_address)"/>
+  </include>
+
+  <!-- Run QueryJob handlers -->
+  <node name="queryjob_scheduler" pkg="sara_uw_website" type="queryjob_server_node" output="screen" respawn="True">
+    <param name="host" type="str" value="$(arg host)"/>
+    <param name="port" type="int" value="$(arg port)"/>
+    <param name="dbname" type="str" value="$(arg dbname)"/>
+    <param name="collname" type="str" value="$(arg collname)"/>
+  </node>
+
+</launch>

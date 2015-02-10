@@ -26,8 +26,8 @@ module.exports = function(grunt) {
       },
       files: [
         '**/*.js',
-        '!bower_components/**/*.js',
         '!node_modules/**/*.js',
+        '!public/bower_components/**/*.js',
         '!public/js/vendor/**/*.js'
       ]
     },
@@ -74,10 +74,10 @@ module.exports = function(grunt) {
         failOnError: true
       },
       ros: {
-        command: 'roslaunch launch/run_rosnodes.launch',
+        command: 'roslaunch launch/webserver.launch',
       },
       ros4test: {
-        command: 'roslaunch launch/run_rosnodes_test.launch',
+        command: 'roslaunch launch/webserver_test.launch',
       },
       sleep: {
         command: 'sleep 5',

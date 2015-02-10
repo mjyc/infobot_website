@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package>
+
+  <!-- Package Info -->
+  <name>sara_uw_website</name>
+  <version>0.0.0</version>
+  <description>SARA Framework: InfoBot Website.</description>
+  <maintainer email="mjyc@cs.washington.edu">Michael Jae-Yoon Chung</maintainer>
+  <author email="mjyc@cs.washington.edu">Michael Jae-Yoon Chung</author>
+  <license>TODO</license>
+
+  <!-- Dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>actionlib</build_depend>
+  <build_depend>actionlib_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <run_depend>actionlib</run_depend>
+  <run_depend>actionlib_msgs</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>warehouse_ros</run_depend>
+
+</package>

@@ -1,0 +1,3 @@
+string id  # target document id
+---
+bool success

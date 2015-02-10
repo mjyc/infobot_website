@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <!-- Run QueryJob handlers -->
+  <include file="$(find sara_uw_websit)/test/test_queryjob_scheduler.test">
+    <arg name="host" value="localhost"/>
+    <arg name="port" value="27017"/>
+    <arg name="dbname" value="sara_uw_website"/>
+    <arg name="collname" value="queryjobs"/>
+  </include>
+
+  <!-- Run rosbridge -->
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+
+</launch>

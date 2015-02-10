@@ -1,9 +1,11 @@
+//-=====================================================================
 //- Menubar
+//-=====================================================================
 
 .navbar.navbar-inverse.navbar-fixed-top(role="navigation")
   .container
     .navbar-header
-      a.navbar-brand.askdube-text(href="/home")
+      a.navbar-brand.askdube-text(href="#" ng-click="setWall()")
         i.fa.fa-question-circle
         span Ask DUB-E
       button.navbar-toggle(type="button", data-toggle="collapse",
@@ -13,6 +15,25 @@
         span.icon-bar
         span.icon-bar
     .navbar-collapse.collapse
+      ul.nav.navbar-nav
+        li(ng-class="{ active: mode==='userall'}")
+          a(href="#", ng-click="setHome()") Home
+        li(ng-class="{ active: mode==='cse'}")
+          a(href="#", ng-click="setWall()") Wall
+        li.dropdown
+          a.dropdown-toggle(href="#", data-toggle="dropdown", role="button",
+                            aria-expanded="false")
+            | CSE &nbsp;
+            i.fa.fa-caret-down
+          ul.dropdown-menu(role="menu")
+            li
+              a(href="https://reserve.cs.washington.edu") CSE Reservation System
+            li
+              a(href="https://norfolk.cs.washington.edu/directory/") CSE Internel Directory
+            li
+              a(href="http://dada.cs.washington.edu/lfprintercam/CgiStart?page=Single&Language=0") Poster room webcam
+            li
+              a(href="http://dada.cs.washington.edu/coffeecam/ViewerFrame?Mode=Motion&Language=0") Coffee room webcam
       ul.nav.navbar-nav.navbar-right
         li.dropdown
           a.dropdown-toggle(data-toggle="dropdown", role="button",
@@ -26,98 +47,160 @@
                 span {{item.name}}
 
 
+//-=====================================================================
 //- Question Input Interface
+//-=====================================================================
 
-.jumbotron.jumbotron-home
+.jumbotron.jumbotron-home(ng-if="ros.connected && (mode==='userall') && !(afterhoursMode)")
   .container
     form(ng-submit="submitQuestion()")
       .form-horizontal
-        .form-group.form-group-lg.question-box(
-          ng-class="{'has-error': errorQuestion }")
+        .form-group.form-group-lg.question-box
           .input-group
             input.form-control(type="text", placeholder="Type question here",
               ng-model="questionForm.typed_cmd")
             .input-group-btn
               button.btn.btn-primary.btn-lg Submit
-          span.help-block(ng-show="errorQuestionTypedCmd")
-            | {{errorQuestionTypedCmd}}
       .text-align-center
         //- button options
         .btn-group.margin-right-10px(dropdown,
-          ng-repeat="(optionName, option) in questionOptions")
+          ng-repeat="(name, option) in questionOptions")
           button.btn.btn-default.btn-sm.dropdown-toggle(type="button",
             dropdown-toggle)
             i.margin-right-5px(
-              ng-class="selectedQuestionOptions[optionName].icon")
-            b {{selectedQuestionOptions[optionName].name}}
+              ng-class="questionOptions[name].selected.icon")
+            b {{questionOptions[name].selected.name}}
             i.fa.fa-caret-down.margin-left-5px
           ui(role="menu").dropdown-menu
             li.dropdown-header(role="presentation")
-              | {{questionOptionsDesc[optionName]}}
-            li(ng-repeat="item in option")
-              a(ng-click="setQuestionOption(optionName, item)")
+              | {{questionOptions[name].desc}}
+            li(ng-repeat="item in option.items")
+              a(ng-click="setQuestionOption(name, item)")
                 i.margin-right-2px(ng-class="item.icon")
                 span {{item.name}}
                 br(ng-if="item.desc !== ''")
                 small(style="color: gray; margin-left: 18px",
                   ng-if="item.desc !== ''")
-                  | Anyone with CSE account.
+                  | {{item.desc}}
         //- deadline option
         .btn-group
           i.fa.fa-exclamation-triangle.margin-right-2px
-          b
-            | Deadline
+          b Deadline
             small &nbsp; (Today) &nbsp;
-          //- TODO: use below code during production time
-          //- input.qoption-deadline(type="time", ng-model="questionDeadline",
-          //-   placeholder="HH:mm:ss", min="08:00:00", max="17:00:00" required)
-          input.qoption-deadline(type="time", ng-model="questionDeadline",
-            placeholder="HH:mm:ss" required)
+          if DEV
+            input.qoption-deadline(type="time", ng-model="buffer.questionDeadline",
+              placeholder="HH:mm:ss" required)
+          else
+            input.qoption-deadline(type="time", ng-model="buffer.questionDeadline",
+              placeholder="HH:mm:ss", min="09:00:00", max="17:00:00" required)
 
+.padding-top-70px(ng-if="(mode==='cse') || !(ros.connected) || afterhoursMode")
 
+.container(ng-if="!(ros.connected)")
+  .alert.alert-danger(role="alert")
+    b
+      i.fa.fa-exclamation-circle.margin-right-5px
+      span DUB-E is temporary down. It will be back.
+
+.container(ng-if="afterhoursMode")
+  .alert.alert-info(role="alert")
+    b
+      i.fa.fa-info-circle.margin-right-5px
+      span DUB-E is taking a rest. Please come back between 9am-5pm, Monday through Friday.
+
+//-=====================================================================
 //- QueryJob List
+//-=====================================================================
 
-.container(infinite-scroll='loadMore()', infinite-scroll-disabled='loadBusy')
-  .panel.panel-default(ng-repeat="queryjob in queryjobs")
+.container(infinite-scroll="loadMore()", infinite-scroll-disabled="loadBusy")
+  .panel.panel-default(ng-repeat="queryjob in queryjobs",
+                       ng-class="{'opacity-half': queryjob.status.isCanceled}")
     .panel-body.body(style="padding-top: 0px;")
       .row
         //- user stuff
-        div(style='text-align: left')
+        div(style="text-align: left")
           //- cancel button
-          button.btn.btn-default.btn-sm.pull-right.cancel-text(ng-if="queryjob.status > 3")
+          button.btn.btn-default.btn-sm.pull-right.cancel-text(
+            ng-if="!(queryjob.status.isFinished) && queryjob.user.mine"
+            ng-click="cancelQueryjob(queryjob)",
+            ng-disabled="{{!(ros.connected)}}")
             | Cancel
-          div(style="padding-top: 15px;", ng-if="!(queryjob.status > 3)")
+          div(style="padding-top: 15px;", ng-if="queryjob.status.isFinished || (mode==='cse')")
           p.col-xs-12
-            span.name-text {{queryjob.user.name}} &nbsp;&nbsp;
-            span.time-text {{queryjob.timeissued | date:'medium'}}
+            span.name-text.margin-right-10px {{queryjob.user.name}}
+            span.time-text {{queryjob.user.timestamp | today}}
           p.col-xs-12
-            i.fa.fa-users(ng-if="(queryjob.is_public)")
-            i.fa.fa-lock(ng-if="!(queryjob.is_public)")
-            span &nbsp;&nbsp;·&nbsp;&nbsp;
-            i.fa.fa-envelope(ng-if="queryjob.notification_email")
-            i.fa.fa-newspaper-o(ng-if="!(queryjob.notification_email)")
-            span &nbsp;&nbsp;·&nbsp;&nbsp;
-            i.fa.fa-exclamation-triangle &nbsp;
-            span {{queryjob.deadline | date:'medium'}}
-          p(style='font-size; 25px').userCmd.lead.col-xs-12
-            | {{queryjob.typed_cmd}}
+            a.color-black(tooltip="{{queryjob.audience.desc}}")
+              i(ng-class="queryjob.audience.icon")
+            span.margin-left-10px.margin-right-10px ·
+            a.color-black(tooltip="{{queryjob.notification.desc}}")
+              i(ng-class="queryjob.notification.icon")
+            span.margin-left-10px.margin-right-10px ·
+            a.color-black(tooltip="Deadline")
+              i.fa.fa-exclamation-triangle &nbsp;
+            span {{queryjob.deadline | today}}
+          p(style="font-size; 25px").userCmd.lead.col-xs-12
+            | {{queryjob.user.text}}
         //- robot stuff
-        div(style='text-align: right')
-          p(style='text-align: right').col-xs-12
-            span.name-text DUB-E &nbsp;&nbsp;
-            //- TODO: make below depends on "status"
-            spen.time-text {{queryjob.timeissued | date:'medium'}}
-          //- TODO: make below depends on the "response"
-          //- p.col-xs-12
-          //-   i.fa.fa-bar-chart-o &nbsp;
-          //-   span 90%
-          p(style='font-size; 25px').lead.col-xs-12
-            | Yes.
-          //- TODO: add image
+        div(style="text-align: right")
+          p(style="text-align: right").col-xs-12
+            span.name-text.margin-right-10px {{queryjob.robot.name}}
+            spen.time-text {{queryjob.robot.timestamp | today}}
+          p.col-xs-12(ng-if="queryjob.status.isSucceeded")
+            a.color-black(tooltip="Confidence")
+              i.fa.fa-bar-chart-o &nbsp;
+            span {{queryjob.result.confidence}}
+          p(style="font-size; 25px").lead.col-xs-12
+            | {{queryjob.robot.text}}
+          p.col-xs-12(ng-if="queryjob.status.isSucceeded")
+            a(ng-href="#",ng-click="toggleImg(queryjob)")
+              img.img-thumbnail(
+                ng-src="{{queryjob.result.img_path}}",
+                ng-class="queryjob.resultImgClass")
         div.col-xs-12
           p
-            //- TODO: make below depends on "status"
-            div(style='text-align: center; margin-bottom: 0px').alert.alert-warning Running
-    //- TODO: implement header and fotter
-    //- .panel-footer.footer
-    //-   .row
+            div(ng-class="queryjob.status.class"
+                style="text-align: center; margin-bottom: 0px")
+              | {{queryjob.status.desc}}
+    .panel-footer.footer(ng-if="queryjob.status.isSucceeded")
+      .row
+        //- comments history
+        .col-xs-12
+          p(ng-repeat="comment in queryjob.comments")
+            small
+              b {{comment.user.name}} &nbsp;
+              span {{comment.text}}
+              br
+              span(style="color: gray;")
+                | {{comment.timecommented | today}}
+        p
+          //- input comment
+          form(ng-submit="submitComment(queryjob)").col-xs-8.col-sm-9
+            .input-group.input-group-sm
+              input.form-control(type="text", placeholder="Write a comment...",
+                ng-model="queryjob.commentForm.text")
+              .input-group-btn
+                button.btn.btn-default.btn-sm Post
+          //- heart button
+          .col-xs-4.col-sm-3(style="text-align: right")
+            button.btn.btn-default.btn-sm(
+              ng-class="queryjob.heartClass",
+              ng-click="toggleHeart(queryjob)")
+              span Thank You DUB-E &nbsp;
+              i.fa.fa-heart
+              span &nbsp;{{queryjob.hearts.length}}
+
+
+//-=====================================================================
+//- Modals
+//-=====================================================================
+script(type="text/ng-template", id="homeErrorModal.html").
+  <div class="modal-header" style="background-color: #d2322d;">
+    <h4 class="modal-title" style="color: white;">ERROR</h3>
+  </div>
+  <div class="modal-body">
+    {{errorModalMsg}}
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" ng-enter="ok();" ng-click="ok()">OK</button>
+  </div>

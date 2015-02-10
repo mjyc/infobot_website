@@ -1,0 +1,361 @@
+#!/usr/bin/env python
+
+'''This node schedules, executes and cancels QueryJobs and executes
+them. Schedulring algorithm is based on "timeissued" fields (FIFO).
+'''
+
+# ######################################################################
+# Imports
+# ######################################################################
+
+import rospy
+
+# System builtins
+import os
+import subprocess
+from datetime import datetime as dt
+from pytz import utc
+
+# ROS
+import actionlib
+import rospkg
+from actionlib_msgs.msg import GoalStatus
+
+# SARA
+from bson.objectid import ObjectId
+from pymongo import MongoClient
+
+# Local
+from sara_uw_website.msg import (
+    RunQueryAction, RunQueryGoal, RunQueryResult, QueryJob, Result, User
+)
+from sara_uw_website.srv import (
+    CancelQueryJob,
+    CancelQueryJobResponse,
+)
+
+
+# ######################################################################
+# Module level constants
+# ######################################################################
+
+RECEIVED = QueryJob.STATUS_RECEIVED
+SCHEDULED = QueryJob.STATUS_SCHEDULED
+RUNNING = QueryJob.STATUS_RUNNING
+SUCCEEDED = QueryJob.STATUS_SUCCEEDED
+CANCELED = QueryJob.STATUS_CANCELED
+FAILED = QueryJob.STATUS_FAILED
+
+
+# ######################################################################
+# Functions
+# ######################################################################
+
+def torostime(t):
+    ''' Converts datetime.datetime object to rospy.rostime.Time object.
+    '''
+
+    if t:
+        s = (t - dt(1970, 1, 1).replace(tzinfo=utc)).total_seconds()
+    else:
+        s = 0
+    return rospy.Time(s)
+
+def torosresult(r):
+    ''' Converts queryjob.result retrieved from DB to
+    sara_uw_website/Result msg.
+    '''
+
+    if r:
+        return Result(r["text"], r["confidence"], r["img_path"])
+    else:
+        return Result()
+
+def torosuser(u):
+    ''' Converts queryjob.result retrieved from DB to
+    sara_uw_website/Result msg.
+    '''
+
+    if u:
+        return User(u["email"], u["name"])
+    else:
+        return User()
+
+def torosqueryjob(queryjob):
+    ''' Converts queryjob retrieved from DB to sara_uw_website/QueryJob
+    msg.
+    '''
+
+    msg = QueryJob()
+    msg.id = str(queryjob["_id"])
+
+    msg.timeissued = torostime(queryjob["timeissued"])
+    msg.typed_cmd = queryjob["typed_cmd"]
+    msg.notification_sms = queryjob["notification_sms"]
+    msg.notification_email = queryjob["notification_email"]
+    msg.is_public = queryjob["is_public"]
+    msg.deadline = torostime(queryjob["deadline"])
+    msg.user = torosuser(queryjob["user"])
+
+    msg.status = queryjob["status"]
+    msg.order = queryjob["order"]
+    msg.timestarted = torostime(queryjob["timestarted"])
+    msg.timecompleted = torostime(queryjob["timecompleted"])
+    msg.result = torosresult(queryjob["result"])
+
+    return msg
+
+# For sending email.
+
+def run_command(cmd, stdin=None):
+    print "Running command: " + cmd
+    if stdin is not None:
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE,
+            stdin=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            shell=True)
+        out = proc.communicate(stdin)[0]
+    else:
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            shell=True)
+        out = proc.communicate()[0]
+    out = out.strip()
+    rc = proc.returncode
+    return rc, out
+
+def get_smtp_passwd():
+    ''' Reads SMTP password from the file.
+    '''
+    rospack = rospkg.RosPack()
+    passFile = os.path.join(rospack.get_path("sara_uw_website"), "config",
+                            "smtp_password_dub-e_at_dub-e_org")
+    str = ""
+    try:
+        f = open(passFile, "r")
+        str = f.read()
+    except:
+        print("Error: Cannot read the password from '" + passFile + "'.")
+        return None
+    return str.strip()
+
+def send_any_email(to, subject, message):
+
+    passwd = get_smtp_passwd()
+    if not passwd:
+        rospy.loginfo("No passwd, skipping email.")
+        return
+
+    rospy.loginfo("Sending email... ")
+
+    (rc, out) = run_command("sendemail -f dub-e@dub-e.org -t " + to + " -u \"" + subject
+                            + "\" -s smtp.gmail.com -o tls=yes -xu dub-e@dub-e.org -xp " +
+                            passwd, message)
+    if ("Email was sent successfully!" in out) and (rc == 0):
+        print "Done!"
+    else:
+        print "Error!"
+
+def send_email(queryjob, text):
+    first_name = queryjob.user.name.split(" ")[0]
+    send_any_email(queryjob.user.email, "Notification from DUB-E: %s" % text,
+                   "Hello %s,\n\n"
+                   "Your question was: %s\n\n"
+                   "My response is: %s\n\n"
+                   "Visit dub-e.org to see full details about my response.\n"
+                   "---\n"
+                   "DUB-E, Service Robot\n"
+                   "Computer Science & Engineering\n"
+                   "University of Washington\n"
+                   % (first_name, queryjob.typed_cmd, text))
+
+
+# ######################################################################
+# Classes
+# ######################################################################
+class QueryJobScheduler:
+
+    def __init__(self):
+        rospy.init_node("queryjob_scheduler")
+
+        # Connect to DB.
+        host = rospy.get_param("~host", "localhost")
+        port = rospy.get_param("~port", 27017)
+        dbname = rospy.get_param("~dbname", "sara_uw_website")
+        collname = rospy.get_param("~collname", "queryjobs")
+        client = MongoClient(host, port, tz_aware=True)
+        db = client[dbname]
+        self._collection = db[collname]
+
+        # ROS Service and Publisher.
+        rospy.Service(
+            "/cancel_queryjob", CancelQueryJob,
+            self.handle_cancel_queryjob)
+        self._pub = rospy.Publisher(
+            '/queryjob', QueryJob, queue_size=10000)
+
+        # ROS SimpleActionClient.
+        self._ac = actionlib.SimpleActionClient("/run_query", RunQueryAction)
+        self.execute_queryjobs()
+
+    def handle_cancel_queryjob(self, req):
+        # Parse input.
+        queryjob_id = ObjectId(req.id)
+
+        # Set to cancel and log.
+        query = {"_id": queryjob_id}
+        update = {"$set": {
+            "status": CANCELED,
+            "timecompleted": dt.utcnow().replace(tzinfo=utc)
+        }}
+        q = self._collection.find_and_modify(query, update)
+        if not q:
+            return CancelQueryJobResponse(False)
+
+        # Extra step is needed for running jobs.
+        if q["status"] == RUNNING:
+            rospy.sleep(0.5)  # give server some time to respond
+            if self._ac.get_state() != GoalStatus.ACTIVE:
+                rospy.logerr("The goal MUST be active!")
+                return CancelQueryJobResponse(False)
+            self._ac.cancel_goal()
+
+        return CancelQueryJobResponse(True)
+
+    def schedule_queryjobs_timeissued_FIFO(self):
+        ''' Schedule QueryJobs based on timeissued values; first comes
+        first served or first in first out (FIFO).
+        '''
+
+        # Cancel previously running QueryJobs.
+        self._collection.find_and_modify(
+            {"status": RUNNING},
+            {"$set": {"status": CANCELED,
+                      "timecompleted": dt.utcnow().replace(tzinfo=utc)}}
+        )
+
+        # Retrieve unscheduled QueryJobs.
+        queue = []
+        query = {"$or": [{"status": RECEIVED}, {"status": SCHEDULED}]}
+        qr = self._collection.find(query).sort("timeissued")
+
+        # Schedule FIFO.
+        order = 1  # order starts from 1
+        for q in qr:
+            queryjob_id = q["_id"]
+            query = {"_id": q["_id"]}
+            update = {"$set": {
+                "order": order,
+                "status": SCHEDULED
+            }}
+            if not self._collection.find_and_modify(query, update):
+                rospy.logerr("Error while writing schedule results!")
+                rospy.signal_shutdown("Bye!")
+
+            # notify updates
+            msg = QueryJob()
+            msg.id = str(queryjob_id)
+            self._pub.publish(msg)
+
+            queue.append(queryjob_id)
+            order += 1
+
+    def execute_queryjobs(self):
+
+        # Execution loop.
+        r = rospy.Rate(1)
+        while not rospy.is_shutdown():
+            # Make sure server is running.
+            rospy.logdebug("Waiting for server...")
+            self._ac.wait_for_server()
+            rospy.logdebug("Connected!")
+
+            # Schedule if there are new QueryJobs.
+            qr = self._collection.find({"status": RECEIVED})
+            if qr.count() > 0:
+                self.schedule_queryjobs_timeissued_FIFO()
+            else:
+                rospy.logdebug("No RECEIVED QueryJob.")
+
+            # Check if there is any QueryJob to execute.
+            qr = self._collection.find({"status": SCHEDULED}).sort("order")
+            if qr.count() == 0:
+                rospy.logdebug("Waiting for a QueryJob...")
+                r.sleep()
+                continue
+
+            # Start a QueryJob.
+            queryjob_id = qr[0]["_id"]
+            query = {"_id": queryjob_id}
+            timestarted = dt.utcnow().replace(tzinfo=utc)
+            update = {"$set": {
+                "timestarted": timestarted,
+                "status": RUNNING
+            }}
+
+            # Notify updates.
+            q = self._collection.find_and_modify(query, update, new=True)
+            if q:
+                msg = torosqueryjob(q)
+                self._pub.publish(msg)
+                goal = RunQueryGoal(msg)
+                self._ac.send_goal(goal)
+                rospy.logdebug("Sent goal: %s" % goal)
+            else:
+                rospy.logerr("Error while writing send_goal results!")
+                rospy.signal_shutdown("Bye!")
+
+            # Finished the QueryJob.
+            rospy.logdebug("Waiting for result...")
+            self._ac.wait_for_result()
+            state = self._ac.get_state()
+            result = self._ac.get_result()
+            rospy.logdebug("Received result: %s" % result)
+            if result is None:
+                result = RunQueryResult()
+                result.result.text = ""
+                result.result.confidence = 0.0
+                result.result.img_path = ""
+
+            status = FAILED
+            if state == GoalStatus.SUCCEEDED:
+                status = SUCCEEDED
+            elif state == GoalStatus.PREEMPTED:
+                status = CANCELED
+
+            query = {"_id": queryjob_id}
+            timecompleted = dt.utcnow().replace(tzinfo=utc)
+            # need to insert new result object at this point of time
+            update = {"$set": {
+                "timecompleted": timecompleted,
+                "status": status,
+                "result": {
+                    "text": result.result.text,
+                    "confidence": result.result.confidence,
+                    "img_path": result.result.img_path
+                }
+            }}
+            q = self._collection.find_and_modify(query, update)
+            if not q:
+                rospy.logerr("Error while writing get_state results!")
+                rospy.signal_shutdown("Bye!")
+            # Notify updates.
+            msg = torosqueryjob(q)
+            self._pub.publish(msg)
+
+            # Send email.
+            if status != RECEIVED and status != SCHEDULED:
+                send_email(msg, result.result.text)
+
+
+# ######################################################################
+# Main
+# ######################################################################
+if __name__ == "__main__":
+    try:
+        node = QueryJobScheduler()
+    except rospy.ROSInterruptException:
+        pass

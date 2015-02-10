@@ -1,0 +1,196 @@
+#!/usr/bin/env python
+
+'''Mock action server based on keyboard.
+'''
+
+import rospy
+
+# System built-ins
+import argparse
+import os
+import pytz
+from datetime import datetime as dt
+
+# SARA
+from pymongo import MongoClient
+
+# Local
+from sara_uw_website.simpler_action_server import SimplerActionServer
+from sara_uw_website.msg import RunQueryAction, RunQueryResult
+
+
+# ######################################################################
+# Functions
+# ######################################################################
+
+def tolocaldt(rt):
+    ''' Converts rospy.rostime.Time object to .
+    '''
+
+    utc = dt.fromtimestamp(rt.to_sec()).replace(tzinfo=pytz.timezone("UTC"))
+    return utc.astimezone(pytz.timezone("US/Pacific"))
+
+
+# ######################################################################
+# Class
+# ######################################################################
+
+class KeyboardActionServer(SimplerActionServer):
+
+    def __init__(self, actionname, actionmsg):
+        SimplerActionServer.__init__(self, actionname, actionmsg)
+
+    def preempt_cb(self):
+        result = RunQueryResult()
+        result.result.text = 'Successfully canceled your question.'
+        if self._as.is_active():
+            print("\n(Server) Update: Preempting current goal!")
+            self._as.set_preempted(result)
+        if self._update_cb:
+            self._update_cb()
+
+
+class KeyboardRunQueryServer():
+
+    def __init__(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--host", type=str, default="localhost")
+        parser.add_argument("--port", type=int, default=27017)
+        parser.add_argument(
+            "--dbname", type=str, default="sara_uw_website")
+        parser.add_argument(
+            "--collname", type=str, default="queryjobs")
+        args, unknown = parser.parse_known_args()
+
+        # Connect to DB.
+        self._dbname = args.dbname
+        self._collname = args.collname
+        self._client = MongoClient(args.host, args.port)
+        self._db = self._client[self._dbname]
+        self._collection = self._db[self._collname]
+
+        # Create a simple action server.
+        self._server = KeyboardActionServer(
+            "/run_query", RunQueryAction)
+        self.current_goal = None
+
+    def _is_server_updated(self):
+        if not self._server._as.is_active():
+            print("Server is not active.")
+            return True
+        if self.current_goal != self._server._as.current_goal.get_goal():
+            print("Current goal is updated.")
+            return True
+        return False
+
+    def _confirm_img_cp(self, queryjob):
+        while True:
+            print("\n" + str(queryjob.id) + ".png")
+
+            def update_img_confirm():
+                print("\nDid you create the above image? y/N: ")
+            self._server.set_update_db(update_img_confirm)
+            ri = raw_input("Did you create the above image? y/N: ")
+            if ri.lower() == "y":
+                break
+
+    def main(self):
+        r = rospy.Rate(1)
+        while not rospy.is_shutdown():
+
+            # Parse operator input.
+            def update_cb_press():
+                print("\nPress any key to see server state: ")
+            self._server.set_update_db(update_cb_press)
+            raw_input("\nPress any key to see server state: ")
+            if not self._server._as.is_active():
+                print("Server is not active.")
+                continue
+
+            # Displays information about current goal.
+            print("Information about server's current goal:")
+            self.current_goal = self._server._as.current_goal.get_goal()
+            queryjob = self.current_goal.queryjob
+
+            # Passed deadline.
+            if queryjob.deadline < rospy.Time.now():
+                result = RunQueryResult()
+                result.result.text = ("Sorry, could not answer your question "
+                                      "by the deadline.")
+                self._server.abort(result)
+                continue
+
+            # Print info about the current goal.
+            timeissued_local = tolocaldt(queryjob.timeissued)
+            deadline_local = tolocaldt(queryjob.deadline)
+            print("  QueryJob ID: {0}".format(queryjob.id))
+            print("  User name: {0}".format(queryjob.user.name))
+            print("  Timeissued: {0}".format(timeissued_local))
+            print("  Typed CMD: {0}".format(queryjob.typed_cmd))
+            print("  SMS: {0}".format(queryjob.notification_sms))
+            print("  Email: {0}".format(queryjob.notification_email))
+            print("  Deadline: {0}".format(deadline_local))
+
+            # Ask server action to take from the user.
+            def update_cb_choose():
+                print("\nChoose to (s)ucceed, (p)reempt, (a)bort and (q)uit: ")
+            self._server.set_update_db(update_cb_choose)
+            ri = raw_input(
+                "Choose to (s)ucceed, (p)reempt, (a)bort and (q)uit: ")
+            # Check if something has changed.
+            if self._is_server_updated():
+                continue
+
+            # Parse the user input
+            if ri == "q":
+                print("Aborting and closing.")
+                self._server.abort()
+                rospy.signal_shutdown("Done.")
+            elif ri not in ["s", "p", "a", "q"]:
+                print("Unknown input: {0}".format(ri))
+                continue
+
+            result = RunQueryResult()
+            if ri == "s":
+                def update_success_msg():
+                    print("\nDUB-E's success message: ")
+                self._server.set_update_db(update_success_msg)
+                result.result.text = raw_input("DUB-E's success message: ")
+
+                def update_confidence():
+                    print("\nDUB-E's confidence: ")
+                self._server.set_update_db(update_confidence)
+                result.result.confidence = float(
+                    raw_input("DUB-E's confidence: "))
+                img_path = os.path.join(
+                    "img", "results", self.current_goal.queryjob.id + ".png")
+                result.result.img_path = img_path
+                if self._is_server_updated():
+                    continue
+                self._server.succeed(result)
+                self._confirm_img_cp(queryjob)
+            elif ri == "p":
+                result.result.text = raw_input("DUB-E's cancel message: ")
+                if self._is_server_updated():
+                    continue
+                self._server.preempt(result)
+            elif ri == "a":
+                result.result.text = raw_input("DUB-E's abort message: ")
+                if self._is_server_updated():
+                    continue
+                self._server.abort(result)
+
+            r.sleep()
+
+
+# ######################################################################
+# Main
+# ######################################################################
+if __name__ == "__main__":
+    rospy.init_node("keyboard_run_query_server")
+    try:
+        keyboardRunQueryServer = KeyboardRunQueryServer()
+        keyboardRunQueryServer.main()
+
+    except rospy.ROSInterruptException:
+        pass

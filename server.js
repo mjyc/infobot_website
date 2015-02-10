@@ -14,14 +14,16 @@ var mongo = require('mongoskin');
 var passport = require('passport');
 var flash = require('connect-flash');
 var expressSession = require('express-session');
+var connectMongo = require('connect-mongo');
+var ROSLIB = require('roslib');
 
 // Locals.
-var database = require('./config/database.js');
-var session = require('./config/session.js');
+var config = require('config');
 var routesBasic = require('./routes/basic');
 var routesUsers = require('./routes/users');
 var routesQueryjobs = require('./routes/queryjobs');
 var routesComments = require('./routes/comments');
+var routesHearts = require('./routes/hearts');
 
 
 // =====================================================================
@@ -29,14 +31,13 @@ var routesComments = require('./routes/comments');
 // =====================================================================
 
 // DB.
-var dbUrl = (JSON.parse(process.env.TEST || false) ?
-  database.urlTest : database.url);
+var dbUrl = config.get('dbConfig').url;
 var db = mongo.db(dbUrl, {
   native_parser: true
 }); // connect to db
 
 // Passport.
-require('./config/passport')(passport, db, process.env.NODE_ENV);
+require('./config/passport')(passport, db);
 
 
 // =====================================================================
@@ -45,21 +46,29 @@ require('./config/passport')(passport, db, process.env.NODE_ENV);
 
 var app = express();
 
+// Setup
+var MongoStore = connectMongo(expressSession);
+var sessionStore = new MongoStore({
+  url: dbUrl
+});
+
 // View engine setup.
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
 app.use(logger('dev'));
+app.use(cookieParser(config.get('sessionSecret')));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/bower_components', express.static(__dirname + '/bower_components'));
-
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(expressSession({
-  secret: session.secret
+  store: sessionStore,
+  secret: config.get('sessionSecret'),
+  name: config.get('cookieKey'),
+  resave: true,
+  saveUninitialized: true
 }));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in
@@ -68,7 +77,8 @@ app.use(flash()); // use connect-flash for flash messages stored in
 // Make our db and MODE accessible to our router.
 app.use(function(req, res, next) {
   req.db = db;
-  req.PROD = (process.env.NODE_ENV === 'production');
+  req.DEV = (app.get('env') === 'development');
+  req.ROSURL = config.get('rosConfig').url;
   next();
 });
 
@@ -88,6 +98,7 @@ app.use('/', routesBasic);
 app.use('/users', routesUsers);
 app.use('/queryjobs', routesQueryjobs);
 app.use('/comments', routesComments);
+app.use('/hearts', routesHearts);
 
 // For angular.
 app.get('*', function(req, res) {

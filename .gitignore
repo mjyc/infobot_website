@@ -1,7 +1,8 @@
 public/img/results
 .rebooted
-config
+config/production.json
 db
 node_modules
-bower_components
+public/bower_components
 tmp
+smtp_password_dub-e_at_dub-e_org

@@ -1,0 +1,11 @@
+.container(style="margin-top: 20px;")
+  p(style='red') Click submit button twice or press enter key twice to submit your question.
+  form(ng-submit="submitQuestion()")
+    .form-horizontal
+      .form-group.form-group-lg.question-box
+        .input-group
+          input.form-control(type="text", placeholder="Type question here",
+            ng-model="typed_cmd")
+          .input-group-btn
+            button.btn.btn-primary.btn-lg Submit
+  {{parsed_cmd}}
