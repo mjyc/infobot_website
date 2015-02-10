@@ -8,7 +8,6 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
   message_generation
-  message_generation
   rospy
   std_msgs
 )
