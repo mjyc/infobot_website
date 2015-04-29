@@ -25,7 +25,7 @@ make; make install
 # install canvas
 sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
 sudo apt-get install libgif-dev
-cd ~/path/to/sara_uw_website
+roscd sara_uw_website  # cd ~/path/to/sara_uw_website
 npm install canvas
 
 # install node dependencies
@@ -49,7 +49,7 @@ First make sure ROS is prepared for running the website server. See [this wiki](
 
 ```
 # install canvas
-cd ~/path/to/sara_uw_website
+roscd sara_uw_website  # cd ~/path/to/sara_uw_website
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
 npm install canvas
 
@@ -69,7 +69,7 @@ bower install
 #### Using [Grunt](http://gruntjs.com/)
 
 ```
-cd ~/path/to/sara_uw_website
+roscd sara_uw_website  # cd ~/path/to/sara_uw_website
 grunt
 ```
 
@@ -78,14 +78,14 @@ grunt
 On first terminal, run
 
 ```
-cd ~/path/to/sara_uw_website
+roscd sara_uw_website  # cd ~/path/to/sara_uw_website
 roslaunch launch/webserver.launch
 ```
 
 On second terminal, run
 
 ```
-cd ~/path/to/sara_uw_website
+roscd sara_uw_website  # cd ~/path/to/sara_uw_website
 node bin/www
 ```
 
