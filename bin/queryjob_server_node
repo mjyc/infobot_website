@@ -61,6 +61,7 @@ def torostime(t):
         s = 0
     return rospy.Time(s)
 
+
 def torosresult(r):
     ''' Converts queryjob.result retrieved from DB to
     sara_uw_website/Result msg.
@@ -71,6 +72,7 @@ def torosresult(r):
     else:
         return Result()
 
+
 def torosuser(u):
     ''' Converts queryjob.result retrieved from DB to
     sara_uw_website/Result msg.
@@ -80,6 +82,7 @@ def torosuser(u):
         return User(u["email"], u["name"])
     else:
         return User()
+
 
 def torosqueryjob(queryjob):
     ''' Converts queryjob retrieved from DB to sara_uw_website/QueryJob
@@ -105,8 +108,8 @@ def torosqueryjob(queryjob):
 
     return msg
 
-# For sending email.
 
+# For sending email.
 def run_command(cmd, stdin=None):
     print "Running command: " + cmd
     if stdin is not None:
@@ -127,6 +130,7 @@ def run_command(cmd, stdin=None):
     rc = proc.returncode
     return rc, out
 
+
 def get_smtp_passwd():
     ''' Reads SMTP password from the file.
     '''
@@ -141,6 +145,7 @@ def get_smtp_passwd():
         print("Error: Cannot read the password from '" + passFile + "'.")
         return None
     return str.strip()
+
 
 def send_any_email(to, subject, message):
 
@@ -158,6 +163,7 @@ def send_any_email(to, subject, message):
         print "Done!"
     else:
         print "Error!"
+
 
 def send_email(queryjob, text):
     first_name = queryjob.user.name.split(" ")[0]

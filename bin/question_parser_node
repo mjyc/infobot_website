@@ -3,12 +3,14 @@
 from sara_uw_website.srv import *
 import rospy
 
+
 def handle_parse_question(req):
     if "error" in req.typed_cmd:
         parsed_cmd = req.typed_cmd + " error!"
     else:
         parsed_cmd = req.typed_cmd + " parsed!"
     return ParseQuestionResponse(parsed_cmd)
+
 
 def parse_question_server():
     rospy.init_node('parse_question_server')
