@@ -43,27 +43,6 @@ bower install
 sudo apt-get install sendemail
 ```
 
-#### On Mac OS X 10.9
-
-First make sure ROS is prepared for running the website server. See [this wiki](https://github.com/pronobis/sara/wiki/Draft-of-Installation-Instructions-for-Mac-OS-X-10.9) for setting ROS on Mac OS X.
-
-```
-# install canvas
-roscd infobot_website  # cd ~/path/to/infobot_website
-export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
-npm install canvas
-
-# install node dependencies
-npm install  # install node dependencies
-npm install bson
-npm install -g grunt-cli  # grunt is like makefile for node
-npm install -g node-inspector  # for debugging
-
-# install web components
-npm install -g bower
-bower install
-```
-
 ## Running Website Server
 
 #### Using [Grunt](http://gruntjs.com/)
