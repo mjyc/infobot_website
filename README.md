@@ -8,8 +8,6 @@ See [MongoDB Website](http://docs.mongodb.org/manual/installation/) for details.
 
 #### On Ubuntu 14.04
 
-Do not copy and paste below code, but actual
-
 ```
 # install node--note that you can use any version > v0.10.32
 if [ ! -d ~/code ]; then mkdir -p ~/local/src; fi;
