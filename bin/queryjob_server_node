@@ -26,10 +26,10 @@ from bson.objectid import ObjectId
 from pymongo import MongoClient
 
 # Local
-from sara_uw_website.msg import (
+from infobot_website.msg import (
     RunQueryAction, RunQueryGoal, RunQueryResult, QueryJob, Result, User
 )
-from sara_uw_website.srv import (
+from infobot_website.srv import (
     CancelQueryJob,
     CancelQueryJobResponse,
 )
@@ -64,7 +64,7 @@ def torostime(t):
 
 def torosresult(r):
     ''' Converts queryjob.result retrieved from DB to
-    sara_uw_website/Result msg.
+    infobot_website/Result msg.
     '''
 
     if r:
@@ -75,7 +75,7 @@ def torosresult(r):
 
 def torosuser(u):
     ''' Converts queryjob.result retrieved from DB to
-    sara_uw_website/Result msg.
+    infobot_website/Result msg.
     '''
 
     if u:
@@ -85,7 +85,7 @@ def torosuser(u):
 
 
 def torosqueryjob(queryjob):
-    ''' Converts queryjob retrieved from DB to sara_uw_website/QueryJob
+    ''' Converts queryjob retrieved from DB to infobot_website/QueryJob
     msg.
     '''
 
@@ -135,7 +135,7 @@ def get_smtp_passwd():
     ''' Reads SMTP password from the file.
     '''
     rospack = rospkg.RosPack()
-    passFile = os.path.join(rospack.get_path("sara_uw_website"), "config",
+    passFile = os.path.join(rospack.get_path("infobot_website"), "config",
                             "smtp_password_dub-e_at_dub-e_org")
     str = ""
     try:
@@ -190,7 +190,7 @@ class QueryJobScheduler:
         # Connect to DB.
         host = rospy.get_param("~host", "localhost")
         port = rospy.get_param("~port", 27017)
-        dbname = rospy.get_param("~dbname", "sara_uw_website")
+        dbname = rospy.get_param("~dbname", "infobot_website")
         collname = rospy.get_param("~collname", "queryjobs")
         client = MongoClient(host, port, tz_aware=True)
         db = client[dbname]

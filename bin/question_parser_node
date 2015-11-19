@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from sara_uw_website.srv import *
+from infobot_website.srv import *
 import rospy
 
 

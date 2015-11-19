@@ -14,9 +14,9 @@ from pytz import utc
 import rospy
 
 # Local
-from sara_uw_website.msg import QueryJob, RunQueryAction
-from sara_uw_website.srv import CancelQueryJob
-from sara_uw_website.simpler_action_server import SimplerActionServer
+from infobot_website.msg import QueryJob, RunQueryAction
+from infobot_website.srv import CancelQueryJob
+from infobot_website.simpler_action_server import SimplerActionServer
 from testutils import random_unix_epoch
 
 
@@ -31,7 +31,7 @@ def test_valid_cancel(self):
     '''
 
     # Create a SimpleActionServer.
-    rospy.init_node("test_sara_uw_website")
+    rospy.init_node("test_infobot_website")
     server = SimplerActionServer(
         "/run_query", RunQueryAction)
 

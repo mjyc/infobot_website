@@ -27,7 +27,7 @@ liveparserController.controller('LiveParserController', ['$scope', function($sco
   var ParseQuestionClient = new ROSLIB.Service({
     ros : ros,
     name : '/parse_question',
-    serviceType : 'sara_uw_website/ParseQuestion'
+    serviceType : 'infobot_website/ParseQuestion'
   });
 
   $scope.submitQuestion = function() {

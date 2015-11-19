@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(sara_uw_website)
+project(infobot_website)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS)

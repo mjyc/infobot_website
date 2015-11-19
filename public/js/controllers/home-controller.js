@@ -55,7 +55,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
     var listener = new ROSLIB.Topic({
       ros: $scope.ros,
       name: '/queryjob',
-      messageType: 'sara_uw_website/QueryJob'
+      messageType: 'infobot_website/QueryJob'
     });
     listener.subscribe(function(msg) {
       reloadQueryjob(msg.id);
@@ -69,7 +69,7 @@ homeControllers.controller('HomeController', ['$scope', '$http', '$modal',
       var addTwoIntsClient = new ROSLIB.Service({
         ros : $scope.ros,
         name : '/cancel_queryjob',
-        serviceType : 'sara_uw_website/CancelQueryJob'
+        serviceType : 'infobot_website/CancelQueryJob'
       });
       addTwoIntsClient.callService(request, function(result) {
         if (result.success) {

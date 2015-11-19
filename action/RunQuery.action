@@ -1,5 +1,5 @@
 # Placeholder action definition.
-sara_uw_website/QueryJob queryjob
+infobot_website/QueryJob queryjob
 ---
-sara_uw_website/Result result
+infobot_website/Result result
 ---

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var debug = require('debug')('sara_uw_website');
+var debug = require('debug')('infobot_website');
 var app = (process.argv.length > 2 && process.argv[2] === 'down') ? require('../serverdown'):require('../server');
 
 app.set('port', process.env.PORT || 8080);

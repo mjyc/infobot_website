@@ -4,7 +4,7 @@
   <arg name="exclude_mongodb" default="false"/>
   <arg name="host" default="localhost"/>
   <arg name="port" default="27017"/>
-  <arg name="dbname" default="sara_uw_website"/>
+  <arg name="dbname" default="infobot_website"/>
   <arg name="collname" default="queryjobs"/>
 
   <arg name="rosbridge_address" default=""/>
@@ -21,7 +21,7 @@
   </include>
 
   <!-- Run QueryJob handlers -->
-  <node name="queryjob_scheduler" pkg="sara_uw_website" type="queryjob_server_node" output="screen" respawn="True">
+  <node name="queryjob_scheduler" pkg="infobot_website" type="queryjob_server_node" output="screen" respawn="True">
     <param name="host" type="str" value="$(arg host)"/>
     <param name="port" type="int" value="$(arg port)"/>
     <param name="dbname" type="str" value="$(arg dbname)"/>

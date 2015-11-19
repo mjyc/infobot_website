@@ -15,8 +15,8 @@ from datetime import datetime as dt
 from pymongo import MongoClient
 
 # Local
-from sara_uw_website.simpler_action_server import SimplerActionServer
-from sara_uw_website.msg import RunQueryAction, RunQueryResult
+from infobot_website.simpler_action_server import SimplerActionServer
+from infobot_website.msg import RunQueryAction, RunQueryResult
 
 
 # ######################################################################
@@ -57,7 +57,7 @@ class KeyboardRunQueryServer():
         parser.add_argument("--host", type=str, default="localhost")
         parser.add_argument("--port", type=int, default=27017)
         parser.add_argument(
-            "--dbname", type=str, default="sara_uw_website")
+            "--dbname", type=str, default="infobot_website")
         parser.add_argument(
             "--collname", type=str, default="queryjobs")
         args, unknown = parser.parse_known_args()

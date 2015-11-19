@@ -13,7 +13,7 @@ dt = datetime.datetime
 from pymongo import MongoClient
 
 # Local
-from sara_uw_website.msg import QueryJob
+from infobot_website.msg import QueryJob
 
 
 # ######################################################################
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     parser.add_argument("--host", type=str, default="localhost")
     parser.add_argument("--port", type=int, default=27017)
     parser.add_argument(
-        "--dbname", type=str, default="sara_uw_website")
+        "--dbname", type=str, default="infobot_website")
     parser.add_argument(
         "--collname", type=str, default="queryjobs")
     # db arguments

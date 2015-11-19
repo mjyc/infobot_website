@@ -53,9 +53,9 @@ class TestQueryJobStore(unittest.TestCase):
         parser.add_argument("--host", type=str, default="localhost")
         parser.add_argument("--port", type=int, default=27017)
         parser.add_argument(
-            "--dbname", type=str, default="test_sara_uw_website")
+            "--dbname", type=str, default="test_infobot_website")
         parser.add_argument(
-            "--collname", type=str, default="test_sara_uw_website")
+            "--collname", type=str, default="test_infobot_website")
         args, unknown = parser.parse_known_args()
 
         self._dbname = args.dbname

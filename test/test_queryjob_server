@@ -20,7 +20,7 @@ from test_queryjob_server_cancel import test_valid_cancel
 # Module level constants
 # ######################################################################
 
-PKG = "sara_uw_website"
+PKG = "infobot_website"
 
 
 # ######################################################################
