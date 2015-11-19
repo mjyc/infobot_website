@@ -1,4 +1,4 @@
-# sara_uw_website
+# infobot_website
 
 ## Installing Dependencies
 
@@ -25,7 +25,7 @@ make; make install
 # install canvas
 sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
 sudo apt-get install libgif-dev
-roscd sara_uw_website  # cd ~/path/to/sara_uw_website
+roscd infobot_website  # cd ~/path/to/infobot_website
 npm install canvas
 
 # install node dependencies
@@ -49,7 +49,7 @@ First make sure ROS is prepared for running the website server. See [this wiki](
 
 ```
 # install canvas
-roscd sara_uw_website  # cd ~/path/to/sara_uw_website
+roscd infobot_website  # cd ~/path/to/infobot_website
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
 npm install canvas
 
@@ -69,7 +69,7 @@ bower install
 #### Using [Grunt](http://gruntjs.com/)
 
 ```
-roscd sara_uw_website  # cd ~/path/to/sara_uw_website
+roscd infobot_website  # cd ~/path/to/infobot_website
 grunt
 ```
 
@@ -78,14 +78,14 @@ grunt
 On first terminal, run
 
 ```
-roscd sara_uw_website  # cd ~/path/to/sara_uw_website
+roscd infobot_website  # cd ~/path/to/infobot_website
 roslaunch launch/webserver.launch
 ```
 
 On second terminal, run
 
 ```
-roscd sara_uw_website  # cd ~/path/to/sara_uw_website
+roscd infobot_website  # cd ~/path/to/infobot_website
 node bin/www
 ```
 
@@ -99,24 +99,24 @@ This node is a ROS server that supplements the Node.js webserver (e.g., server.j
 
 ##### Action Subscribed Topics
 
-* `run_query/result` (sara_uw_website/RunQueryActionResult)
+* `run_query/result` (infobot_website/RunQueryActionResult)
   * Monitor result from the robot-side executor.
 
 ##### Action Published Topics
 
-* `run_query/goal` (sara_uw_website/RunQueryActionGoal)
+* `run_query/goal` (infobot_website/RunQueryActionGoal)
   * Sends goals to the robot-side executor.
 * `run_query/cancel` (actionlib_msgs/GoalID)
   * Sends cancel requests to the robot-side executor.
 
 #### Published Topics
 
-* `queryjob` (sara_uw_website/QueryJob)
+* `queryjob` (infobot_website/QueryJob)
   * Updated queryjob wrapped in ROS msg.
 
 #### Services
 
-* `cancel_queryjob` (sara_uw_website/CancelQueryJob)
+* `cancel_queryjob` (infobot_website/CancelQueryJob)
   * Cancel service can be called at any stage of scheduling.
 
 ### question_parser_node
