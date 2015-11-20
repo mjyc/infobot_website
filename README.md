@@ -16,7 +16,7 @@ git clone https://github.com/joyent/node.git
 cd node
 git checkout tags/v0.10.32
 ./configure --prefix=~/local
-make; make install
+make && make install
 # make sure to add ~/local/bin to $PATH
 # e.g., echo 'export PATH=~/local/bin:$PATH' >> ~/.bashrc
 
