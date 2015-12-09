@@ -4,7 +4,7 @@
   <!-- Package Info -->
   <name>infobot_website</name>
   <version>0.0.0</version>
-  <description>SARA Framework: InfoBot Website.</description>
+  <description>InfoBot Framework: InfoBot Website.</description>
   <maintainer email="mjyc@cs.washington.edu">Michael Jae-Yoon Chung</maintainer>
   <author email="mjyc@cs.washington.edu">Michael Jae-Yoon Chung</author>
   <license>TODO</license>

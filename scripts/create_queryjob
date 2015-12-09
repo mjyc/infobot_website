@@ -9,7 +9,7 @@ from pytz import utc
 import datetime
 dt = datetime.datetime
 
-# SARA
+# InfoBot
 from pymongo import MongoClient
 
 # Local

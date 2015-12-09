@@ -2,7 +2,7 @@
 <launch>
 
   <!-- Run QueryJob handlers -->
-  <include file="$(find sara_uw_websit)/test/test_queryjob_scheduler.test">
+  <include file="$(find infobot_uw_websit)/test/test_queryjob_scheduler.test">
     <arg name="host" value="localhost"/>
     <arg name="port" value="27017"/>
     <arg name="dbname" value="infobot_website"/>

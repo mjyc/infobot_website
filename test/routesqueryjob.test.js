@@ -15,10 +15,10 @@ var config = require('config');
 
 // DB setups.
 // Make sure the test database is clean.
-var sara_db = mongo.db(config.get('test.dbConfig.url'), {
+var infobot_db = mongo.db(config.get('test.dbConfig.url'), {
   native_parser: true
 });
-sara_db.collectionNames(function(err, items) {
+infobot_db.collectionNames(function(err, items) {
   expect(items).to.eql([]); // MUST NOT BE USED!
 });
 // Connect to test db.

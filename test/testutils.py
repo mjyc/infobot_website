@@ -12,7 +12,7 @@ import argparse
 import random
 import unittest
 
-# SARA
+# InfoBot
 from bson.objectid import ObjectId
 from pymongo import MongoClient
 

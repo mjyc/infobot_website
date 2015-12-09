@@ -11,7 +11,7 @@
 
   <!-- Make sure to run DB -->
   <node name="mongo" type="mongo_wrapper_ros.py" pkg="warehouse_ros" output="log" unless="$(arg exclude_mongodb)">
-    <param name="database_path" value="~/sara/db"/>
+    <param name="database_path" value="~/infobot_ws/db"/>
     <param name="overwrite" value="false"/>
   </node>
 

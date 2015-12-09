@@ -11,7 +11,7 @@ import os
 import pytz
 from datetime import datetime as dt
 
-# SARA
+# InfoBot
 from pymongo import MongoClient
 
 # Local
